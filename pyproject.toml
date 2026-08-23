@@ -1,0 +1,56 @@
+# For more information about the structure of this file, see:
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+[project]
+name = "dss5105-capstone-project"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.3.16,<2.0.0",
+    "langchain-anthropic>=1.6.1,<2.0.0",
+    "langchain-core>=1.6.0,<2.0.0",
+    "langchain-openai>=1.6.0,<2.0.0",
+    "python-dotenv>=1.0",
+]
+
+# Subset of packages that are used during dev but that are not needed for the built package, think linter etc.
+# https://packaging.python.org/en/latest/specifications/dependency-groups/
+[dependency-groups]
+dev = [
+    "jupyterlab>=4.6.3",
+    "jupytext>=1.19.5,<2.0.0",
+    "nbstripout>=0.9.1,<0.10.0",
+    "pre-commit>=4.6.2,<5.0.0",
+    "pytest>=9.1.1,<10.0.0",
+    "ruff>=0.16.4,<0.17.0",
+]
+
+# Specifies what is used for building the project.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Ruff: our formatter and linter (replaces black + flake8 + isort).
+[tool.ruff]
+line-length = 119
+
+# Formatting and tidiness:
+# - E is pycodestyle (line length, whitespace habits)
+# - F is pyflakes (unused imports, undefined names)
+# - I sorts imports
+# Ruff autofixes nearly all of it, so pre-commit fixes rather than CI failing.
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+# Paired notebook .py files: imports appear where they're needed (E402) and
+# often before they're used (F401). Fine while exploring, not fine in src/.
+[tool.ruff.lint.per-file-ignores]
+"notebooks/**" = ["E402", "F401"]
+
+# Tests that hit a real provider are opt-in only. CI never pays for tokens.
+#   uv run pytest            normal suite, live tests skipped
+#   uv run pytest -m live    only the live tests (needs API keys in .env)
+#   uv run pytest -m ''      everything
+[tool.pytest.ini_options]
+markers = ["live: hits a real LLM API; costs money"]  # Tag tests with @pytest.mark.live.
+addopts = "-m 'not live' --strict-markers"  # Default filter; error on unknown markers.
+testpaths = ["tests"]
