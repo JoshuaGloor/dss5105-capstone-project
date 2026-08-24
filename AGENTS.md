@@ -12,7 +12,7 @@ short version of the same rules, so keep the two in agreement.
 
 ## Models
 
-- Build chat models with `get_model()` from `src/dss5105_capstone_project/llm.py`.
+- Build chat models with `get_model()` from `src/dss5105/llm.py`.
   Do not construct `ChatAnthropic`, `ChatOpenAI`, or call `init_chat_model()`
   anywhere else.
 - The model comes from `LLM_MODEL` in `.env`. Never hardcode a model name.

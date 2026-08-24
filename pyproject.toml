@@ -29,6 +29,11 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# Our code lives in src/dss5105, it deliberately doesn't match the project (shorter to import).
+# Without this, hatchling looks for src/dss5105_capstone_project and the build fails.
+[tool.hatch.build.targets.wheel]
+packages = ["src/dss5105"]
+
 # Ruff: our formatter and linter (replaces black + flake8 + isort).
 [tool.ruff]
 line-length = 119

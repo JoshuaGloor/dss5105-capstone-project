@@ -5,11 +5,12 @@
 ## Quickstart
 
 ```bash
-git clone <repo> && cd <repo>
-uv sync --all-groups       # installs everything into .venv
-uv run pre-commit install  # sets up the commit-time checks
-cp .env.example .env       # then paste in your own API key
-uv run pytest              # should pass, and costs nothing
+git clone git@github.com:JoshuaGloor/dss5105-capstone-project.git
+cd dss5105-capstone-project
+uv sync --all-groups         # installs everything into .venv
+uv run pre-commit install    # sets up the commit-time checks
+cp .env.example .env         # then paste in your own API key
+uv run pytest                # see current tests pass
 ```
 
 As suggested by the course, we run and manage everything using `uv`.
@@ -23,7 +24,7 @@ and `tests/`, and the rest quietly keeps everyone's setup in sync.
 
 | File | What it's for | When it comes up |
 |---|---|---|
-| `src/dss5105_capstone_project/` | Our actual code | This is where we build |
+| `src/dss5105/` | Our actual code | This is where we build |
 | `tests/` | Tests for that code | Alongside the code we write |
 | `notebooks/` | Exploration and analysis | For exploration using notebooks |
 | `.env` (yours; don't commit) | Your own API key | Once, during setup |
@@ -32,7 +33,7 @@ and `tests/`, and the rest quietly keeps everyone's setup in sync.
 | `.python-version` | The one Python we all run; `pyproject.toml` only sets a minimum | Static, never changes for this course |
 | `.env.example` | Template listing which keys exist | When a new env variable should be added |
 | `.gitignore` | What git deliberately ignores | Sometimes |
-| `AGENTS.md` | Same rules, written for AI coding agents | When a convention here changes |
+| `AGENTS.md` | Same rules, written for AI coding agents | When an agent (or you) decides to modify this |
 | `CLAUDE.md` | One-line pointer to `AGENTS.md` | Never |
 | `.pre-commit-config.yaml` | Checks that run as we commit | Runs on its own, at commit time |
 | `.github/workflows/ci.yaml` | Checks that run on a pull request | Runs on its own, on every PR |
@@ -54,7 +55,7 @@ two have drifted apart.
 
 ### 2. The code: `src/`, `tests/`
 
-`src/dss5105_capstone_project/` holds the package, `tests/` holds its tests.
+`src/dss5105/` holds the package, `tests/` holds its tests.
 
 LangChain allows us to code in a vendor agnostic way.
 Both classes, `ChatOpenAI` and `ChatAnthropic` are `BaseChatModel`s.
