@@ -163,6 +163,17 @@ That keeps outputs and unreadable JSON diffs out of Git, and avoids bloating the
 it has to be in sync with its `.py`.**
 CI checks exactly that and fails if the two disagree ([PR-time checks](#5-pr-time-checks-ciyaml)).
 
+**Committing rewrites the notebook.** The commit hooks sync your edits into the
+`.py`, let ruff format it, then write the result back into the `.ipynb`. So if
+the notebook is open in Jupyter while you commit, reload it before carrying on.
+Otherwise the stale buffer saves the old, unformatted source back over what the
+hooks just did.
+
+For the same reason, **edit one side at a time**. If both an `.ipynb` and its
+`.py` change before a sync, jupytext keeps whichever was written last and
+silently discards the other. Work in the notebook, or work in the script, and
+sync in between.
+
 #### 6.1 How to use Jupytext
 
 For a quick run, start JupyterLab with:

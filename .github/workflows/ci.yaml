@@ -44,12 +44,20 @@ jobs:
       - name: Check pre-commit
         run: uv run pre-commit run --all-files --show-diff-on-failure
 
-      # Paired notebooks are synced by hand (see README). But enforced here:
-      # If the .py and .ipynb disagree, the sync produces a diff and we fail.
+      # If a committed .ipynb and its .py disagree, the sync rewrites a tracked
+      # file and we fail. `git diff`, not `git status`: syncing a .py-only commit
+      # legitimately generates an untracked .ipynb, which must not fail the build.
+      #
+      # Expected behaviour:
+      #   | committed             | sync does                     | result |
+      #   |-----------------------|-------------------------------|--------|
+      #   | .py only              | generates an untracked .ipynb | pass   |
+      #   | .py + .ipynb, in sync | nothing                       | pass   |
+      #   | .py + .ipynb, drifted | rewrites a tracked file       | fail   |
       - name: Notebooks in sync
         run: |
           find notebooks -name '*.ipynb' -exec uv run jupytext --sync {} +
-          test -z "$(git status --porcelain -- notebooks/)"
+          git diff --exit-code -- notebooks/
 
       - name: Tests
         run: uv run pytest

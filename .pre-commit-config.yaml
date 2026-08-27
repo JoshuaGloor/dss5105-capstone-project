@@ -7,6 +7,18 @@
 repos:
   - repo: local
     hooks:
+      # Notebooks are handled as sync -> format -> sync, so that ruff only ever
+      # writes the .py and jupytext is the only thing that writes the .ipynb.
+      # Step 1: pull whichever half you edited into the .py.
+      - id: jupytext-sync-in
+        name: jupytext sync (notebook edits into .py)
+        entry: uv run jupytext --sync
+        language: system
+        files: ^notebooks/.*\.(ipynb|py)$
+        require_serial: true
+
+      # Step 2: ruff, on .py only. Formatting the .ipynb here instead would
+      # leave the pair out of sync and redden CI on the next PR.
       - id: ruff-check
         name: ruff check
         entry: uv run ruff check --fix
@@ -18,6 +30,14 @@ repos:
         entry: uv run ruff format
         language: system
         types_or: [python, pyi]
+        require_serial: true
+
+      # Step 3: push the formatting ruff just applied back into the .ipynb.
+      - id: jupytext-sync-out
+        name: jupytext sync (formatting back into .ipynb)
+        entry: uv run jupytext --sync
+        language: system
+        files: ^notebooks/.*\.(ipynb|py)$
         require_serial: true
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
