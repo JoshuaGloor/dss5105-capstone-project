@@ -33,6 +33,7 @@ and `tests/`, and the rest quietly keeps everyone's setup in sync.
 | `.python-version` | The one Python we all run; `pyproject.toml` only sets a minimum | Static, never changes for this course |
 | `.env.example` | Template listing which keys exist | When a new env variable should be added |
 | `.gitignore` | What git deliberately ignores | Sometimes |
+| `CONTRIBUTING.md` | Step-by-step setup and how to contribute | Whenever helpful |
 | `AGENTS.md` | Same rules, written for AI coding agents | When an agent (or you) decides to modify this |
 | `CLAUDE.md` | One-line pointer to `AGENTS.md` | Never |
 | `.pre-commit-config.yaml` | Checks that run as we commit | Runs on its own, at commit time |
@@ -61,10 +62,14 @@ LangChain allows us to code in a vendor agnostic way.
 Both classes, `ChatOpenAI` and `ChatAnthropic` are `BaseChatModel`s.
 We can use [`init_chat_model`](https://reference.langchain.com/python/langchain/chat_models/base/init_chat_model) with the model string to take advantage of this.
 `get_model()` in `llm.py` provides a simple wrapper for that: in our scripts we
-call `get_model()` and it returns the model named by `LLM_MODEL` in `.env`, with
-`temperature=0.0` so our results stay reproducible. If `LLM_MODEL` isn't set, it
-fails right away with a message telling you what to fix, instead of breaking
-confusingly later.
+call `get_model()` and it returns the model named by `LLM_MODEL` in `.env`. If
+`LLM_MODEL` isn't set, it fails right away with a message telling you what to
+fix, instead of breaking confusingly later.
+
+We deliberately don't set `temperature`. Recent Anthropic models (Sonnet 5,
+Opus 5 and newer) reject it with a 400, so passing it would break the default
+provider. That means we can't dial in determinism that way, and identical
+prompts can give slightly different answers.
 
 We can use `llm.py` to add anything that is model related later as well.
 

@@ -7,8 +7,11 @@ from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
 
 
-def get_model(*, temperature: float = 0.0, **kwargs) -> BaseChatModel:
+def get_model(**kwargs) -> BaseChatModel:
     """Chat model named by LLM_MODEL, e.g. anthropic:claude-sonnet-5 or openai:gpt-4.1.
+
+    We don't set temperature: recent Anthropic models reject it outright (400).
+    Pass it yourself if you're on a provider that still accepts it.
 
     Raises RuntimeError if LLM_MODEL is missing or empty.
     """
@@ -18,4 +21,4 @@ def get_model(*, temperature: float = 0.0, **kwargs) -> BaseChatModel:
         raise RuntimeError(
             "LLM_MODEL is not set. Copy .env.example to .env and set it, e.g. LLM_MODEL=anthropic:claude-sonnet-5"
         )
-    return init_chat_model(spec, temperature=temperature, **kwargs)
+    return init_chat_model(spec, **kwargs)
