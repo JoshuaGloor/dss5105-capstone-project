@@ -50,3 +50,7 @@ from dss5105.llm import get_model
 model = get_model()
 resp = model.invoke("In Singlish, congratulate the user for finishing DSS5105 GitHub setup. One sentences.")
 resp.content
+
+# %% [markdown]
+# Edit a line here if you want:
+# - Joshua - setup completed.
