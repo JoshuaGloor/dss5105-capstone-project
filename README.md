@@ -187,7 +187,7 @@ For a quick run, start JupyterLab with:
 uv run jupyter lab
 ```
 
-Right-click a `.py` file and select **Open With > Notebook** to run it as a notebook.
+Right-click a `.py` file and select **Open With > Jupytext Notebook** to run it as a notebook.
 
 For VS Code, install the
 [jupytext extension](https://marketplace.visualstudio.com/items?itemName=congyiwu.vscode-jupytext)
