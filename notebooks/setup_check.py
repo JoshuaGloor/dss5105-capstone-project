@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.19.5
 #   kernelspec:
-#     display_name: dss5105-capstone-project (3.12.x)
+#     display_name: dss5105-capstone-project (3.12.12)
 #     language: python
 #     name: python3
 # ---
@@ -54,3 +54,7 @@ resp.content
 # %% [markdown]
 # Edit a line here if you want:
 # - Joshua - setup completed.
+# - Ruby - setup completed.
+
+# %% [markdown]
+#
