@@ -3,6 +3,39 @@
 Notes for AI coding agents. Humans want [README.md](README.md); this is the
 short version of the same rules, so keep the two in agreement.
 
+## The project
+
+We are building Track 2: the Quick-Response Subcontracting Desk. Read these before
+writing code, in this order:
+
+- [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md) - the problem, our thesis, the
+  architecture, roles, deliverables and dates.
+- [docs/DATA_FINDINGS.md](docs/DATA_FINDINGS.md) - what the data actually says. Measured,
+  not guessed. Do not re-derive these numbers; if you change the data, update the file.
+- [docs/TOOL_SPEC.md](docs/TOOL_SPEC.md) - the tool contracts. Build against them.
+- [docs/EVALUATION_PLAN.md](docs/EVALUATION_PLAN.md) - what "working" means and how it is
+  measured.
+
+Two rules that override convenience:
+
+- **The LLM never does arithmetic.** Every numeral shown to a user must trace back to a
+  tool output. A hallucinated delivery estimate is the worst failure in this track and we
+  check compliance automatically.
+- **The objective is configuration, not a branch.** Lateness, defects, fairness and cost
+  are weights passed into the scorer, never `if` statements in allocation logic.
+
+## Track 2 data and harness
+
+- `track2/data/` and `track2/harness/simulate.py` are provided course material, committed
+  deliberately: the tracks document places no usage restriction on them.
+- **Do not modify `simulate.py` in place.** Every team runs the same file so the numbers
+  stay comparable. To challenge its assumptions, wrap or subclass it and say so in the
+  report.
+- `simulate.py` resolves its data as `../data` relative to itself. Keep the `track2/`
+  layout intact.
+- Call `eligible_workshops()` from the harness rather than reimplementing the eligibility
+  rule, so our decisions and the simulator can never disagree.
+
 ## Environment
 
 - `uv` only. `uv sync --all-groups` to install, `uv run <cmd>` to run anything.
