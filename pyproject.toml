@@ -38,6 +38,13 @@ packages = ["src/dss5105"]
 [tool.ruff]
 line-length = 119
 
+# track2/ is provided course material. simulate.py is the shared harness every team runs,
+# so we keep it byte-identical instead of letting ruff restyle it (it would rewrap the
+# dataclass comments and trip E501 on the report header). force-exclude is required
+# because pre-commit passes filenames explicitly, which otherwise overrides `exclude`.
+extend-exclude = ["track2/"]
+force-exclude = true
+
 # Formatting and tidiness:
 # - E is pycodestyle (line length, whitespace habits)
 # - F is pyflakes (unused imports, undefined names)
