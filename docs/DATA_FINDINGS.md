@@ -1,156 +1,135 @@
-# Data Findings
+# Data and experiment findings
 
-Everything here is measured against the committed data in `track2/`. If you change the
-data, re-run and update this file. Reproduction commands are at the bottom.
+This file separates facts in the course data from observations produced by the
+current experiment runner. Earlier chat notes contained unretained probe results;
+those are not evidence for the current implementation.
 
-"Today" in the dataset is **2026-04-01**. Stages are KNITTING, ASSEMBLY, WASHING, PACKING.
+## Data and simulator facts
 
-## Finding 1: the baselines are not a target
+Sources: [data dictionary](../track2/data/data_dictionary.md),
+[workshops.csv](../track2/data/workshops.csv), and the
+[unmodified simulator](../track2/harness/simulate.py).
 
-A five-line heuristic (pick the eligible shop with the earliest
-`queue + pieces/capacity + lead_days`) beats all three provided baselines by a wide
-margin:
+- The course supplies 120 orders, 8 workshop profiles, and 30 chat requests.
+- The chat inbox is dated 2026-04-01. The simulator instead replays all orders in
+  `order_date` order, starting at the first order's date. Do not apply the inbox's
+  "today" to the historical replay.
+- The simulator uses order ID, category, pieces, order date, and due date. It
+  simulates new outcomes rather than scoring the historical `completed_date` or
+  `days_late` columns. It does not restrict replay to IN_PROGRESS orders.
+- Eligibility requires ACTIVE status, a supported category, and compliance with
+  a batch cap if present. A blank cap means no cap. It does not mean ineligible.
+- W7 OldMill is SUSPENDED and is never reactivated by the simulator. W8 FreshStart
+  has a 300-piece cap; the other profiles have no batch cap.
+- Eligibility does not guarantee timely delivery. Current queue, processing,
+  and transport determine the delivery estimate.
+- `workshops.csv` contains subcontracting `cost_per_piece`. The supplied files do
+  not contain customer selling prices, historical quotes, or past allocations.
+  Workshop cost cannot answer a question about a customer quote.
+- `simulate.py` does not read `dispatch_requests.txt`. Language evaluation is a
+  separate task.
 
-| policy | mean days | p90 | % late | % defect | cost | max share |
+## Reproducible initial experiments
+
+The tables below are copied from the current runner's `Simulator.report()` output
+using seed 5105. They use the existing course data and unmodified harness. The
+saved outputs' source hashes were checked against the current files.
+
+```bash
+uv run python -m dss5105.evaluate --output results/allocation-normal.json
+uv run python -m dss5105.evaluate --shock --output results/allocation-shock.json
+```
+
+Run from a source checkout after `uv sync --all-groups`. JSON records include
+source hashes, seed, weights, scales, choices, queue snapshots, and outcomes.
+Weighted policies include eligible candidate estimates and score components.
+`results/` is generated and Git-ignored; these tables and the runner preserve the
+reproduction route. Retain selected raw artifacts with the final evaluation.
+
+See [ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md) for exact score definitions,
+normalization scales, tie-breaking, and exploratory weights. In particular,
+`lateness` is a greedy point-estimate penalty, not a proven late-rate optimizer.
+
+### Normal scenario
+
+| Policy | Mean days | P90 days | % late | % defect | Cost | Max share |
 |---|---|---|---|---|---|---|
-| `random` | 21.5 | 45.6 | 34% | 4% | 111,780 | 23% |
-| `greedy_biggest` | 49.0 | 80.6 | 84% | 4% | 108,430 | 70% |
-| `cheapest` | 105.1 | 192.9 | 93% | 8% | 85,960 | 70% |
-| **5-line earliest-finish** | **8.1** | **13.7** | **2%** | 5% | 115,640 | 26% |
+| random | 21.5 | 45.6 | 34% | 4% | 111,780 | 23% |
+| greedy_biggest | 49.0 | 80.6 | 84% | 4% | 108,430 | 70% |
+| cheapest | 105.1 | 192.9 | 93% | 8% | 85,960 | 70% |
+| earliest_finish | 8.1 | 13.7 | 2% | 5% | 115,640 | 26% |
+| lateness | 8.1 | 13.7 | 2% | 6% | 115,360 | 25% |
+| defects | 162.5 | 282.1 | 95% | 2% | 129,920 | 70% |
+| hybrid | 20.1 | 32.8 | 17% | 3% | 109,355 | 42% |
 
-Consequence: "we beat the baselines" is table stakes and must not be our headline. The
-real comparison the spec asks for is our full system against the best short heuristic.
+### Shock scenario
 
-## Finding 2: the shock scenario is absorbed almost for free
+| Policy | Mean days | P90 days | % late | % defect | Cost | Max share |
+|---|---|---|---|---|---|---|
+| random | 23.4 | 48.4 | 39% | 4% | 111,780 | 23% |
+| greedy_biggest | 51.0 | 81.2 | 87% | 4% | 108,430 | 70% |
+| cheapest | 103.9 | 190.0 | 92% | 5% | 85,960 | 70% |
+| earliest_finish | 8.4 | 15.4 | 2% | 5% | 115,805 | 26% |
+| lateness | 8.3 | 15.4 | 2% | 6% | 115,665 | 27% |
+| defects | 165.0 | 285.1 | 95% | 2% | 129,920 | 70% |
+| hybrid | 19.6 | 34.1 | 22% | 3% | 109,165 | 41% |
 
-Under `--shock`, earliest-finish degrades only 8.1 -> 8.4 mean days.
+## What these runs support
 
-The reason is mechanical. When a workshop closes, `simulate.py` still advances that
-shop's `queue_free`, so the `queues` dict handed to the allocator already encodes the
-closure one batch after work starts piling up there. Any queue-aware policy therefore
-"adapts" without ever detecting anything.
+- Considering the live queue gives the short earliest-finish heuristic much lower
+  turnaround and late rate than the provided baselines in these runs. Its normal
+  rounded summary matches the earlier notes; the lost script's exact implementation
+  is not established.
+- The weighted lateness policy does not show a substantial advantage over that
+  short heuristic in the displayed turnaround and late-rate metrics. This is an
+  important comparator, not a result to hide.
+- Quality-first routing performs poorly on timeliness in this experiment. It is
+  evidence of a tradeoff for this policy and dataset, not proof that fast and
+  low-defect allocation is mathematically impossible.
+- The hybrid changes the tradeoff: in the normal run it costs less and has fewer
+  simulated defective batches than the lateness policy, but more late batches.
+  It has not been selected as the product default or shown to be Pareto-optimal.
+- Baselines still win on some metrics: cheapest has lower cost than our current
+  policies, and random has lower load concentration than our current policies.
+  A primary-objective win does not imply superiority on every metric.
 
-This is an honest negative result and we will report it as one. The interesting question
-becomes what *explicit* shock detection adds on top, which we measure rather than assume.
+## Metric definitions and inference limits
 
-## Finding 3: quality at speed is arithmetically impossible in this factory
+`mean days` and `p90 days` measure turnaround from dispatch to delivery, not days
+past the deadline. `% late` counts batches whose rounded completion date exceeds
+the due date. It does not measure the severity of lateness. `% defect` counts
+batch-level defect events, not defective garments. `max share` is the largest
+workshop's share of allocated pieces, a concentration proxy rather than a complete
+definition of fairness. The printed percentages are rounded.
 
-This is structural, not a tuning problem.
+Defect draws are stochastic but seeded. Decisions change future queues, so one
+seed does not establish performance across possible runs. A proposed expected
+quality metric can remove the immediate defect-draw noise conditional on a fixed
+allocation; allocations themselves can still change across seeds. No such extra
+metric is exported by the initial `evaluate` runner. The separate weight-search
+runner now reports conditional expected batch-defect exposure; see
+[WEIGHT_TUNING.md](WEIGHT_TUNING.md) for its definition and results.
 
-| shop | defect rate | capacity/day | makes |
-|---|---|---|---|
-| W4 Little Loom | 0.02 | 70 | ACCESSORIES |
-| W2 SteadyHands | 0.03 | 170 | TOPS+ACCESSORIES |
-| W8 FreshStart | 0.04 | 100 | TOPS (max 300/batch) |
-| W1 QuickStitch | 0.12 | 300 | TOPS |
-| W5 GiantWeave | 0.06 | 400 | TOPS |
+In the shock scenario, the target is selected from ACTIVE workshops. The closure
+rule adjusts a chosen batch's start time if it falls in the closure interval; it
+does not change the workshop's status to SUSPENDED. Later queue inputs may expose
+that delay. Current policies use these queues, not explicit failure detection.
+Selecting the shock target also consumes RNG state, so normal/shock differences
+include changed defect draws and are not a clean estimate of the closure alone.
+A dedicated controlled experiment would need a documented wrapper or variant.
 
-The two low-defect shops run 240 pieces/day combined. QuickStitch alone does 300/day at
-six times W2's defect rate. So routing for quality starves capacity: a pure
-minimise-defects policy reaches 2.7% expected defect but **95% late**. That tension is
-the factory's real dilemma and it explains why both `cheapest` and a naive low-defect
-policy collapse.
+## Questions not yet settled
 
-## Finding 4: accessories are the binding constraint
+The earlier weight-sweep and cost-frontier claims have no retained reproduction
+script and are not included as current results. There is no established optimal
+hybrid, proof of incompatible objectives, or verified count of infeasible chat
+requests. Do not tune toward those old numbers.
 
-Only W2 (170/day), W4 (70/day) and W6 (130/day) make ACCESSORIES: 370 pieces/day in
-total. But 27 of the 35 accessory orders exceed 300 pieces, and R20 alone asks for
-2,000 scarves. Every genuinely hard allocation in the inbox is an accessories order.
+Before computing chat feasibility, establish the intended order, quantities,
+requested date, exclusions, and queue-state convention. R12 explicitly excludes
+QuickStitch, so an unconstrained fastest estimate via that shop cannot establish
+feasibility for that request. A past deadline or infeasible request needs an honest
+explanation and options; it does not automatically authorize a late allocation.
 
-## Finding 5: 12 of the 16 allocatable requests cannot hit the date they ask for
-
-This is the finding most likely to be missed. Best achievable completion is computed as
-`current_queue_days + pieces/capacity + pickup_lead_days` from 2026-04-01 across all
-eligible shops.
-
-| req | order | cat | pieces | requested | best possible | via | slip (days) |
-|---|---|---|---|---|---|---|---|
-| R04 | ORD-029 | ACCESSORIES | 1500 | 2026-04-01 | 2026-04-14 | SteadyHands | +13 |
-| R06 | ORD-061 | ACCESSORIES | 800 | 2026-04-05 | 2026-04-09 | Nimble Needle | +4 |
-| R07 | ORD-020 | TOPS | 1200 | 2026-03-31 | 2026-04-10 | QuickStitch | +10 |
-| R09 | ORD-045 | TOPS | 150 | 2026-04-09 | 2026-04-04 | Nimble Needle | -5 |
-| R12 | ORD-053 | TOPS | 800 | 2026-04-10 | 2026-04-09 | QuickStitch | -1 |
-| R16 | ORD-114 | TOPS | 2000 | 2026-03-23 | 2026-04-13 | QuickStitch | +21 |
-| R17 | ORD-120 | TOPS | 1500 | 2026-03-17 | 2026-04-11 | QuickStitch | +25 |
-| R20 | ORD-103 | ACCESSORIES | 2000 | 2026-04-04 | 2026-04-17 | SteadyHands | +13 |
-| R21 | ORD-081 | TOPS | 1500 | 2026-04-13 | 2026-04-11 | QuickStitch | -2 |
-| R22 | ORD-083 | TOPS | 1000 | 2026-03-23 | 2026-04-09 | QuickStitch | +17 |
-| R23 | ORD-093 | ACCESSORIES | 100 | 2026-03-29 | 2026-04-04 | Nimble Needle | +6 |
-| R25 | ORD-109 | TOPS | 500 | 2026-04-13 | 2026-04-07 | Nimble Needle | -6 |
-| R26 | ORD-107 | TOPS | 2000 | 2026-03-16 | 2026-04-13 | QuickStitch | +28 |
-| R27 | ORD-055 | TOPS | 800 | 2026-03-31 | 2026-04-09 | QuickStitch | +9 |
-| R28 | ORD-002 | TOPS | 1000 | 2026-03-29 | 2026-04-09 | QuickStitch | +11 |
-| R30 | ORD-099 | TOPS | 1500 | 2026-04-05 | 2026-04-11 | QuickStitch | +6 |
-
-Only **R09, R12, R21 and R25** are feasible as requested. Nine of the twelve misses ask
-for a date that is already in the past on 2026-04-01; R06, R20 and R30 are future-dated
-but still unreachable once queues are counted.
-
-Design consequence: `INFEASIBLE_DEADLINE` is a first-class outcome, not an error. The
-correct behaviour on 12 of 16 allocatable requests is *allocate and report the slip*
-with the earliest achievable date. A system that replies "sent to QuickStitch" without
-naming the slip is wrong on 75% of the allocatable inbox.
-
-Note also R27, which asks for the lowest defect rate but whose fastest option is
-QuickStitch, the worst-defect shop. Objective and deadline genuinely conflict there.
-
-## Finding 6: the objectives partially co-optimise; defects is the odd one out
-
-Swept 624 weight configurations over (lateness, defects, fairness, cost).
-
-| config | mean days | % late | expected defect | cost | max share |
-|---|---|---|---|---|---|
-| pure lateness | 8.1 | 2% | 6.9% | 114,065 | **24%** |
-| **lateness + cost + fairness** | 9.9 | **2%** | 6.1% | **103,920** | 34% |
-| pure defects | 162.5 | 95% | **2.7%** | 129,920 | 70% |
-| pure cost | 105.1 | 93% | 7.8% | **85,960** | 70% |
-
-Lateness, cost and fairness are largely compatible: we can hold 2% late while cutting
-about 10,000 of cost relative to optimising lateness alone. Minimising defects is the
-only objective that forces a genuine sacrifice, for the structural reason in Finding 3.
-
-## Finding 7: a metric objection worth reporting
-
-`simulate.py` draws defects stochastically, one Bernoulli trial per batch, so the
-reported `% defect` is noisy across policies and partly reflects the RNG rather than the
-allocation. We additionally report **pieces-weighted expected defect rate of the chosen
-shops**, which carries the same signal with no variance.
-
-The track explicitly invites arguing with the harness given evidence, so this belongs in
-`Evaluation.pdf`. We report both numbers; we do not silently substitute ours.
-
-## The eight workshops
-
-| id | name | cap/day | lead | defect | cost | makes | status | max batch | queue today |
-|---|---|---|---|---|---|---|---|---|---|
-| W1 | QuickStitch | 300 | 1 | 0.12 | 1.5 | TOPS | ACTIVE | - | 4.0 |
-| W2 | SteadyHands | 170 | 2 | 0.03 | 1.3 | TOPS+ACC | ACTIVE | - | 2.5 |
-| W3 | BudgetWorks | 230 | 3 | 0.09 | 0.8 | TOPS | ACTIVE | - | 5.0 |
-| W4 | Little Loom | 70 | 1 | 0.02 | 1.6 | ACCESSORIES | ACTIVE | - | 0.5 |
-| W5 | GiantWeave | 400 | 4 | 0.06 | 1.1 | TOPS | ACTIVE | - | 3.0 |
-| W6 | Nimble Needle | 130 | 1 | 0.05 | 1.2 | TOPS+ACC | ACTIVE | - | 1.0 |
-| W7 | OldMill | 200 | 2 | 0.10 | 0.9 | TOPS+ACC | **SUSPENDED** | - | 0.0 |
-| W8 | FreshStart | 100 | 2 | 0.04 | 1.0 | TOPS | ACTIVE | **300** | 0.0 |
-
-W7 is never eligible. W8 rejects any batch over 300 pieces.
-
-## Order data shape
-
-120 orders, 86 COMPLETE and 34 IN_PROGRESS. 85 TOPS, 35 ACCESSORIES. Pieces range
-100 to 2000, mean 779. Order dates 2026-01-01 to 2026-03-27; due dates 2026-01-18 to
-2026-05-01. Lead time from order to due date is 14 to 35 days, mean 25.1.
-
-Eight customers, the largest being Cotton Club and Maple & Co at 19 orders each and
-TrendCart at 17. That matters for ambiguity: "the TrendCart order" has 17 candidates and
-"the vests" has 18.
-
-## Reproducing
-
-```
-python3 track2/harness/simulate.py            # the three baselines
-python3 track2/harness/simulate.py --shock    # with the mid-run closure
-```
-
-The simulator is seeded (5105) and deterministic. The heuristic, sweep and feasibility
-numbers above were produced by throwaway probe scripts; they are reproduced as committed
-code under the allocation-engine and evaluation workstreams.
+Additional data summaries and chat labels should be added only with a recorded
+method and evidence. Do not treat preliminary model-generated labels as ground truth.

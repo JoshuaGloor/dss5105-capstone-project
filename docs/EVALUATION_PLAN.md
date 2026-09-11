@@ -1,143 +1,166 @@
-# Evaluation Plan
+# Evaluation plan
 
-`Evaluation.pdf` carries 15% of the grade on its own and feeds the 35% problem-solving
-score. The spec says plainly that inflated numbers cost more marks than low ones, and
-that teams presenting only successes score poorly. Plan accordingly: we are optimising
-for defensible evidence, not for a good-looking table.
+Source of mandatory requirements: Spec v4 p. 6 and Tracks v3 pp. 6-7. Evaluation
+quality carries 15% of the project rubric; the simulator does not produce a final
+course grade. This document is a plan, not a claim that the complete system has
+already been evaluated.
 
-Write this evaluation set **before** the system. It defines what "working" means.
+## Course requirements and current evidence
 
-## Required checklist
+| Requirement | Current status |
+|---|---|
+| Use the shared simulator against all three provided baselines | Initial offline runs complete; reproducible runner and traces available |
+| Declare a primary objective at Sprint 1 | Not selected; current presets do not constitute a team declaration |
+| Report primary, another objective, and a justified weighted hybrid | Lateness, defects, and hybrid experiments available; final choice and weight rationale pending |
+| Include at least one shock run | Initial shock run complete; broader robustness analysis pending |
+| Beat all three baselines on the primary objective and report where baselines win | Initial late-rate results are favorable; primary not declared; metric tradeoffs recorded in DATA_FINDINGS.md |
+| Compare with a short heuristic and explain the system's added value | earliest_finish implemented; full-system added value not yet measured |
+| Evaluate all 30 supplied chat requests by behavior | Not implemented; labeling and rubric needed |
+| Judge decisions and explanation faithfulness separately | Planned |
+| Explain metrics, evaluation-set construction, per-category results, and limitations | Initial simulator method documented; full report pending |
+| Analyze at least 10 failure cases individually | Pending; collect cases as features are built |
+| State what would be measured with more time | Planned in final report |
+| If development used the evaluation set, disclose it and provide a held-out result | Supplied data has already been inspected and used in development; held-out evaluation pending |
 
-Every line below is a literal requirement. Tick them off.
+A tool specification, usable interface, and auditable output are also core Track 2
+capabilities. Completing the simulator rows does not complete the project.
 
-- [ ] Run the shared simulator `track2/harness/simulate.py`
-- [ ] Report our **primary** objective
-- [ ] Report at least **one other** objective
-- [ ] Report **one hybrid** (weighted mix), with the weights justified
-- [ ] All of the above against **all three** baselines
-- [ ] At least one `--shock` run
-- [ ] Report **the cases where a baseline still wins**
-- [ ] State what our system adds over a **ten-line heuristic** (or honestly, that it adds nothing yet)
-- [ ] Results on **all 30** requests in `dispatch_requests.txt`, broken down by behaviour
-- [ ] Judge **decision** and **explanation faithfulness** separately
-- [ ] **At least 10** failure cases analysed individually (we target 15)
-- [ ] What we measured and why that metric
-- [ ] How the evaluation set was built, and why it is not rigged in our favour
-- [ ] Per-category breakdown
-- [ ] What we would measure with more time
-- [ ] If we tuned on the evaluation set, say so and report a held-out result too
+## Allocation experiments
 
-## Metrics
+Use the commands and definitions in [ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md).
+Current observations and both scenario tables are in [DATA_FINDINGS.md](DATA_FINDINGS.md).
+Each policy run starts fresh queues. Preserve the seed, configuration, scales,
+source versions, and raw per-order evidence when reporting results.
 
-From the harness: mean turnaround, p90 turnaround, % late, % defect, total cost, max
-workshop share (our fairness proxy).
-
-Added by us: **pieces-weighted expected defect rate** of the chosen shops. The harness
-draws defects stochastically per batch, so its `% defect` is partly RNG rather than
-allocation quality. We report both and explain why. The track explicitly invites arguing
-with the harness given evidence.
-
-Also added: **slip against the requested date**, because 12 of the 16 allocatable chat
-requests cannot hit the date they ask for (see [DATA_FINDINGS.md](DATA_FINDINGS.md)).
-An allocation that is on the efficient frontier but silently 25 days late is not a good
-answer.
-
-## Explanation faithfulness, measured automatically
-
-This is our strongest differentiator and it directly targets the failure the track marks
-hardest. The requirement is that every number in an explanation traces back to a tool
-output.
-
-Method: log every tool call and its outputs for a request. Extract every numeral and
-date from the agent's user-facing explanation. Assert each one appears in that request's
-tool-output set (with tolerance for rounding and formatting).
-
-Report: percentage of numerals that trace to a tool call, plus every violation
-individually. A right allocation with an invented justification counts as a **failure**,
-so decision correctness and faithfulness are scored on separate axes and reported in a
-two-by-two table.
-
-## The 30-request behaviour taxonomy
-
-PROPOSED, NOT RATIFIED. These labels are one person's reading. Do **not** treat them as
-ground truth, and do not show them to the other labellers before independent labelling
-(see the protocol below), or we lose the inter-rater evidence.
-
-| Behaviour | Count | Requests |
+| Metric | Meaning | Important limit |
 |---|---|---|
-| ALLOCATE | 16 | R04 R06 R07 R09 R12 R16 R17 R20 R21 R22 R23 R25 R26 R27 R28 R30 |
-| CLARIFY | 7 | R01 R03 R05 R10 R15 R19 R29 |
-| REFUSE | 4 | R08 R11 R14 R24 |
-| DECLINE | 3 | R02 R13 R18 |
+| Mean turnaround | Average dispatch-to-delivery duration | Not mean days overdue |
+| P90 turnaround | The course report's upper-quantile statistic | Retain the course indexing convention |
+| Late fraction | Fraction of batches delivered after their due date | Does not measure lateness severity |
+| Defect fraction | Fraction of batches with a simulated defect event | Not the fraction of garments defective |
+| Total cost | Sum of pieces times chosen workshop unit cost | Not customer selling price or profit |
+| Maximum workshop share | Largest share of assigned pieces | Concentration proxy; eligibility and capacity differ |
 
-### The four refusals, each a different rule
+Report the original metrics even if adding better-suited ones. The separate
+[weight-search runner](WEIGHT_TUNING.md) adds batch-average expected defect probability.
+Actual overdue duration and pieces-weighted defect exposure remain proposed additions.
+Distinguish these definitions:
+weighting workshop defect probabilities by pieces does not measure actual defective
+garment counts in the harness. Conditional expected exposure avoids immediate defect
+sampling noise, but allocation paths still depend on past random events.
 
-| Req | Asked for | Correct refusal |
-|---|---|---|
-| R08 | ORD-073 (400 hoodies) to FreshStart | 400 exceeds the 300-piece trial cap |
-| R11 | ORD-008 to OldMill | OldMill status is SUSPENDED |
-| R14 | ORD-103 scarves to QuickStitch | QuickStitch makes TOPS only |
-| R24 | ORD-015 to Little Loom | ORD-015 is vests (TOPS); Little Loom makes ACCESSORIES only |
+The scoring penalty is not the evaluator: it uses a continuous point estimate of
+lateness, while the simulator uses sampled outcomes and rounded completion dates.
+A good internal score does not establish a good realized result or global optimum.
 
-Each refusal must carry the reason **and** an alternative.
+Next experiments should inspect changed allocations, baseline wins, and sensitivity
+to scales and additional scenarios. Initial weight and seed sensitivity results are
+documented in [WEIGHT_TUNING.md](WEIGHT_TUNING.md). Avoid presenting tuning on this supplied replay as
+held-out performance. Use documented additional data/scenarios and freeze any held-out
+set before tuning against it. Preserve the shared run for cross-team comparison.
 
-### The three declines, each failing differently
+For shock analysis, disclose that target selection consumes RNG state and changes
+subsequent defect draws. Current queue-aware policies do not explicitly detect a
+closure. A causal estimate of closure impact or a claim of failure detection needs
+additional controlled evidence, not just the normal/shock table difference.
 
-| Req | Asked for | Why we cannot answer |
-|---|---|---|
-| R02 | Which workshop handled Harbor Knits last October | No allocation history exists in this data |
-| R13 | The price quoted to TrendCart on ORD-120 | No price or quote column exists |
-| R18 | Movement on ORD-999 | No such order in the dataset |
+## Chat evaluation: define the rubric before implementing intake
 
-Three distinct messages, not one generic "I do not know".
+The simulator never reads `dispatch_requests.txt`. Run these requests through the
+future chat application and retain the conversation, tool inputs/outputs, structured
+request, decision, and explanation for each case.
 
-### Sub-labels that overlay ALLOCATE
+| Behavior | What to judge |
+|---|---|
+| Complete request | Correct extraction, resolution, constraints, objective interpretation, eligibility and justified recommendation |
+| Ambiguous or incomplete request | Targeted clarification; no guessed order, quantity, or deadline |
+| Ineligible suggestion | Correct refusal reason and an eligible alternative where possible |
+| Unanswerable question | Explicit limitation tied to missing records or fields; no invented answer |
 
-- **INFEASIBLE_DEADLINE** (12 of 16): must allocate *and* report the slip with the
-  earliest achievable date.
-- **Hard constraint:** R12 (no QuickStitch this week, imposed by Boss), R25 (not
-  BudgetWorks, imposed by Mei). The record must name who imposed it.
-- **Objective override in natural language:** R09 (fastest, cost no object), R21
-  (cheapest that still makes Apr 13), R27 (lowest defect rate). These are three
-  different weight vectors stated in English, and they are the bridge between the chat
-  surface and the allocation engine.
-- **Split request:** R23.
+Overlay labels should capture deadline infeasibility, exclusion provenance, objective
+preferences, and split requests. Behaviors need not be mutually exclusive: a request
+may be resolvable but infeasible, or need clarification before a recommendation.
 
-## How we show the set is not rigged
+Do not assume a single gold workshop for every valid request. Some outcomes admit
+several defensible choices; a rubric should check constraints and evidence as well
+as any reference policy. For a requested deadline, feasibility must use the permitted
+candidate set. An instruction such as R21's "cheapest shop that can still make" the
+date is a constrained request, not merely a different soft weight vector.
 
-1. **Independent labelling.** Three team members label all requests separately, without
-   discussion and without reading the table above.
-2. **Report raw agreement and Cohen's kappa before adjudication.** Publish the
-   disagreements. Requests where humans disagreed are exactly where the system should be
-   allowed partial credit, and saying so is worth more than a clean 100%.
-3. **Adjudicate** disagreements in a recorded meeting, then freeze the labels.
-4. **Held-out set.** Write 30 new chat requests in the same style, labelled by the same
-   protocol, and never look at them during development. Report both numbers. The data is
-   explicitly extensible provided we document what we changed.
+Before labeling, decide and record:
 
-## Ablation: what does the LLM actually add?
+- Whether each inbox case starts from the same 2026-04-01 snapshot or earlier cases
+  update shared queues. The data does not itself define a commitment sequence.
+- How message fields override CSV fields, and which conflicts require clarification.
+- How past deadlines, unknown dates, and infeasible requests should be handled.
+- When the agent may recommend alternatives and when a human must confirm a decision.
 
-The direct answer to the spec's question. Four systems, same 120 orders and same 30
-requests:
+Do not pre-label every impossible deadline as "allocate anyway". The system must
+explain the conflict and offer permitted options without silently changing the task.
 
-| System | Simulator | 30 requests |
-|---|---|---|
-| A. Ten-line heuristic | yes | cannot run: no language surface |
-| B. Tools + scorer, no LLM | yes | cannot run |
-| C. LLM, no tools (model does its own arithmetic) | yes | yes |
-| D. Full system | yes | yes |
+## Proposed annotation protocol
 
-Expected and acceptable outcome: A and D score similarly on the simulator, because
-allocation quality comes from the scorer. C should be visibly worse on faithfulness and
-probably on allocation too. If A matches D on the simulator, **say so plainly** and
-locate our contribution in the chat surface, the refusals, the constraint handling and
-the audit record, which A cannot do at all.
+The following is a team methodology proposal, not an extra literal course minimum.
+Earlier model-generated label counts and feasibility tables are not ground truth
+and are excluded from the rubric.
 
-## Failure analysis
+Have multiple team members independently label the requests against the raw data,
+recording supporting rows and acceptable behaviors. Record prior exposure to earlier
+labels rather than claiming annotators are blind if they have already seen them.
+Discuss disagreements only after independent labels are saved, then freeze an
+adjudicated rubric and document the reasoning.
 
-At least 10 cases, individually analysed; target 15. Assign each to a category
-(extraction, resolution, eligibility, estimation, objective interpretation, faithfulness,
-UX) and record what went wrong, why, and what would fix it. Start collecting these from
-the first working prototype. Do not leave this to the final week; it is the section that
-most visibly separates a strong report from a weak one.
+Report agreement before adjudication. Cohen's kappa applies to two raters; use
+pairwise Cohen's kappa or an appropriate multi-rater measure such as Fleiss' kappa
+if more raters participate. Define how multi-label behaviors are encoded before
+calculating agreement. These statistics are planned, not already measured.
+
+Prepare additional labeled requests that are held out from prompt and tool tuning.
+Set their size and category coverage explicitly in the evaluation design; the
+course does not prescribe an additional set of exactly 30 chat requests.
+
+## Explanation faithfulness
+
+An automated checker is planned. It should link claims to the right tool field,
+request, workshop, units, and state snapshot. Merely finding the same number anywhere
+in a tool-output log is insufficient: the right value attached to the wrong workshop
+is still false. Check non-numerical claims such as eligibility and imposed constraints
+as well. Specify permitted rounding and date formatting, and inspect violations.
+
+Report decision correctness and explanation faithfulness separately, including cases
+where a correct recommendation has an unsupported explanation. The course treats a
+right allocation with an invented justification as a failure. Report both coverage
+and errors; an agent that omits all numerical claims has not necessarily explained
+the decision well.
+
+## What does the language layer add?
+
+Compare the short heuristic with the weighted allocator on structured simulator
+inputs. Then evaluate the complete chat system on extraction, clarification,
+constraint handling, refusal, and faithful explanation. Where useful, compare its
+structured requests with manually verified structured inputs passed to the same
+allocator; this helps isolate language errors from allocation errors.
+
+A Python heuristic does not parse chat by itself, but ordinary code can enforce
+constraints once supplied in structured form. Do not claim that only an LLM can
+handle exclusions or refuse an ineligible workshop. If the full system uses the
+same allocator and receives identical inputs, do not attribute its numerical policy
+performance to the LLM.
+
+The previous proposal to let an LLM do arithmetic is not part of the implementation
+or default tests. All product arithmetic remains in tools. Any provider-based
+experiment must be explicitly planned and authorized; `uv run pytest` stays offline
+and live tests remain opt-in.
+
+## Failure analysis and final reporting
+
+For each analyzed failure, record the input, expected behavior and evidence, observed
+behavior, failure category, consequence, and possible fix. Categories can include
+extraction, resolution, constraints, estimation, scoring, explanation, state handling,
+and UX. Include baseline wins and policy tradeoffs separately from software bugs.
+If too few genuine failures are observed, design meaningful stress cases and disclose
+that construction; do not fabricate failures to fill a quota.
+
+The final report should distinguish implemented behavior, observed results, proposed
+improvements, and untested assumptions. Do not mark required evaluation complete
+merely because the corresponding code or plan exists.

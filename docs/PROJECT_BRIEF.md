@@ -1,131 +1,128 @@
-# Project Brief: Track 2, The Quick-Response Subcontracting Desk
+# Project brief: Quick-Response Subcontracting Desk
 
-Read this first. It is the shared understanding of what we are building and why.
-Numbers quoted here are measured, not estimated; see [DATA_FINDINGS.md](DATA_FINDINGS.md)
-for how to reproduce every one of them.
+Track 2 replaces informal subcontracting decisions in a factory group chat with
+an assistant that understands requests, recommends an eligible workshop, and
+records the evidence behind the recommendation.
 
-## The problem in one paragraph
+## Sources and how to use these documents
 
-SweaterCo is a quick-response apparel factory. Reorders arrive with 7 to 14 days of
-notice and the factory is already full, so batches are farmed out to 8 outside
-workshops. Today that decision is made by one dispatcher posting a message in a group
-chat: "@Chen - order 042, 1,500 crewnecks. Send it to QuickStitch." The message *is*
-the decision, the reasoning lives in one person's head, and nothing is recorded. We are
-replacing that group chat with a system that answers three questions instantly (can
-they make it, can they take it now, are they allowed to), allocates the batch, and
-leaves behind an auditable record of why.
+Course requirements come from `Capstone_Project_Spec_v4.pdf` and
+`Capstone_Project_Tracks_v3.pdf` under Week 0 / Capstone Project. The TA announcement
+clarifies that teams choose their own primary objective and declare it at Sprint 1.
+The announcement references older document versions; use the versions above.
 
-## Our thesis
+- Spec pp. 2-4: objective declaration and sprint requirements.
+- Spec pp. 5-7: final deliverables, evaluation, and grading.
+- Tracks pp. 4-7: Track 2 capabilities, simulator, and language evaluation.
+- [Course data dictionary](../track2/data/data_dictionary.md): data definitions.
+- [Data findings](DATA_FINDINGS.md): reproducible observations and their limits.
+- [Tool specification](TOOL_SPEC.md): implemented interfaces and proposed extensions.
+- [Evaluation plan](EVALUATION_PLAN.md): required evidence and remaining work.
+- [Allocation guide](ALLOCATION_ENGINE.md): current algorithm and run commands.
 
-> The LLM compiles a chat message into a constrained allocation query.
-> Tools do all arithmetic. One configurable scorer picks. The record explains.
+Course requirements, current implementation, and team proposals are different
+things. An idea in these documents is not a completed feature or a verified result.
 
-This matters because of the single most important measurement we have made: a five-line
-queue-aware heuristic already beats all three provided baselines by a wide margin
-(8.1 mean days vs 21.5 for `random`, 2% late vs 34%). Beating the baselines is not a
-result and we will not present it as one.
+## What the system needs to do
 
-What the heuristic *cannot* do is take an instruction. It cannot honour "keep it away
-from BudgetWorks", cannot resolve "cheapest shop that can still make Apr 13", and
-cannot refuse "OldMill is free, give them ORD-008". That gap is our contribution, and
-we must be able to defend it with an ablation rather than an assertion.
+For each request, establish which order is meant, which workshops can make it,
+which are allowed to receive it, and how their current queues affect delivery.
+Recommend an allocation using a configurable objective and explain the tradeoffs.
+Ask about ambiguity, refuse an ineligible suggestion with a reason and alternative,
+and acknowledge questions that cannot be answered from the available data.
 
-## Architecture
+The course requires natural-language intake, a queryable workshop register,
+per-candidate delivery estimates, handling of no-good-option cases, documented
+tools, auditable output, and a usable dispatcher interface. An allocator alone
+covers only part of Track 2.
 
-A bidding round, where the bids are tool-computed:
+## Current implementation
 
-1. **Intake (LLM).** Parse a chat line into a structured request: order reference,
-   pieces, due date, hard constraints, and an objective weight vector. Detect when the
-   request is ambiguous, incomplete, ineligible or unanswerable.
-2. **Resolution (tools).** Resolve the order reference against `orders.csv`. Ask a
-   follow-up question rather than guess.
-3. **Bidding (tools).** Every workshop returns a structured bid computed by
-   `estimate_delivery`: `{eta_date, cost, defect_risk, eligible, exclusion_reason}`.
-   Ineligible shops still bid, and their bid carries the reason they are out. That is
-   what powers refusals and the greyed-out rows in the UI.
-4. **Award (scorer).** Score the bid table against the objective weight vector plus any
-   hard constraints. Deterministic and inspectable.
-5. **Record (tools).** Write the audit artefact: candidates considered, each one's
-   numbers, constraints applied and who imposed them, and why the winner won.
-
-**Hard rule.** A bid is never generated by an LLM. Every numeral that reaches the user
-must originate from a tool call. An estimate hallucinated by the model is the single
-failure this track marks hardest, and we measure our compliance automatically. See
-`explanation faithfulness` in [EVALUATION_PLAN.md](EVALUATION_PLAN.md).
-
-## Primary objective (declared at Sprint 1)
-
-STATUS: proposed, pending team ratification.
-
-Proposal: declare **minimise lateness** as primary, ship a **hybrid** weight vector as
-the default configuration, and make the cost/defect frontier our headline finding.
-
-Rationale: lateness is the business story for a quick-response factory, and it is the
-objective most teams will pick, which keeps our numbers comparable. Our differentiation
-then sits in the analysis rather than in a number everyone will cluster on. The measured
-frontier supports this: at an identical 2% late we can buy back roughly 10,000 of cost
-versus optimising lateness alone.
-
-The objective must be **configuration, not a branch in the allocation logic**. This is a
-fixed requirement of the track, not a design preference.
-
-## Deliverables and dates
-
-| When | What |
-|---|---|
-| Fri 16 Oct 2026, 15:00 | `Presentation_GroupNN_Sprint1.pptx` slides, live 5-min talk. Declare primary objective |
-| Fri 30 Oct 2026, 15:00 | `Presentation_GroupNN_Sprint2` video + slides |
-| Fri 13 Nov 2026, 15:00 | `Presentation_GroupNN` video + slides |
-| Sun 15 Nov 2026, 23:59 | `GroupNN.zip` with all seven documents |
-
-`NN` is always zero-padded to two digits and capitalisation must match exactly.
-Non-conforming filenames lose marks. Slide 1 of Sprints 2 and 3 must carry the group
-number, member names with student IDs, a public GitHub link and a working demo link.
-
-The seven files in the final zip: `Readme.pdf`, `Slide.pdf`, `Video.mp4`,
-`Documentation.pdf` (max 15 pages), `Evaluation.pdf`, `Teams.pdf`,
-`Strategic_Recommendations.pdf`.
-
-## Grading weights
-
-| Category | Weight | Note |
+| Component | Status | Location |
 |---|---|---|
-| Problem solving | 35% | Cover every listed core capability explicitly |
-| Engineering quality | 20% | Must run from a clean checkout; deploy it |
-| Evaluation quality | 15% | Rigour and honesty; depth of failure analysis |
-| User interface design | 15% | UX-first. Usability beats aesthetics |
-| Documentation | 8% | |
-| Presentation | 7% | Hard 5-minute stop |
+| Course simulator and eligibility rule | Provided, unchanged | `track2/harness/simulate.py` |
+| Queue-aware earliest-finish reference | Implemented | `src/dss5105/allocator.py` |
+| Weighted scorer and allocator callback | Implemented: lateness, defects, cost weights | `src/dss5105/allocator.py` |
+| Baseline and preset experiments | Implemented: normal and shock, JSON traces | `src/dss5105/evaluate.py` |
+| Exploratory weight search | Implemented: fixed grid, frozen candidates, additional seed checks | `src/dss5105/tune.py` |
+| Model construction helper | Implemented; not used by allocation experiments | `src/dss5105/llm.py` |
+| Chat intake, resolution, and constraint capture | Planned | See tool specification |
+| Dispatcher UI and confirmed allocation records | Planned | Technology and owners undecided |
+| Chat evaluation and faithfulness checker | Planned | See evaluation plan |
 
-Two things are worth internalising. UX is worth as much as evaluation and is the item
-teams most often leave until last. And honesty is explicitly graded: the spec states
-that inflated numbers cost more marks than low ones, and that teams presenting only
-successes score poorly. Our strategy is real work reported straight, including the
-parts that did not work.
+Offline tests cover eligibility, queue sensitivity, configuration changes,
+estimates, empty candidates, and reproducible simulator runs. They do not establish
+chat accuracy, deployed usability, or optimal allocation quality.
 
-## Roles
+## Architecture and objective choice
 
-| Owner | Workstream | Ships |
+The intended flow is:
+
+```text
+Chat request -> LLM interpretation and tool-backed resolution
+             -> structured order, constraints, and objective configuration
+             -> Python estimates and allocation
+             -> tool-backed explanation and proposed decision
+             -> dispatcher confirmation and persisted record
+```
+
+The simulator evaluates the Python allocator directly, without an LLM. The LLM's
+planned role is understanding, clarification, tool use, and faithful explanation.
+All arithmetic belongs in tools. An instruction file or skill does not replace
+executable allocation logic.
+
+The course permits a single dispatcher agent or a multi-agent design; it does not
+require bidding, negotiation, or a particular scorer formula. Our current design
+uses one deterministic weighted scorer. Objectives are parameters, never separate
+branches in allocation logic. Eligibility remains a hard constraint.
+
+The primary objective is **not yet selected**. The course candidates are:
+minimise lateness, minimise defects, fair allocation, or robustness to workshop
+failure. Cost is an additional measured tradeoff, not one of these primary choices.
+
+Lateness, defects, and a lateness/defects hybrid are initial experiment presets.
+The hybrid is exploratory, not a validated business default. Fairness scoring and
+a dedicated robustness policy are not implemented. Choose the primary objective
+and justify the final hybrid weights after reviewing evidence; do not assume a
+cost/quality frontier or speculate about what other teams will select.
+
+## Milestones and final submission
+
+Source: Spec pp. 2-5. Times below are course local times.
+
+| Milestone | Upload deadline | Review format |
 |---|---|---|
-| TBD | Tools and data layer | Register, eligibility, `estimate_delivery`. All arithmetic |
-| TBD | Allocation engine | Scorer, weight configs, bidding round, simulator runs, ablations |
-| TBD | LLM intake | Extraction, clarify / refuse / decline, constraint capture |
-| TBD | UX and deployment | Streamlit dispatcher screen, live demo link |
-| TBD | Evaluation lead | Labels, faithfulness checker, failure cases, `Evaluation.pdf` |
-| TBD | Docs and PM | `Documentation.pdf`, `Readme`, `Teams`, `Strategic_Recommendations`, video, filename compliance |
+| Sprint 1 | Fri 16 Oct 2026, 15:00 | 19:00 session; live 5-minute presentation and 2-minute Q&A; declare primary objective |
+| Sprint 2 | Fri 30 Oct 2026, 15:00 | 19:00 session; 5-minute presentation video and 2-minute Q&A |
+| Sprint 3 | Fri 13 Nov 2026, 15:00 | 19:00 session; 5-minute presentation video and 2-minute Q&A |
+| Final submission | Sun 15 Nov 2026, 23:59 | `GroupNN.zip` |
 
-The last two are full roles, not leftovers: together they carry 23% of the grade plus
-the deliverable checklist. `Strategic_Recommendations.pdf` warns that generic
-LLM-generated answers score near zero, so it needs real market research with citations.
+Presentation stems are `Presentation_GroupNN_Sprint1`,
+`Presentation_GroupNN_Sprint2`, and `Presentation_GroupNN`. Slides may be `.pptx`
+or `.pdf`; presentation videos are `.mp4`. Use the required two-digit group number
+and exact capitalization. Every member must attend the review and be ready for Q&A.
+From Sprint 2, the first slide must include the group number, member names and
+student IDs, a public GitHub link, and a working demo link.
 
-Keep workstreams in separate modules. With six people the risk is not capability, it is
-four people editing one file while two go idle. Branch and open a PR, per
-[../AGENTS.md](../AGENTS.md).
+The final zip contains `Readme.pdf`, `Slide.pdf` or `Slide.pptx`, `Video.mp4`,
+`Documentation.pdf` (maximum 15 pages), `Evaluation.pdf`, `Teams.pdf`, and
+`Strategic_Recommendations.pdf`. The final `Video.mp4` is a demo video, distinct
+from the Sprint 3 presentation video. Strategic recommendations need real market
+research and three concrete opportunities, not generic claims.
 
-## Where the files are
+Grading weights: problem solving 35%, engineering 20%, evaluation 15%, UI 15%,
+documentation 8%, presentation 7%. Simulator metrics are not a course grade.
 
-- `track2/data/` - orders (120), workshops (8), dispatch requests (30), data dictionary
-- `track2/harness/simulate.py` - the shared simulator. **Do not modify it in place.**
-  If we want to argue with its assumptions we subclass or wrap it, and we say so in
-  the report. Every team runs the same file so the numbers stay comparable.
-- `track2/Factory_Primer.md` - three-minute domain primer. Read it once.
+## Next work and ownership
+
+Review the first experiments and their limits before tuning. Define and label the
+chat evaluation set before building the intake flow. Then implement resolution,
+constraints, and delivery tools around the allocator, followed by the dispatcher
+interface and confirmation workflow. Maintain reproducible evidence throughout.
+
+Owners are not assigned here. Agree ownership of allocation/data, language intake,
+UI/deployment, evaluation, and documentation/presentation as a team. These are work
+areas, not a prescribed headcount or fixed role split.
+
+Use `uv`, keep provider tests opt-in, preserve the course harness, and work through
+branches and PRs. See [repository instructions](../AGENTS.md).

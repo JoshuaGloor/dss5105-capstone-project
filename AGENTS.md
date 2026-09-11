@@ -10,19 +10,27 @@ writing code, in this order:
 
 - [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md) - the problem, our thesis, the
   architecture, roles, deliverables and dates.
-- [docs/DATA_FINDINGS.md](docs/DATA_FINDINGS.md) - what the data actually says. Measured,
-  not guessed. Do not re-derive these numbers; if you change the data, update the file.
-- [docs/TOOL_SPEC.md](docs/TOOL_SPEC.md) - the tool contracts. Build against them.
+- [docs/DATA_FINDINGS.md](docs/DATA_FINDINGS.md) - source facts, reproducible experiments,
+  and inference limits. Use the recorded commands when verification is needed. Update
+  the evidence if data or policies change; do not reconstruct lost probes as established facts.
+- [docs/TOOL_SPEC.md](docs/TOOL_SPEC.md) - implemented interfaces and proposed tool
+  contracts. Finalize a proposed contract before implementing its tool.
 - [docs/EVALUATION_PLAN.md](docs/EVALUATION_PLAN.md) - what "working" means and how it is
   measured.
+
+Course requirements come from Spec v4 and Tracks v3; implementation status comes from
+code and reproducible evidence. Keep team proposals distinct from requirements and
+results. The primary objective is not yet selected. See
+[docs/ALLOCATION_ENGINE.md](docs/ALLOCATION_ENGINE.md) for the current offline allocator.
 
 Two rules that override convenience:
 
 - **The LLM never does arithmetic.** Every numeral shown to a user must trace back to a
   tool output. A hallucinated delivery estimate is the worst failure in this track and we
   check compliance automatically.
-- **The objective is configuration, not a branch.** Lateness, defects, fairness and cost
-  are weights passed into the scorer, never `if` statements in allocation logic.
+- **The objective is configuration, not a branch.** The current scorer takes lateness,
+  defects and cost weights. Future objective terms must also be configurable, never
+  policy-name `if` statements in allocation logic. Fairness scoring is not implemented yet.
 
 ## Track 2 data and harness
 

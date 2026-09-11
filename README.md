@@ -1,6 +1,7 @@
 # DSS5105 Capstone Project: Group 11
 
-> TODO: project description once the topic is fixed.
+Track 2: the Quick-Response Subcontracting Desk. The first working increment is
+an offline, configurable allocator evaluated with the course's shared simulator.
 
 ## Quickstart
 
@@ -14,6 +15,39 @@ uv run pytest                # see current tests pass
 ```
 
 As suggested by the course, we run and manage everything using `uv`.
+
+## Allocation experiments (no API key needed)
+
+```bash
+uv run python -m dss5105.evaluate --output results/allocation-normal.json
+uv run python -m dss5105.evaluate --shock --output results/allocation-shock.json
+```
+
+These compare the course baselines, a short earliest-finish heuristic, and
+lateness/defects/hybrid weight configurations. Delivery arithmetic stays in Python;
+objectives are configuration. Eligibility uses the course helper, and the course
+simulator is left unchanged. See [the allocation guide](docs/ALLOCATION_ENGINE.md)
+for the score definition, assumptions, saved traces, and current limitations.
+
+For an exploratory weight grid and additional random-seed checks, run
+`uv run python -m dss5105.tune`. This saves `results/weight-search.json` without
+changing the existing presets. See [WEIGHT_TUNING.md](docs/WEIGHT_TUNING.md) for
+the selection rules, observed tradeoffs, and limits of these development results.
+
+## Project documents
+
+Read [PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md) for course sources, scope, milestones,
+and implementation status. [DATA_FINDINGS.md](docs/DATA_FINDINGS.md) records source
+facts and reproducible experiment results;
+[TOOL_SPEC.md](docs/TOOL_SPEC.md) separates implemented interfaces from planned tools;
+[EVALUATION_PLAN.md](docs/EVALUATION_PLAN.md) distinguishes course requirements from
+our proposed methodology. Team proposals are not verified results or extra course
+requirements. The primary objective remains undecided.
+
+When data or policies change, reproduce affected results with the documented runner
+and update their evidence. Do not treat the earlier, unretained probes as established
+findings. Finalize proposed tool contracts before implementing them. The current
+scorer supports lateness, defects and cost weights; fairness scoring is future work.
 
 ## Understanding the repo
 
