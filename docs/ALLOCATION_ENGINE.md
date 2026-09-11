@@ -11,6 +11,14 @@ From a source checkout, after `uv sync --all-groups`:
 uv run python -m dss5105.evaluate --output results/allocation-normal.json
 uv run python -m dss5105.evaluate --shock --output results/allocation-shock.json
 uv run pytest
+
+# Run one preset, without editing Python
+uv run python -m dss5105.evaluate --preset defects --output results/defects.json
+
+# Run an arbitrary configured mix; unspecified weights are zero
+uv run python -m dss5105.evaluate \
+  --lateness-weight 1.0 --defects-weight 0.05 --cost-weight 0.1 \
+  --output results/custom.json
 ```
 
 The table comes directly from the original `Simulator.report()`. The JSON saves
@@ -21,6 +29,13 @@ results are ignored by Git; explicitly select evidence to publish later.
 `mean days` and `p90 days` measure turnaround, not days overdue. `% late` counts
 late batches; `% defect` counts batches with a simulated defect event. `max share`
 measures the largest share of allocated pieces. No official combined grade exists.
+
+Without `--preset` or custom weight flags, `evaluate` compares every current preset.
+`--preset NAME` runs one configured objective while retaining all four references
+(`random`, `greedy_biggest`, `cheapest`, and `earliest_finish`). Supplying any weight
+flag runs one configuration named `custom`; omitted weights are zero. The flags cannot
+be combined with `--preset`, and at least one supplied weight must be positive. The
+printed and saved output records the actual weights and fixed score scales.
 
 ## Read the code in this order
 

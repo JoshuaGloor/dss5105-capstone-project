@@ -29,6 +29,13 @@ objectives are configuration. Eligibility uses the course helper, and the course
 simulator is left unchanged. See [the allocation guide](docs/ALLOCATION_ENGINE.md)
 for the score definition, assumptions, saved traces, and current limitations.
 
+The same entry point can run one preset or a custom mix without editing code:
+
+```bash
+uv run python -m dss5105.evaluate --preset defects
+uv run python -m dss5105.evaluate --lateness-weight 1 --defects-weight 0.05 --cost-weight 0.1
+```
+
 For an exploratory weight grid and additional random-seed checks, run
 `uv run python -m dss5105.tune`. This saves `results/weight-search.json` without
 changing the existing presets. See [WEIGHT_TUNING.md](docs/WEIGHT_TUNING.md) for
