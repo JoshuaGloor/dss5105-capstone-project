@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">QuickResponse target architecture and current implementation status</title>
+  <title id="title">SweaterCo Quick-Response Subcontracting Desk: target architecture and current implementation status</title>
   <desc id="desc">The Streamlit dispatcher connects through a language extraction layer to deterministic Python tools. Language integration is tested with fake models; live accuracy is unevaluated. Course data feeds resolution, eligibility and configurable ranking. Future human confirmation updates versioned queues and audit storage. The shared simulator evaluates policies separately from planned live chat evaluation. Offline draft inputs also exercise the tools without a model.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#71817b" stroke-width="1.5"/></marker>

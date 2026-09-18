@@ -233,11 +233,13 @@ def render_decision(result: dict, preview_id: str):
 
 
 def main():
-    st.set_page_config(page_title="QuickResponse | Dispatch desk", layout="wide", initial_sidebar_state="expanded")
+    st.set_page_config(
+        page_title="SweaterCo | Quick-Response Dispatch Desk", layout="wide", initial_sidebar_state="expanded"
+    )
     st.html("<style>" + STYLE.read_text() + "</style>")
     with st.sidebar:
-        st.html('<div class="qr-brand"><span>q</span>QuickResponse</div>')
-        st.caption("SUBCONTRACTING DESK")
+        st.html('<div class="qr-brand"><span>S</span>SweaterCo</div>')
+        st.caption("QUICK-RESPONSE SUBCONTRACTING DESK")
         source = st.radio(
             "Input source",
             options=["examples", "chat"],
@@ -274,7 +276,7 @@ def main():
                 label_visibility="collapsed",
             )
             st.caption("Each request starts from the same queue snapshot. Previews do not reserve capacity.")
-    st.html('<div class="qr-eyebrow">QUICKRESPONSE / DISPATCH DESK</div>')
+    st.html('<div class="qr-eyebrow">SWEATERCO / DISPATCH DESK</div>')
     st.title("The right workshop. A decision you can explain.")
     st.caption("Understand the request, compare the options, keep the evidence.")
     conversation = None
