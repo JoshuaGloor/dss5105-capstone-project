@@ -1,0 +1,33 @@
+/* Local styling only: no external fonts, scripts, or browser services. */
+.stApp { color: #203731; }
+.block-container { max-width: 1510px; padding-top: 2.2rem; padding-bottom: 3rem; }
+[data-testid="stSidebar"] { border-right: 1px solid #dce3db; }
+.qr-brand { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 750; letter-spacing: -1px; margin-bottom: 12px; }
+.qr-brand span { display: grid; place-items: center; color: #fff; background: #1c5948; width: 34px; height: 34px; border-radius: 9px; }
+.qr-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #60726c; }
+h1 { letter-spacing: -1.3px; line-height: 1.15; max-width: 800px; }
+h3 { letter-spacing: -0.4px; }
+.qr-message { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; background: #fff; padding: 22px 24px; border: 1px solid #dce3db; border-radius: 12px; margin: 4px 0 18px; }
+.qr-avatar { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: #eeeadd; color: #675e45; font-weight: 700; }
+.qr-meta { font-size: 13px; }
+.qr-meta span { margin-left: 10px; color: #60726c; }
+.qr-message p { font-size: 16px; line-height: 1.6; margin: 10px 0 14px; }
+.qr-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.qr-tags span { padding: 4px 8px; border-radius: 4px; background: #f4f3ec; font-size: 12px; }
+.st-key-decision, .st-key-comparison, .st-key-decision_settings, .st-key-confirmation_panel { background: #fff; border-radius: 12px; }
+[data-testid="stMetricValue"] { font-size: 26px; }
+[data-testid="stCaptionContainer"] { color: #60726c; }
+.qr-table-scroll { overflow-x: auto; max-width: 100%; }
+.qr-table { border-collapse: collapse; width: 100%; font-size: 13px; text-align: left; }
+.qr-table th { color: #60726c; font-size: 11px; font-weight: 500; padding: 10px 9px; white-space: nowrap; }
+.qr-table td { padding: 14px 9px; border-top: 1px solid #e9eee6; white-space: nowrap; }
+.qr-table td:last-child, .qr-table th:last-child { text-align: right; }
+.qr-table small { display: block; color: #60726c; font-size: 11px; margin-top: 3px; }
+.qr-selected { background: #edf6eb; }
+.qr-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 760px) {
+  .block-container { padding: 1.5rem 1rem; }
+  .qr-message { padding: 18px 14px; }
+  h1 { font-size: 30px; }
+  [data-testid="stMetricValue"] { font-size: 21px; }
+}

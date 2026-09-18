@@ -120,6 +120,15 @@ A dedicated controlled experiment would need a documented wrapper or variant.
 
 ## Questions not yet settled
 
+The read-only dispatch preview now defines an independent inbox snapshot and
+conservative date/constraint handling in [DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md).
+Reproduce its development inputs with `uv run python -m dss5105.prototype`; the
+generated `results/dispatch-previews.json` retains every preset's tool evidence.
+These hand-authored interpretations are not gold chat labels or measured extraction
+accuracy. A first live initial-response evaluation now exists in
+[CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md). It reports frozen draft
+checks and manual findings separately; it is not held-out or full-system validation.
+
 The earlier weight-sweep and cost-frontier claims have no retained reproduction
 script and are not included as current results. There is no established optimal
 hybrid, proof of incompatible objectives, or verified count of infeasible chat

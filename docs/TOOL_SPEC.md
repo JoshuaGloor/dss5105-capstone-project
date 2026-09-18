@@ -73,7 +73,29 @@ change allocation logic; only configuration changes the objective.
 - Failure behavior: both raise `NoEligibleWorkshop` when no candidate exists. The
   original simulator has no return value for defer, split, or escalate.
 
-## Proposed agent tools - not implemented
+## Dispatch adapter increment
+
+The structured preview boundary is specified in
+[DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md). It finalizes resolution, exclusions,
+date handling, request preferences, independent queue snapshots, and preview
+failure states. It composes the offline tools; it is not free-text extraction or
+a durable allocation service. The remaining proposed interfaces below describe
+the later agent and persistence layers.
+
+The [Streamlit page](STREAMLIT_APP.md) calls this preview boundary directly. Its
+custom sliders change configuration without changing allocation logic. Its demo
+confirmation is session-only UI behavior, not an implementation of `commit_allocation`.
+
+Natural-language extraction and multi-turn patch validation are specified in
+[INTAKE_CONTRACT.md](INTAKE_CONTRACT.md) and implemented in `intake.py`. The model
+extracts quoted fields; deterministic code invokes the preview service. It does
+not autonomously choose among registered tool calls or perform numerical work.
+
+The opt-in live evaluation boundary is defined in
+[CHAT_EVALUATION.md](CHAT_EVALUATION.md) and implemented by `evaluate_chat.py`.
+It checkpoints raw extraction and tool evidence without committing allocations.
+
+## Proposed agent tools and later extensions
 
 These contracts are design proposals for the next increment. Finalize their schemas
 and write relevant tests before implementation. Shared inputs should carry a resolved

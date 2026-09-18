@@ -46,13 +46,19 @@ covers only part of Track 2.
 | Baseline and preset experiments | Implemented: normal and shock, JSON traces | `src/dss5105/evaluate.py` |
 | Exploratory weight search | Implemented: fixed grid, frozen candidates, additional seed checks | `src/dss5105/tune.py` |
 | Model construction helper | Implemented; not used by allocation experiments | `src/dss5105/llm.py` |
-| Chat intake, resolution, and constraint capture | Planned | See tool specification |
-| Dispatcher UI and confirmed allocation records | Planned | Technology and owners undecided |
-| Chat evaluation and faithfulness checker | Planned | See evaluation plan |
+| Structured request resolution and constraints | Implemented read-only previews; hand-authored inputs | `src/dss5105/dispatch.py` |
+| Natural-language extraction and clarification conversation | Implemented; initial live development evaluation available, known clarification issues | `src/dss5105/intake.py`, `src/dss5105/chat_ui.py` |
+| Dispatcher UI | Streamlit page with live previews, sliders, and demo confirmation; HTML design reference retained | `streamlit_app.py`, `docs/prototype/index.html` |
+| Confirmed allocation records and queue updates | Planned; prototype confirmation is demo only | Technology and owners undecided |
+| Chat evaluation and faithfulness checker | Live inbox runner and partial tool-integrity checks implemented; independent gold/held-out/full faithfulness pending | See evaluation plan |
 
 Offline tests cover eligibility, queue sensitivity, configuration changes,
 estimates, empty candidates, and reproducible simulator runs. They do not establish
 chat accuracy, deployed usability, or optimal allocation quality.
+
+The first dispatch increment is documented in [DISPATCH_PREVIEW.md](DISPATCH_PREVIEW.md).
+See [PLAN.md](../PLAN.md) for phased acceptance gates and the
+[Sprint 1 architecture](sprint1-architecture.svg) for the target system with status labels.
 
 ## Architecture and objective choice
 
@@ -67,7 +73,8 @@ Chat request -> LLM interpretation and tool-backed resolution
 ```
 
 The simulator evaluates the Python allocator directly, without an LLM. The LLM's
-planned role is understanding, clarification, tool use, and faithful explanation.
+current role is extracting intent and quoted fields; Python validates patches,
+asks clarification questions, and provides the displayed facts.
 All arithmetic belongs in tools. An instruction file or skill does not replace
 executable allocation logic.
 
