@@ -53,6 +53,7 @@ class DeliveryEstimate:
     transport_days: float
     turnaround_days: float
     expected_turnaround_days: float
+    available_days: float
     lateness_days: float
     defect_risk: float
     cost: float
@@ -76,6 +77,7 @@ def estimate_delivery(batch: Batch, workshop: Workshop, queues: dict[str, float]
         transport_days=workshop.lead_days,
         turnaround_days=turnaround,
         expected_turnaround_days=expected,
+        available_days=float(time_available),
         lateness_days=max(0.0, expected - time_available),
         defect_risk=workshop.defect_rate,
         cost=batch["pieces"] * workshop.cost,

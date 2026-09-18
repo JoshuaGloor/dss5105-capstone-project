@@ -10,9 +10,9 @@ from datetime import date, datetime, time, timedelta
 from math import ceil, isfinite
 from pathlib import Path
 
-from dss5105.allocator import ObjectiveWeights, ScoreScales, rank_candidates
+from dss5105.allocator import ObjectiveWeights, ScoreScales, earliest_finish, estimate_delivery, rank_candidates
 from dss5105.evaluate import PRESETS
-from dss5105.harness import HARNESS_PATH, Simulator, eligible_workshops
+from dss5105.harness import HARNESS_PATH, Simulator, cheapest, eligible_workshops, greedy_biggest, random_choice
 
 ROOT = HARNESS_PATH.parents[2]
 DATA = ROOT / "track2" / "data"
@@ -21,6 +21,12 @@ PREFERENCES = {
     "fastest": ObjectiveWeights(lateness=1),
     "lowest_defects": ObjectiveWeights(lateness=0, defects=1),
     "cheapest_on_time": ObjectiveWeights(lateness=0, cost=1),
+}
+BASELINES = {
+    "earliest_finish": ("Earliest finish (short heuristic)", earliest_finish),
+    "cheapest": ("Cheapest eligible", cheapest),
+    "greedy_biggest": ("Biggest capacity", greedy_biggest),
+    "random_choice": ("Random eligible (seeded)", random_choice),
 }
 
 
@@ -99,6 +105,20 @@ class DispatchDesk:
             for path in (DATA / "orders.csv", DATA / "workshops.csv", DATA / "dispatch_requests.txt", HARNESS_PATH)
         }
 
+    def display_fields(self, estimate, score=None) -> dict:
+        """Single source of the formatted strings shown to a user, for every policy."""
+        eta = datetime.combine(self.as_of, time()) + timedelta(minutes=ceil(estimate.expected_turnaround_days * 1440))
+        values = {
+            "eta": eta.isoformat(sep=" ", timespec="minutes"),
+            "turnaround": f"{estimate.expected_turnaround_days:.2f} days",
+            "lateness": f"{estimate.lateness_days:.2f} days",
+            "cost": f"{estimate.cost:,.2f}",
+            "defects": f"{estimate.defect_risk:.1%}",
+        }
+        if score is not None:
+            values["score"] = f"{score:.4f}"
+        return values
+
     def resolve_order(self, request: DispatchInput) -> dict:
         if request.order_id is not None:
             matches = [row for row in self.orders if row["order_id"] == request.order_id]
@@ -143,6 +163,7 @@ class DispatchDesk:
             "effective_weights": asdict(effective),
             "scales": asdict(ScoreScales()),
             "candidates": [],
+            "baselines": [],
             "excluded": [],
             "flags": [],
             "recommendation": None,
@@ -226,24 +247,30 @@ class DispatchDesk:
                 result["excluded"].append({"workshop_id": key, "name": workshop.name, "reasons": reasons})
         for candidate in rank_candidates(batch, permitted, self.queues, effective):
             estimate = candidate.estimate
-            eta = datetime.combine(self.as_of, time()) + timedelta(
-                minutes=ceil(estimate.expected_turnaround_days * 1440)
-            )
             result["candidates"].append(
                 {
                     **asdict(candidate),
                     "name": self.workshops[estimate.workshop_id].name,
                     "meets_deadline": estimate.lateness_days == 0,
-                    "display": {
-                        "eta": eta.isoformat(sep=" ", timespec="minutes"),
-                        "turnaround": f"{estimate.expected_turnaround_days:.2f} days",
-                        "lateness": f"{estimate.lateness_days:.2f} days",
-                        "cost": f"{estimate.cost:,.2f}",
-                        "defects": f"{estimate.defect_risk:.1%}",
-                        "score": f"{candidate.score:.4f}",
-                    },
+                    "display": self.display_fields(estimate, candidate.score),
                 }
             )
+        if eligible:
+            for policy, (label, choose) in BASELINES.items():
+                workshop_id = choose(batch, self.workshops, self.queues)
+                reference = estimate_delivery(batch, self.workshops[workshop_id], self.queues)
+                result["baselines"].append(
+                    {
+                        "policy": policy,
+                        "label": label,
+                        "workshop_id": workshop_id,
+                        "name": self.workshops[workshop_id].name,
+                        "meets_deadline": reference.lateness_days == 0,
+                        "respects_exclusions": workshop_id not in constraints,
+                        "estimate": asdict(reference),
+                        "display": self.display_fields(reference),
+                    }
+                )
         candidates = result["candidates"]
         selectable = candidates
         if request.preference == "cheapest_on_time":

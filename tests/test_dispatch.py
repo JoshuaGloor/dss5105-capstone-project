@@ -172,3 +172,55 @@ def test_invalid_queue_and_workshop_are_not_repaired(desk):
     desk.queues["W1"] = float("nan")
     with pytest.raises(ValueError, match="snapshot"):
         preview(desk)
+
+
+def test_baselines_are_reported_for_every_reference_policy(desk):
+    result = preview(desk, pieces=500, due_date="2026-04-13")
+    assert [row["policy"] for row in result["baselines"]] == [
+        "earliest_finish",
+        "cheapest",
+        "greedy_biggest",
+        "random_choice",
+    ]
+    for row in result["baselines"]:
+        assert row["workshop_id"] in desk.workshops
+        assert row["name"] == desk.workshops[row["workshop_id"]].name
+        assert row["display"]["turnaround"] == f"{row['estimate']['expected_turnaround_days']:.2f} days"
+        assert row["meets_deadline"] == (row["estimate"]["lateness_days"] == 0)
+        assert "score" not in row["display"]
+
+
+def test_baselines_are_deterministic_so_a_preview_keeps_one_identity(desk):
+    first = preview(desk, pieces=500, due_date="2026-04-13")
+    second = preview(desk, pieces=500, due_date="2026-04-13")
+    assert first["baselines"] == second["baselines"]
+    assert first["snapshot"]["id"] == second["snapshot"]["id"]
+
+
+def test_a_reference_policy_may_ignore_an_exclusion_this_desk_respects(desk):
+    text = "keep it away from BudgetWorks"
+    request = DispatchInput(
+        order_id="ORD-109",
+        pieces=500,
+        due_date="2026-04-13",
+        exclusions=[{"workshop_id": "W3", "imposed_by": "Mei", "evidence": text}],
+    )
+    result = desk.preview(envelope(text), request, ObjectiveWeights())
+    assert "W3" not in {row["estimate"]["workshop_id"] for row in result["candidates"]}
+    cheapest_row = next(row for row in result["baselines"] if row["policy"] == "cheapest")
+    assert cheapest_row["workshop_id"] == "W3"
+    assert cheapest_row["respects_exclusions"] is False
+
+
+def test_unresolved_requests_report_no_baselines(desk):
+    result = desk.preview(envelope(), DispatchInput(customer="Harbor Knits"), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert result["baselines"] == []
+
+
+def test_available_days_is_a_tool_field_the_chart_can_plot(desk):
+    result = preview(desk, pieces=500, due_date="2026-04-13")
+    assert result["candidates"][0]["estimate"]["available_days"] == 12.0
+    past = preview(desk, pieces=500, due_date="2026-03-01")
+    assert past["candidates"][0]["estimate"]["available_days"] < 0
+    assert "PAST_DEADLINE" in past["flags"]

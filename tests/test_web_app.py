@@ -115,3 +115,34 @@ def test_cancel_does_not_confirm(app):
     assert not app.exception
     assert "reviewing_preview" not in app.session_state
     assert "confirmed_preview" not in app.session_state
+
+
+def test_chart_and_baseline_table_render_from_tool_fields(app):
+    assert not app.exception
+    preview = app.session_state["preview"]
+    charts = [element for element in app.main if element.type in ("arrow_vega_lite_chart", "vega_lite_chart")]
+    assert charts, "the candidate comparison must include a chart"
+    markup = "".join(element.body for element in app.main if element.type == "html")
+    assert "Cheapest eligible" in markup
+    assert "This desk (effective weights)" in markup
+    cheapest_row = next(row for row in preview["baselines"] if row["policy"] == "cheapest")
+    assert cheapest_row["name"] in markup
+    assert cheapest_row["display"]["turnaround"] in markup
+
+
+def test_baseline_row_shows_when_a_reference_policy_breaks_an_exclusion(app):
+    preview = app.session_state["preview"]
+    assert preview["input"]["exclusions"], "R25 excludes BudgetWorks"
+    cheapest_row = next(row for row in preview["baselines"] if row["policy"] == "cheapest")
+    assert cheapest_row["respects_exclusions"] is False
+    markup = "".join(element.body for element in app.main if element.type == "html")
+    assert "Ignores an exclusion" in markup
+
+
+def test_changing_weights_recomputes_the_baseline_comparison(app):
+    before = app.session_state["preview"]
+    app.radio(key="objective").set_value("defects").run()
+    after = app.session_state["preview"]
+    assert after["effective_weights"] != before["effective_weights"]
+    assert after["baselines"] == before["baselines"], "reference policies do not follow our weights"
+    assert app.session_state["preview_id"] != app.session_state.get("confirmed_preview")

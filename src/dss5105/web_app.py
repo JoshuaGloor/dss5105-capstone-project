@@ -6,6 +6,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
+import altair as alt
 import streamlit as st
 
 from dss5105.allocator import ObjectiveWeights
@@ -25,6 +26,10 @@ STATUS_LABELS = {
     "DECLINE": "Data unavailable",
     "RECORDED_STATUS": "Recorded status only",
 }
+MEETS_COLOR = "#26a37c"
+MISSES_COLOR = "#94631a"
+MEETS_LABEL = "Meets the deadline"
+MISSES_LABEL = "Misses the deadline"
 FLAGS = {
     "PAST_DEADLINE": "The requested deadline is already in the past.",
     "NO_ON_TIME_OPTION": "No permitted whole-batch option meets the date.",
@@ -107,6 +112,57 @@ def settings(request: DispatchInput) -> ObjectiveWeights:
         return configured
 
 
+def candidate_chart(result: dict):
+    """Plot only tool-produced estimates; tooltips reuse the tool's formatted strings."""
+    rows = [
+        {
+            "name": candidate["name"],
+            "days": candidate["estimate"]["expected_turnaround_days"],
+            "status": MEETS_LABEL if candidate["meets_deadline"] else MISSES_LABEL,
+            "turnaround": candidate["display"]["turnaround"],
+            "cost": candidate["display"]["cost"],
+            "defects": candidate["display"]["defects"],
+            "eta": candidate["display"]["eta"],
+        }
+        for candidate in result["candidates"]
+    ]
+    order = [row["name"] for row in rows]
+    axis = alt.Axis(grid=True, gridColor="#e6e9e4", gridWidth=1, domain=False, tickSize=0, labelColor="#60726c")
+    bars = (
+        alt.Chart(alt.Data(values=rows))
+        .mark_bar(cornerRadiusEnd=4, size=18)
+        .encode(
+            y=alt.Y("name:N", sort=order, title=None, axis=alt.Axis(domain=False, tickSize=0, labelColor="#203731")),
+            x=alt.X("days:Q", title="Expected days to delivery", axis=axis),
+            color=alt.Color(
+                "status:N",
+                scale=alt.Scale(domain=[MEETS_LABEL, MISSES_LABEL], range=[MEETS_COLOR, MISSES_COLOR]),
+                legend=alt.Legend(title=None, orient="top", labelColor="#203731"),
+            ),
+            tooltip=[
+                alt.Tooltip("name:N", title="Workshop"),
+                alt.Tooltip("turnaround:N", title="Expected"),
+                alt.Tooltip("eta:N", title="ETA"),
+                alt.Tooltip("cost:N", title="Cost units"),
+                alt.Tooltip("defects:N", title="Defect risk"),
+                alt.Tooltip("status:N", title="Deadline"),
+            ],
+        )
+    )
+    layers = [bars]
+    available = result["candidates"][0]["estimate"]["available_days"]
+    if available >= 0:
+        marker = alt.Data(values=[{"available": available, "label": "Deadline"}])
+        layers.append(alt.Chart(marker).mark_rule(size=2, color="#203731").encode(x="available:Q"))
+        layers.append(
+            alt.Chart(marker)
+            .mark_text(align="left", dx=6, dy=-2, baseline="top", color="#203731", fontSize=11, fontWeight=600)
+            .encode(x="available:Q", text="label:N")
+        )
+    chart = alt.layer(*layers).properties(height=alt.Step(30)).configure_view(stroke=None)
+    st.altair_chart(chart, width="stretch")
+
+
 def candidate_table(result: dict):
     rows = []
     selected_id = result["recommendation"] or result["alternative"]
@@ -136,6 +192,47 @@ def candidate_table(result: dict):
         '<th scope="col">Workshop</th><th scope="col">Expected days</th><th scope="col">Cost units</th>'
         '<th scope="col">Defect risk</th><th scope="col">Deadline</th></tr></thead>'
         f"<tbody>{''.join(rows)}</tbody></table></div>"
+    )
+
+
+def baseline_table(result: dict):
+    """One table: this desk's effective configuration against the shared reference policies."""
+    chosen_id = result["recommendation"] or result["alternative"]
+    chosen = next((row for row in result["candidates"] if row["estimate"]["workshop_id"] == chosen_id), None)
+    rows = []
+    if chosen is not None:
+        rows.append(
+            {
+                "label": "This desk (effective weights)",
+                "name": chosen["name"],
+                "display": chosen["display"],
+                "meets_deadline": chosen["meets_deadline"],
+                "respects_exclusions": True,
+                "selected": True,
+            }
+        )
+    rows.extend({**row, "selected": False} for row in result["baselines"])
+    body = ""
+    for row in rows:
+        values = row["display"]
+        deadline = "Meets estimate" if row["meets_deadline"] else "Late " + values["lateness"]
+        constraint = "Respected" if row["respects_exclusions"] else "Ignores an exclusion"
+        cells = "".join(
+            f"<td>{html.escape(value)}</td>"
+            for value in (values["turnaround"], values["cost"], values["defects"], deadline, constraint)
+        )
+        body += (
+            f'<tr class="{"qr-selected" if row["selected"] else ""}">'
+            f"<td><strong>{html.escape(row['label'])}</strong>"
+            f"<small>{html.escape(row['name'])}</small></td>{cells}</tr>"
+        )
+    st.html(
+        '<div class="qr-table-scroll"><table class="qr-table"><caption class="qr-sr-only">'
+        "This desk compared with the shared reference policies on the same order and queue snapshot"
+        '</caption><thead><tr><th scope="col">Policy</th><th scope="col">Expected days</th>'
+        '<th scope="col">Cost units</th><th scope="col">Defect risk</th><th scope="col">Deadline</th>'
+        '<th scope="col">Exclusions</th></tr></thead>'
+        f"<tbody>{body}</tbody></table></div>"
     )
 
 
@@ -208,6 +305,7 @@ def render_decision(result: dict, preview_id: str):
         st.subheader("Candidate workshops")
         st.caption("Same order. Same queue snapshot. Ranked by effective configuration.")
         if result["candidates"]:
+            candidate_chart(result)
             candidate_table(result)
         else:
             st.info(
@@ -215,6 +313,13 @@ def render_decision(result: dict, preview_id: str):
                 if result["status"] == "CLARIFY"
                 else "No candidate estimate is available for this request."
             )
+        if result["baselines"]:
+            st.subheader("Compared with the reference policies")
+            st.caption(
+                "Same order, same queue snapshot. Reference policies see eligibility only, "
+                "so they can pick a workshop this desk has been told to avoid."
+            )
+            baseline_table(result)
         if result["excluded"]:
             with st.expander("Why other workshops are excluded", expanded=True):
                 for row in result["excluded"]:
