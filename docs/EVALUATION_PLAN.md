@@ -15,8 +15,8 @@ already been evaluated.
 | Include at least one shock run | Initial shock run complete; broader robustness analysis pending |
 | Beat all three baselines on the primary objective and report where baselines win | Initial late-rate results are favorable; primary not declared; metric tradeoffs recorded in DATA_FINDINGS.md |
 | Compare with a short heuristic and explain the system's added value | earliest_finish implemented; full-system added value not yet measured |
-| Evaluate all 30 supplied chat requests by behavior | Not implemented; labeling and rubric needed |
-| Judge decisions and explanation faithfulness separately | Planned |
+| Evaluate all 30 supplied chat requests by behavior | First live initial-response run complete; independent gold annotations and held-out evaluation pending |
+| Judge decisions and explanation faithfulness separately | Behavior and tool-field integrity checked separately; full explanation/UX review still pending |
 | Explain metrics, evaluation-set construction, per-category results, and limitations | Initial simulator method documented; full report pending |
 | Analyze at least 10 failure cases individually | Pending; collect cases as features are built |
 | State what would be measured with more time | Planned in final report |
@@ -64,10 +64,32 @@ subsequent defect draws. Current queue-aware policies do not explicitly detect a
 closure. A causal estimate of closure impact or a claim of failure detection needs
 additional controlled evidence, not just the normal/shock table difference.
 
-## Chat evaluation: define the rubric before implementing intake
+## Chat evaluation: define the rubric before implementing language intake
+
+The [dispatch preview](DISPATCH_PREVIEW.md) now supports structured inputs and an
+independent snapshot convention specified in [DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md).
+Its draft fixtures are implementation examples, not gold labels or evidence of
+language understanding. The generated prototype bundles their tool outcomes.
+Generate a blank independent annotation sheet with
+`uv run python -m dss5105.prototype --annotations results/annotations-rater-a.csv`.
+The generator never copies predicted outcomes into expected-label columns.
+
+The [Streamlit page](STREAMLIT_APP.md) now has offline AppTest coverage for request
+selection, live custom weights, exception states, preference precedence, and demo
+confirmation invalidation. These are application behavior checks using draft
+structured inputs, not NLP accuracy, human usability results, or durable commitment
+tests. Browser layout still needs manual review in Chrome.
+
+Natural-language intake now has fake-model and AppTest coverage for typed extraction,
+literal evidence validation, clarification state, preserved constraints, explicit
+retry, and absence of provider calls on ordinary reruns. These do not measure real
+extraction accuracy. The [intake contract](INTAKE_CONTRACT.md) distinguishes those
+checks from semantic correctness/completeness. The first live run is documented in
+[CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md), with a frozen draft rubric,
+raw outputs and manual review of errors that the automated checks missed.
 
 The simulator never reads `dispatch_requests.txt`. Run these requests through the
-future chat application and retain the conversation, tool inputs/outputs, structured
+chat application and retain the conversation, tool inputs/outputs, structured
 request, decision, and explanation for each case.
 
 | Behavior | What to judge |
@@ -87,7 +109,8 @@ as any reference policy. For a requested deadline, feasibility must use the perm
 candidate set. An instruction such as R21's "cheapest shop that can still make" the
 date is a constrained request, not merely a different soft weight vector.
 
-Before labeling, decide and record:
+The first increment records conservative choices below in the dispatch contract.
+Review them as a team before freezing annotations:
 
 - Whether each inbox case starts from the same 2026-04-01 snapshot or earlier cases
   update shared queues. The data does not itself define a commitment sequence.
@@ -121,7 +144,9 @@ course does not prescribe an additional set of exactly 30 chat requests.
 
 ## Explanation faithfulness
 
-An automated checker is planned. It should link claims to the right tool field,
+The live runner now checks candidate-bound numerical display fields and selected
+workshop eligibility. This is a partial tool-integrity audit, not a complete
+explanation-faithfulness checker. The full checker should link claims to the right tool field,
 request, workshop, units, and state snapshot. Merely finding the same number anywhere
 in a tool-output log is insufficient: the right value attached to the wrong workshop
 is still false. Check non-numerical claims such as eligibility and imposed constraints

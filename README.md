@@ -2,6 +2,7 @@
 
 Track 2: the Quick-Response Subcontracting Desk. The first working increment is
 an offline, configurable allocator evaluated with the course's shared simulator.
+The next increment adds structured dispatch previews and an interactive product prototype.
 
 ## Quickstart
 
@@ -10,11 +11,55 @@ git clone git@github.com:JoshuaGloor/dss5105-capstone-project.git
 cd dss5105-capstone-project
 uv sync --all-groups         # installs everything into .venv
 uv run pre-commit install    # sets up the commit-time checks
-cp .env.example .env         # then paste in your own API key
 uv run pytest                # see current tests pass
 ```
 
 As suggested by the course, we run and manage everything using `uv`.
+No API key is needed for tests, allocation experiments, or the prototype. Set up
+`.env` only when deliberately running a provider-backed feature or live test.
+
+## Streamlit dispatch desk
+
+```bash
+sh scripts/run_app.sh
+```
+
+Open `http://localhost:8501` in Chrome. The page supports request selection, live
+Python previews, objective presets and custom weight sliders, candidate comparison,
+exclusion reasons, evidence export, and demo confirmation. Supplied examples need no API key.
+Choose **Natural language** to submit a request and answer clarification questions
+using the configured model. Provider calls happen only on send/retry; Python tools
+still calculate every estimate. See [the language guide](docs/NATURAL_LANGUAGE.md).
+The launcher keeps caches/temp files in this project and does not open a browser.
+See [the web app guide](docs/STREAMLIT_APP.md) for examples, tests, and limitations.
+
+The [first real-model evaluation](docs/CHAT_EVALUATION_RESULTS.md) covers all supplied
+inbox requests and records both automated failures and manual-review findings.
+See [the evaluation command](docs/CHAT_EVALUATION.md) to reproduce a paid run;
+default tests remain offline. Its draft-check results are not held-out accuracy.
+
+## Portable HTML prototype and CLI
+
+```bash
+uv run python -m dss5105.dispatch --request R12 --preset lateness
+uv run python -m dss5105.prototype
+```
+
+Open [the HTML prototype](docs/prototype/index.html) directly in a browser. It
+compares Python-generated previews, explains exclusions, and exports evidence.
+The web interface uses **Streamlit**; this HTML remains a standalone design reference.
+No Streamlit installation is needed to open the HTML.
+Its request interpretations are hand-authored development fixtures, not a working
+language agent. Confirmation demonstrates the UI only; it saves no allocation.
+
+See [PLAN.md](PLAN.md) for the staged build plan,
+[the dispatch run guide](docs/DISPATCH_PREVIEW.md) for input/state conventions, and
+[the Sprint 1 architecture](docs/sprint1-architecture.svg) for implemented vs planned
+components. The primary objective remains a team decision.
+
+Keep new artifacts, helper scripts, caches, and temporary files within the project.
+Prototype review does not require browser automation or an external browser profile;
+open the HTML directly in Chrome.
 
 ## Allocation experiments (no API key needed)
 

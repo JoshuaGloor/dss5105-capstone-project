@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickResponse | Dispatch desk prototype</title>
+  <style>
+    :root { color-scheme: light; --ink:#203731; --muted:#60726c; --paper:#f4f3ec; --line:#dce3db; --green:#1c5948; --mint:#e9f3e9; --amber:#94631a; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,select { font:inherit; }
+    button { cursor:pointer; }
+    button:disabled { cursor:not-allowed; opacity:.6; }
+    button:focus-visible, a:focus-visible, summary:focus-visible { outline:3px solid #cf923e; outline-offset:3px; }
+    header { min-height:78px; display:flex; align-items:center; justify-content:space-between; padding:16px 32px; background:#fff; border-bottom:1px solid var(--line); gap:20px; }
+    .brand { font-size:23px; font-weight:750; letter-spacing:-1px; }
+    .brand span { display:inline-grid; place-items:center; background:var(--green); color:#fff; width:34px; height:34px; margin-right:10px; border-radius:9px; font-size:19px; }
+    .top-meta { display:flex; align-items:center; gap:20px; font-size:12px; color:var(--muted); }
+    .badge { display:inline-block; padding:5px 10px; border-radius:5px; font-size:11px; font-weight:700; letter-spacing:.04em; background:var(--mint); color:var(--green); }
+    .demo-banner { padding:9px 32px; background:#e9eae1; color:#46554e; font-size:12px; }
+    .shell { display:grid; grid-template-columns:268px minmax(0,1fr); min-height:calc(100vh - 115px); }
+    aside { background:#fbfbf7; border-right:1px solid var(--line); padding:28px 16px; }
+    .eyebrow { text-transform:uppercase; letter-spacing:.14em; font-size:10px; font-weight:750; color:var(--muted); }
+    .inbox-heading { display:flex; align-items:center; justify-content:space-between; margin:0 10px 18px; }
+    .inbox-heading h2 { margin:0; font-size:18px; }
+    #inbox { max-height:900px; overflow-y:auto; padding-right:3px; }
+    .request { width:100%; text-align:left; padding:13px 12px; border:0; border-radius:8px; margin-bottom:5px; background:transparent; color:var(--ink); }
+    .request:hover { background:#efefe7; }
+    .request[aria-pressed=true] { background:var(--green); color:#fff; }
+    .request small { display:block; color:var(--muted); font-size:11px; margin:4px 0; }
+    .request[aria-pressed=true] small { color:#c7ded4; }
+    .request-line { display:flex; justify-content:space-between; gap:10px; font-size:12px; font-weight:650; }
+    .request-text { font-size:13px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .aside-note { font-size:11px; color:var(--muted); margin:22px 10px 0; }
+    main { padding:32px 38px 42px; max-width:1530px; min-width:0; }
+    .intro { display:flex; justify-content:space-between; align-items:end; gap:18px; margin-bottom:24px; }
+    h1 { font-size:32px; line-height:1.18; letter-spacing:-1.2px; margin:8px 0; font-weight:650; }
+    .intro p { color:var(--muted); margin:0; font-size:13px; }
+    .flow { display:flex; gap:14px; font-size:11px; color:var(--muted); white-space:nowrap; padding-bottom:5px; }
+    .flow b { color:var(--green); }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:12px; }
+    .message { padding:20px 24px; display:grid; grid-template-columns:36px 1fr; gap:14px; }
+    .avatar { background:#eeeadd; color:#675e45; border-radius:50%; width:36px; height:36px; display:grid; place-items:center; font-weight:700; }
+    .message-meta { display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:12px; color:var(--muted); }
+    .message-meta strong { color:var(--ink); }
+    #message { margin:8px 0 0; font-size:16px; }
+    .context { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .context span { background:var(--paper); padding:4px 8px; border-radius:4px; font-size:11px; }
+    .workspace { display:grid; grid-template-columns:minmax(0,1fr) 254px; gap:20px; margin-top:20px; align-items:start; }
+    .workspace > * { min-width:0; }
+    .decision { padding:23px 24px; }
+    .decision-head { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .status { color:var(--green); background:var(--mint); border-radius:4px; padding:5px 9px; font-size:11px; font-weight:700; }
+    .status.review { color:#7f5618; background:#faf0db; }
+    .status.block { color:#8e4740; background:#f9e9e5; }
+    #recommendation { font-size:28px; margin:15px 0 5px; letter-spacing:-.7px; line-height:1.2; }
+    #explanation { color:var(--muted); font-size:13px; margin:10px 0 19px; }
+    .metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid var(--line); padding-top:18px; gap:15px; }
+    .metric span { display:block; color:var(--muted); font-size:11px; }
+    .metric strong { display:block; font-size:22px; font-weight:650; margin:3px 0; }
+    .metric small { font-size:10px; color:var(--muted); }
+    #flags { margin:14px 0 0; font-size:12px; color:var(--amber); }
+    .actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:20px; }
+    .primary,.secondary { border:0; padding:10px 15px; border-radius:6px; font-size:12px; font-weight:650; }
+    .primary { background:var(--green); color:#fff; }
+    .secondary { background:#f0f2ed; color:var(--ink); }
+    .objective { padding:20px; }
+    .objective h2 { font-size:15px; margin:5px 0 8px; }
+    .objective p { font-size:11px; color:var(--muted); margin:8px 0 16px; }
+    .preset { width:100%; display:flex; justify-content:space-between; align-items:center; text-align:left; padding:11px; border:1px solid var(--line); background:#fff; border-radius:7px; color:var(--ink); margin-bottom:7px; font-size:13px; }
+    .preset[aria-pressed=true] { background:var(--mint); border-color:#438266; }
+    .preset small { display:block; color:var(--muted); font-size:10px; }
+    .preset .mark { color:var(--green); }
+    .weight-line { display:flex; justify-content:space-between; font-size:11px; margin-top:10px; }
+    .weight-value { font-variant-numeric:tabular-nums; font-weight:650; }
+    .objective details { border-top:1px solid var(--line); padding-top:12px; margin-top:16px; }
+    summary { cursor:pointer; color:var(--muted); font-size:12px; }
+    .comparison { margin-top:20px; padding:21px 24px; }
+    .section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .section-title h2 { font-size:15px; margin:0; }
+    .section-title small { font-size:11px; color:var(--muted); }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:12px; text-align:left; }
+    th { color:var(--muted); font-size:10px; font-weight:500; padding:10px 8px; white-space:nowrap; }
+    td { border-top:1px solid #edf0ea; padding:12px 8px; white-space:nowrap; }
+    td:last-child,th:last-child { text-align:right; }
+    tr.chosen { background:#f0f7ee; }
+    .workshop-name { display:block; font-weight:650; }
+    td small { color:var(--muted); font-size:10px; }
+    .pass { color:var(--green); } .late { color:#94631a; }
+    .empty { font-size:13px; color:var(--muted); padding:18px 0; }
+    #exclusions { margin-top:17px; }
+    .exclusion { font-size:12px; padding:9px 0; border-top:1px solid #edf0ea; }
+    .exclusion span { color:var(--muted); }
+    .evidence { margin-top:20px; padding:17px 24px; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:350px; overflow:auto; font-size:11px; color:#43544c; background:#f6f7f2; padding:15px; border-radius:6px; }
+    footer { margin-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:11px; color:var(--muted); }
+    footer a { color:var(--green); }
+    dialog { color:var(--ink); width:min(520px,92vw); border:1px solid var(--line); border-radius:14px; padding:30px; box-shadow:0 20px 100px #142b3140; }
+    dialog::backdrop { background:#13281d70; }
+    dialog h2 { margin:8px 0; font-size:24px; }
+    dialog p { color:var(--muted); font-size:14px; }
+    .receipt { margin-top:15px; padding:12px; background:var(--mint); border-radius:6px; font-size:12px; }
+    [hidden] { display:none !important; }
+    @media(min-width:1600px) { #inbox { max-height:1080px; } }
+    @media(max-width:1150px) { main { padding:26px 22px; } .shell { grid-template-columns:225px minmax(0,1fr); } .workspace { grid-template-columns:1fr; } .objective { display:grid; grid-template-columns:1fr 1fr; gap:16px; } .flow { display:none; } }
+    @media(max-width:700px) { header { padding:16px; } .top-meta .date { display:none; } .demo-banner { padding:10px 16px; } .shell { display:block; } aside { border-right:0; border-bottom:1px solid var(--line); padding:16px; } #inbox { display:flex; gap:8px; max-height:none; overflow-x:auto; } .request { min-width:210px; max-width:210px; margin:0; } .inbox-heading { margin-bottom:10px; } .aside-note { display:none; } main { padding:22px 16px; } h1 { font-size:27px; } .decision,.comparison { padding:20px 16px; } .objective { display:block; } .metrics { gap:10px; } .metric strong { font-size:18px; } .message { padding:18px; } footer { display:block; } }
+    @media(max-width:700px) { header { gap:12px; } .brand { white-space:nowrap; font-size:20px; } .top-meta > span:first-child { display:none; } .top-meta { gap:0; } .top-meta .badge { font-size:9px; } }
+    @media print { aside,.actions,.objective,footer,.demo-banner { display:none; } .shell,.workspace { display:block; } main { max-width:none; } .panel { break-inside:avoid; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><span aria-hidden="true">q</span>QuickResponse</div>
+    <div class="top-meta"><span>SUBCONTRACTING DESK</span><span class="date" id="as-of"></span><span class="badge">PRODUCT PROTOTYPE</span></div>
+  </header>
+  <div class="demo-banner">Offline demonstration. Real tool estimates, draft request interpretations. Confirmation is a demo; no capacity is reserved.</div>
+  <div class="shell">
+    <aside aria-label="Dispatch requests">
+      <div class="inbox-heading"><h2>Inbox</h2><span class="badge" id="inbox-count"></span></div>
+      <nav id="inbox" aria-label="Select a supplied request"></nav>
+      <p class="aside-note">Each request starts from the same queue snapshot. Switching requests does not allocate work.</p>
+    </aside>
+    <main>
+      <div class="intro"><div><div class="eyebrow">Review before dispatch</div><h1>The right workshop.<br>A decision you can explain.</h1><p>Understand the request, compare the options, keep the evidence.</p></div><div class="flow"><b>Request</b><span>&gt;</span><b>Compare</b><span>&gt;</span><span>Confirm</span></div></div>
+      <section class="panel message" aria-label="Original request"><div class="avatar" id="avatar"></div><div><div class="message-meta"><strong id="sender"></strong><span id="message-time"></span><span id="request-id" class="badge"></span></div><p id="message"></p><div class="context" id="context"></div></div></section>
+      <div class="workspace">
+        <div>
+          <section class="panel decision" aria-label="Allocation preview" aria-live="polite">
+            <div class="decision-head"><span class="eyebrow">Tool-backed decision</span><span id="status" class="status"></span></div>
+            <h2 id="recommendation"></h2><p id="explanation"></p>
+            <div class="metrics" id="metrics"><div class="metric"><span>Expected turnaround</span><strong id="turnaround"></strong><small id="eta"></small></div><div class="metric"><span>Subcontracting cost</span><strong id="cost"></strong><small>Source cost units</small></div><div class="metric"><span>Batch defect risk</span><strong id="defects"></strong><small>Workshop profile probability</small></div></div>
+            <p id="flags" hidden></p>
+            <div class="actions"><button class="primary" id="confirm" type="button">Review confirmation</button><button class="secondary" id="download" type="button">Export tool evidence</button></div>
+            <div class="receipt" id="receipt" role="status" hidden>Demo confirmation recorded in this view only. No allocation was saved and no queue was changed.</div>
+          </section>
+          <section class="panel comparison" aria-label="Workshop comparison">
+            <div class="section-title"><h2>Candidate workshops</h2><small>Same order. Same queue snapshot.</small></div>
+            <div class="table-wrap"><table id="candidate-table"><thead><tr><th>Workshop</th><th>Expected days</th><th>Cost units</th><th>Defect risk</th><th>Deadline</th></tr></thead><tbody id="candidates"></tbody></table></div>
+            <p class="empty" id="empty" hidden></p>
+            <details id="exclusions"><summary>Why other workshops are excluded</summary><div id="excluded-list"></div></details>
+          </section>
+        </div>
+        <section class="panel objective" aria-label="Objective configuration">
+          <div><div class="eyebrow">Decision settings</div><h2>Compare objectives</h2><p>Primary selection is pending. These are exploratory presets, not a final team declaration.</p>
+          <div role="group" aria-label="Objective preset"><button class="preset" data-preset="lateness" aria-pressed="true"><span>Lateness<small>Primary candidate</small></span><span class="mark">&rarr;</span></button><button class="preset" data-preset="defects" aria-pressed="false"><span>Defects<small>Comparison objective</small></span><span class="mark">&rarr;</span></button><button class="preset" data-preset="hybrid" aria-pressed="false"><span>Hybrid<small>Weighted compromise</small></span><span class="mark">&rarr;</span></button></div></div>
+          <div><p id="override"></p><div class="weight-line"><span>Lateness weight</span><span class="weight-value" id="weight-lateness"></span></div><div class="weight-line"><span>Defects weight</span><span class="weight-value" id="weight-defects"></span></div><div class="weight-line"><span>Cost weight</span><span class="weight-value" id="weight-cost"></span></div><details><summary>Custom weights &amp; sliders</summary><p>Live sliders in the planned Streamlit web app will call the Python preview tools. This HTML prototype switches precomputed presets.</p></details><p>Hard constraints always apply. A hybrid need not fall between both other outcomes on every metric.</p></div>
+        </section>
+      </div>
+      <details class="panel evidence"><summary>Inspect the structured input and numerical evidence</summary><p class="eyebrow">Development fixture interpretation - requires human review</p><pre id="evidence"></pre></details>
+      <footer><span>Delivery estimates include expected rework. This preview does not predict unknown workshop closures.</span><a href="../sprint1-architecture.svg">System architecture</a></footer>
+    </main>
+  </div>
+  <dialog id="confirmation" aria-labelledby="dialog-title"><div class="eyebrow">Confirmation preview</div><h2 id="dialog-title">Review the allocation</h2><p id="confirm-summary"></p><p>The final app will validate the latest queue state and save an auditable allocation. This button demonstrates the interaction only.</p><div class="actions"><button id="cancel-confirm" class="secondary">Back to comparison</button><button id="demo-confirm" class="primary">Confirm demo only</button></div></dialog>
+  <script id="dispatch-data" type="application/json">__DISPATCH_DATA__</script>
+  <script>
+    const data = JSON.parse(document.getElementById('dispatch-data').textContent);
+    const el = id => document.getElementById(id);
+    const escapeText = value => String(value).replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+    let activeRequest = 'R25';
+    let activePreset = 'lateness';
+    const titles = {RECOMMEND:'Ready to review',CLARIFY:'Clarification needed',REFUSE_SUGGESTION:'Suggested workshop refused',NEEDS_REVIEW:'Exception needs review',NO_FEASIBLE_OPTION:'No feasible option',DECLINE:'Data unavailable',RECORDED_STATUS:'Recorded status only'};
+    const flagLabels = {PAST_DEADLINE:'The deadline is already in the past.',NO_ON_TIME_OPTION:'No permitted whole-batch option meets the date.',SPLIT_NOT_IMPLEMENTED:'Split planning needs a separate review.',SELECTED_OPTION_LATE:'The selected option misses the date.',SUGGESTION_REFUSED:'The proposed workshop is not permitted.'};
+    const current = () => data.previews[activeRequest][activePreset];
+    el('as-of').textContent = 'Snapshot ' + data.as_of;
+    el('inbox-count').textContent = data.inbox_count + ' requests';
+    el('inbox').innerHTML = data.inbox.map(item => `<button class="request" type="button" data-request="${escapeText(item.request_id)}" aria-pressed="false"><span class="request-line"><span>${escapeText(item.requester)}</span><span>${escapeText(item.time)}</span></span><small>${escapeText(item.request_id)}</small><span class="request-text">${escapeText(item.text)}</span></button>`).join('');
+    function render() {
+      const result = current();
+      const request = result.request;
+      const chosenId = result.recommendation || result.alternative;
+      const chosen = result.candidates.find(row => row.estimate.workshop_id === chosenId);
+      el('receipt').hidden = true;
+      el('confirmation').close();
+      document.querySelectorAll('[data-request]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.request === activeRequest)));
+      document.querySelectorAll('[data-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.preset === activePreset)));
+      el('avatar').textContent = request.requester.charAt(0);
+      el('sender').textContent = request.requester;
+      el('message-time').textContent = request.time;
+      el('request-id').textContent = request.request_id;
+      el('message').textContent = request.text;
+      const context = result.order ? [result.order.order_id,result.order.customer,result.order.product,result.order.pieces + ' pieces', 'Delivery due ' + (result.batch ? result.batch.due_date : result.order.due_date)] : ['Order needs resolution'];
+      if (result.input.date_uncertain || result.input.date_kind === 'shipping') context[context.length - 1] = 'Delivery date needs confirmation';
+      el('context').innerHTML = context.map(item => '<span>' + escapeText(item) + '</span>').join('');
+      el('status').textContent = titles[result.status];
+      el('status').className = 'status' + (result.status === 'RECOMMEND' ? '' : ['REFUSE_SUGGESTION','DECLINE','NO_FEASIBLE_OPTION'].includes(result.status) ? ' block' : ' review');
+      el('recommendation').textContent = chosen ? (result.alternative ? 'Alternative: ' : result.status === 'NEEDS_REVIEW' ? 'For discussion: ' : '') + chosen.name : titles[result.status];
+      el('explanation').textContent = result.message;
+      el('metrics').hidden = !chosen;
+      if (chosen) { el('turnaround').textContent = chosen.display.turnaround; el('eta').textContent = 'ETA ' + chosen.display.eta; el('cost').textContent = chosen.display.cost; el('defects').textContent = chosen.display.defects; }
+      el('flags').hidden = !result.flags.length;
+      el('flags').textContent = result.flags.map(flag => flagLabels[flag]).join(' ');
+      el('confirm').disabled = result.status !== 'RECOMMEND';
+      el('confirm').textContent = result.status === 'RECOMMEND' ? 'Review confirmation' : 'Resolve before confirmation';
+      for (const key of ['lateness','defects','cost']) el('weight-' + key).textContent = result.effective_weights[key];
+      el('override').textContent = result.input.preference === 'configured' ? 'Effective preset: ' + data.preset_labels[activePreset] : 'Request preference overrides presets: ' + result.input.preference.replaceAll('_',' ') + '. These weights stay fixed.';
+      el('candidate-table').hidden = !result.candidates.length;
+      el('empty').hidden = !!result.candidates.length;
+      el('empty').textContent = result.status === 'CLARIFY' ? 'Resolve the request before comparing workshops.' : result.status === 'DECLINE' ? 'No estimate can answer a question about unavailable records.' : 'No permitted candidate evidence is available.';
+      el('candidates').innerHTML = result.candidates.map(row => `<tr class="${row.estimate.workshop_id === chosenId ? 'chosen' : ''}"><td><span class="workshop-name">${escapeText(row.name)}</span><small>${escapeText(row.estimate.workshop_id)}${row.estimate.workshop_id === chosenId ? ' / preview' : ''}</small></td><td>${escapeText(row.display.turnaround)}</td><td>${escapeText(row.display.cost)}</td><td>${escapeText(row.display.defects)}</td><td class="${row.meets_deadline ? 'pass' : 'late'}">${row.meets_deadline ? 'Meets estimate' : 'Late ' + escapeText(row.display.lateness)}</td></tr>`).join('');
+      el('exclusions').hidden = !result.excluded.length;
+      el('excluded-list').innerHTML = result.excluded.map(row => `<div class="exclusion"><strong>${escapeText(row.name)}</strong><br><span>${escapeText(row.reasons.join(' '))}</span></div>`).join('');
+      el('evidence').textContent = JSON.stringify({interpretation_source:data.interpretation_source,fixture_sha256:data.fixture_sha256,...result},null,2);
+    }
+    el('inbox').addEventListener('click', event => { const button = event.target.closest('[data-request]'); if (button) { activeRequest = button.dataset.request; render(); } });
+    document.querySelectorAll('[data-preset]').forEach(button => button.addEventListener('click', () => { activePreset = button.dataset.preset; render(); }));
+    el('confirm').addEventListener('click', () => { const result = current(); const chosen = result.candidates.find(row => row.estimate.workshop_id === result.recommendation); el('confirm-summary').textContent = result.order.order_id + ' to ' + chosen.name + '. Estimated delivery: ' + chosen.display.eta + '. Cost: ' + chosen.display.cost + ' source units.'; el('confirmation').showModal(); });
+    el('cancel-confirm').addEventListener('click', () => el('confirmation').close());
+    el('demo-confirm').addEventListener('click', () => { el('confirmation').close(); el('receipt').hidden = false; });
+    el('download').addEventListener('click', () => { const blob = new Blob([el('evidence').textContent],{type:'application/json'}); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href=url; link.download=activeRequest+'-'+activePreset+'-preview.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url),1000); });
+    render();
+  </script>
+</body>
+</html>

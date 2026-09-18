@@ -46,6 +46,11 @@ Two rules that override convenience:
 
 ## Environment
 
+- Keep all newly created artifacts, helper scripts, caches, and temporary files
+  inside this project. Do not create external browser profiles or launch browser
+  automation for prototype review; the user opens the standalone HTML in Chrome.
+- The final web interface uses Streamlit. The HTML prototype is a design reference;
+  do not introduce a separate frontend stack or API service without a concrete need.
 - `uv` only. `uv sync --all-groups` to install, `uv run <cmd>` to run anything.
 - Never `pip install`, never activate a venv by hand.
 - If you change `pyproject.toml`, commit the updated `uv.lock` too. CI runs
