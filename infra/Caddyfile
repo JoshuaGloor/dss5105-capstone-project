@@ -1,0 +1,16 @@
+# SITE_ADDRESS defaults to ":80" (plain HTTP on the instance IP).
+# Set it to a domain and Caddy gets and renews a certificate by itself.
+{$SITE_ADDRESS::80} {
+	encode gzip
+
+	# Streamlit serves the app and its own client, just specify compose service name and port.
+	reverse_proxy app:8501
+
+	# The demo URL is public and the app spends real LLM credits. We know this PW hash is committed.
+	# It simply is to avoid bots etc. from using credits, not meant to be real auth.
+	# To set a new password, generate a hash and replace the block below:
+	#   {podman | docker} run --rm docker.io/library/caddy:2 caddy hash-password --plaintext 'your-password'
+	basic_auth {
+		demo_user $2a$14$owxe3G7lBF3JEHlJtCDwNe9pdts6601dYXWyp9Pf.GRbmZye9TiHO
+	}
+}

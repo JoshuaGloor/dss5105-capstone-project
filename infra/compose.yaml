@@ -1,0 +1,52 @@
+# Shared by local dev and the server. Two services; no frontend.
+#
+# Local:  cd infra && {podman | docker} compose up --build
+# Server: docker compose -f compose.yaml -f compose.prod.yaml up -d
+#         (-f is explicit, so compose.override.yaml is ignored there)
+name: dss5105
+
+# Reusable logging config; same for both services.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  app:
+    # Locally localhost/dss5105-app:dev, where both engines keep images they
+    # built; on the server .env sets REGISTRY to the ECR host.
+    image: ${REGISTRY:-localhost}/dss5105-app:${TAG:-dev}
+    restart: unless-stopped
+    healthcheck:
+      # We use Streamlit's own readiness endpoint, so caddy can wait for it below (service_healthy)
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import sys, urllib.request
+          body = urllib.request.urlopen("http://127.0.0.1:8501/_stcore/health", timeout=3).read()
+          sys.exit(0 if body.strip() == b"ok" else 1)
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    logging: *logging
+
+  caddy:
+    # Fully qualified since podman has no implicit docker.io default.
+    image: docker.io/library/caddy:2
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro # Bind mount: copy Caddyfile into container
+      - caddy_data:/data # Named volume: Caddy's state
+    depends_on:
+      app:
+        condition: service_healthy
+    logging: *logging
+
+volumes:
+  caddy_data:
