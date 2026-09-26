@@ -1,7 +1,9 @@
 # Sprint 1 deck: content draft
 
 Working draft of `Presentation_Group11_Sprint1` (.pptx or .pdf, upload by 15:00 on
-Fri 16 Oct 2026; live 5 minutes + 2 minutes Q&A, hard stop). Slide order follows
+Fri 16 Oct 2026; live 5 minutes + 2 minutes Q&A, hard stop). The built deck is
+[slides/Presentation_Group11_Sprint1.pptx](slides/Presentation_Group11_Sprint1.pptx),
+with these speaker notes; fill in member names and owners before upload. Slide order follows
 Spec v5 p. 3. Every number on a slide comes from a retained evidence file named
 under that slide; do not type a number into the deck that is not listed here.
 

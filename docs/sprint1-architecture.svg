@@ -68,8 +68,8 @@
   <path d="M661 357 H695" class="line"/>
   <path d="M1179 390 H1213" class="line"/>
   <path d="M936 542 V565 H196 V526" class="line"/>
-  <rect x="400" y="552" width="365" height="26" fill="#f4f3ec"/>
-  <text x="415" y="570" class="tiny">Tool evidence returns to the review interface</text>
+  <rect x="290" y="552" width="365" height="26" fill="#f4f3ec"/>
+  <text x="305" y="570" class="tiny">Tool evidence returns to the review interface</text>
 
   <rect x="56" y="615" width="605" height="117" rx="10" class="ready"/>
   <text x="79" y="648" class="heading">Course data + draft structured inputs</text>
