@@ -47,8 +47,10 @@ or simulator outcomes. Do not send fixture interpretations as model input.
   Python applies the inbox year when omitted and the declared snapshot for relative
   dates. Ambiguous formats and other relative phrases prompt for an explicit date.
 - An unknown revised date marks the prior deadline uncertain. A validated new date
-  clears date uncertainty; shipping vs delivery is a separate question.
-- Question codes: order, quantity, deadline, date_kind, scope, constraint_change.
+  clears date uncertainty. The model marks a ship date with `date_kind=shipping` but
+  never asks about it; the dispatch tool compares it with the recorded due date and
+  asks only when they differ (intake-v2).
+- Question codes: order, quantity, deadline, scope, constraint_change.
   Python supplies the question text. Missing-state codes remain pending until the
   corresponding field is supplied; scope/constraint-change require a new request.
 - A different explicit order ID after one has been established requires starting a
@@ -77,15 +79,26 @@ Retain the failed user message separately. Require Retry or New request before a
 different follow-up so a failed constraint-bearing message is not silently skipped.
 Retries are explicit; there is no background model-call loop.
 
-Natural language is an explicit mode next to offline supplied examples. Sending a
+Group-chat request is the default mode; offline supplied examples remain one click
+away. Sending a
 message in that mode calls the configured provider and may incur its normal usage
-charges. Read-only previews still require review and cannot create allocations.
+charges. Read-only previews cannot create allocations. Saved-plan mode wraps the
+same validated input in a separate human-confirmed persistence workflow; the model
+never supplies commit authority or a confirming dispatcher identity.
 On reruns, re-evaluate the validated draft through Python with the selected weights.
 All assistant questions and numerical cards come from deterministic tool outputs;
 unverified model prose is never displayed as an explanation.
 
+Answer buttons are a second input path. `apply_selection` turns a clicked order ID or
+alternative workshop into a quoted patch and validates it with `apply_patch`, exactly
+like model output. The dispatcher is the speaker, provenance records the change, and
+the trace says no model was called. Buttons are offered only from tool results: the
+in-progress orders behind an ambiguous reference, or the alternative the tool chose
+for a refused workshop. A clicked alternative still passes eligibility and exclusions.
+
 No automatic chat logs are written to disk. Session evidence is downloadable by
-the user. All development artifacts, caches, and test temporary files remain in
+the user. Explicit saved-plan confirmation retains reviewed intake evidence in the
+allocation record. All development artifacts, caches, and test temporary files remain in
 the repository. Live provider verification is not part of default tests.
 
 ## Evaluation limits

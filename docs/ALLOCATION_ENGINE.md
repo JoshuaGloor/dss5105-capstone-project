@@ -9,7 +9,7 @@ From a source checkout, after `uv sync --all-groups`:
 
 ```bash
 uv run python -m dss5105.evaluate --output results/allocation-normal.json
-uv run python -m dss5105.evaluate --shock --output results/allocation-shock.json
+uv run python -m dss5105.evaluate --shock --seeds 10 --output results/allocation-shock.json
 uv run pytest
 
 # Run one preset, without editing Python
@@ -21,14 +21,19 @@ uv run python -m dss5105.evaluate \
   --output results/custom.json
 ```
 
-The table comes directly from the original `Simulator.report()`. The JSON saves
+Single-seed tables use official `Simulator.report()`. `--seeds N` averages
+the official per-run metrics and uses the official table formatter. Shock series
+also retain paired normal traces, mean late-rate/late-days changes and the normal
+random-lateness guardrail. Use `--shock --seeds 10` for course reporting. The JSON saves
 the seed, source hashes, weights, scales, per-order choices, queue snapshots and
 outcomes. Weighted policies also save all eligible candidate scores. Generated
 results are ignored by Git; explicitly select evidence to publish later.
 
 `mean days` and `p90 days` measure turnaround, not days overdue. `% late` counts
 late batches; `% defect` counts batches with a simulated defect event. `max share`
-measures the largest share of allocated pieces. No official combined grade exists.
+measures the largest share of allocated pieces. `late days` is mean positive
+overdue days across all batches; `% def pcs` weights defective batches by pieces.
+It is not a count of individually inspected defective garments. No combined grade exists.
 
 Without `--preset` or custom weight flags, `evaluate` compares every current preset.
 `--preset NAME` runs one configured objective while retaining all four references
@@ -62,8 +67,13 @@ score = lateness_weight * lateness_days / lateness_scale
       + defects_weight * defect_risk / defects_scale
       + cost_weight * cost_per_piece / cost_scale
 
-lateness_days = max(0, expected_turnaround_days - days_until_due)
+lateness_days = max(0, expected_turnaround_days + deadline_buffer_days - days_until_due)
 ```
+
+`deadline_buffer_days` is part of the configuration and defaults to 0, which is the
+original score. A positive buffer penalizes candidates that would use nearly all of
+the slack; estimates and the "meets deadline" test do not change. See
+[MARGIN_STUDY.md](MARGIN_STUDY.md) for why it exists and what it buys.
 
 The minimum score wins. All configurations break ties by expected turnaround,
 then workshop ID. Thus, when every shop can deliver on time, pure lateness chooses
@@ -105,9 +115,10 @@ and chat-imposed constraints are not implemented in this first increment.
 - No policy reads future orders, the hidden shock target, or future defect draws.
   Shock information can only affect later choices through the queues supplied by
   the harness. A good shock score alone does not prove explicit failure detection.
-- Every `Simulator.run` starts fresh queues and its seeded RNG. Normal and shock
-  scenarios do not have identical defect draws: choosing a shock target consumes
-  randomness. A difference between the scenarios is not a pure closure effect.
+- Every `Simulator.run` starts fresh queues and its seeded RNG. Data v3 chooses
+  the shock target with a separate stream, aligning normal/shock random draws.
+  Different allocation paths can still change the probability of a defect event.
+  Report shock over ten seeds, with paired normal controls for robustness deltas.
 - `rank_candidates` returns an empty list when nobody is eligible. The simulator
   callback raises `NoEligibleWorkshop` because the harness has no deferral protocol.
   The future chat layer must turn this into an explicit escalation, not invent a shop.

@@ -1,5 +1,11 @@
 # Dispatch preview: run and inspect
 
+Data v3 is now loaded. Candidate tables show the April queue values; the Streamlit
+estimate breakdown also shows processing, transport and expected rework. Impossible
+requests show the earliest permitted estimated delivery and review options, with
+confirmation disabled. See [the update review](V3_REFINEMENT.md).
+
+
 The supplied `dispatch_requests.txt` is the natural-language evaluation inbox.
 `simulate.py` never reads it. This increment reads the inbox envelopes and connects
 explicit structured interpretations to the existing Python allocator. It does not
@@ -88,8 +94,9 @@ To review this prototype, simply open the HTML in Chrome; Streamlit is not requi
   filters; ambiguous results remain unresolved. Unknown explicit IDs do not fall
   back to an arbitrary customer order.
 - An explicit known delivery date overrides the stored deadline, preserving both
-  values. An uncertain new date blocks ranking. "Ship date" needs clarification
-  rather than being silently treated as a delivery deadline.
+  values. An uncertain new date blocks ranking. A "ship date" equal to the order's
+  recorded due date is used as the deadline, with a visible note; any other ship date
+  needs clarification rather than being silently treated as a delivery deadline.
 - A quantity, customer, or product conflict requires clarification. A future order
   amendment workflow must define who authorizes changed quantities.
 - Past/infeasible deadlines and split requests require review. No best-scoring

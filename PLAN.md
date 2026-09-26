@@ -1,5 +1,34 @@
 # Build plan: QuickResponse dispatch desk
 
+## Data v3 refinement completed
+
+See [the update review](docs/V3_REFINEMENT.md) and [refreshed offline evidence](docs/V3_EVALUATION.md).
+Official files, changed fixtures, queue evidence, infeasible-request options, paired
+ten-seed shock reporting and the generated HTML are updated. The objective formula
+and default whole-batch mode remain unchanged. The old live-chat run is historical;
+a new authorized live rerun and independent annotations remain pending.
+
+A second pass aligned tool behavior with the dictionary's request mix. A ship date
+that equals the recorded due date is used as the deadline (R06, R16). A status query
+on an unrecorded order is declined (R18). Two-workshop split estimates are shown for
+split requests and impossible dates. Split plans still cannot be saved.
+
+The allocator's value over earliest finish is now measured in
+[MARGIN_STUDY.md](docs/MARGIN_STUDY.md). Stall detection has no headroom under shock.
+A 10-day deadline buffer with a small cost weight cuts late days and cost but adds
+a few late batches, making it a candidate for the other-objective or hybrid comparison.
+
+The next team gate is to choose a primary objective using the Tracks v4 metrics and
+guardrails, then finish register/overload tools and deadline amendments. Lateness
+is the proposed candidate; pure defects currently fails the timeliness guardrail.
+The case for lateness against all four candidates, and the Sprint 1 slide content,
+are drafted in [SPRINT1_DECK.md](docs/SPRINT1_DECK.md) for team sign-off.
+
+Local durable confirmation is now implemented behind an explicit saved-plan mode.
+See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md). It is offline-tested
+for retries, concurrency, stale inputs, atomic queue updates and restart durability.
+
+
 Working version for team discussion. The product prototype is our proposed target
 experience, not a statement that every pictured feature is production-ready.
 
@@ -44,8 +73,9 @@ Product references:
    request-specific preference overrides the global preset.
 4. **Resolve exceptions.** Refuse an invalid suggested workshop and offer eligible
    alternatives. Explain late options without silently approving them. Clarify a
-   new date, obtain an explicit permitted change, or escalate. Split planning needs
-   separate semantics and evidence; it is not supported by the shared callback.
+   new date, obtain an explicit permitted change, or escalate. The tool estimates the
+   fastest two-workshop split; saving a split plan needs a record-contract extension,
+   and the shared simulator callback never splits.
 5. **Confirm.** Review the final order/workshop/configuration/evidence. Revalidate
    the state version, then save one auditable allocation and update queues atomically.
    A preview is not a reservation. Retrying confirmation must not duplicate work.
@@ -62,7 +92,7 @@ Product references:
 | Portable HTML prototype | Interactive inbox, preset comparison, evidence export, demo confirmation |
 | Streamlit web page | Implemented: native controls call live Python previews |
 | Custom weights | Available through CLI and live Streamlit sliders |
-| Confirmed allocation storage and queue mutation | Not implemented; prototype confirmation is local demonstration only |
+| Confirmed allocation storage and queue mutation | Implemented in Saved local plan; independent previews remain demo-only |
 | Full chat evaluation and faithfulness checker | Initial live inbox run and partial tool-integrity audit complete; independent gold, held-out and full explanation checks pending |
 
 ## Implementation sequence and acceptance gates
@@ -136,13 +166,13 @@ in the browser, no queue mutation on previews, and no rerun implicitly commits w
 
 ### Phase D - Confirm and record an allocation safely
 
-- [ ] Finalize `commit_allocation` before implementing it: request identity, approved
+- [x] Finalize `commit_allocation` before implementing it: request identity, approved
       constraints, state version, confirmation identity, idempotency key, and audit schema.
-- [ ] Define queue units and processing/rework update conventions. Delivery transport
+- [x] Define queue units and processing/rework update conventions. Delivery transport
       must not accidentally become workshop processing occupancy.
-- [ ] Add transactional local storage (SQLite is the initial proposal), request
+- [x] Add transactional local storage (SQLite), request
       uniqueness, stale-preview rejection, and an audit export.
-- [ ] Require renewed review if queue state, order details, or configuration changes.
+- [x] Require renewed review if queue state, order details, or configuration changes.
 - [ ] Support explicit deadline amendments/escalation without editing course source CSVs.
 
 Gate: repeated clicks create one allocation; simultaneous stale confirmations cannot
@@ -151,7 +181,8 @@ overbook; stored decisions reproduce their inputs, constraints, configuration, a
 ### Phase E - Evaluate, deploy, and prepare final evidence
 
 - [ ] Freeze and justify primary, comparison, and hybrid configurations.
-- [ ] Run all required shared baselines, short heuristic, and normal/shock scenarios.
+- [ ] Freeze final configurations and rerun shared baselines, simple heuristic,
+      normal and ten-seed shock scenarios. Exploratory v3 evidence is refreshed.
       Preserve seeds, source hashes, raw results, baseline wins, and inference limits.
 - [ ] Evaluate every supplied chat request and the frozen additional held-out cases;
       report behavior categories, decision correctness, explanation faithfulness,
@@ -180,16 +211,17 @@ the project brief. Do not claim that Sprint 1 requires the complete application.
 
 1. Select a primary candidate based on evidence; agree how the other objective and
    hybrid expose its tradeoffs. The formal declaration is at Sprint 1.
-2. Review date semantics: "ship date" may mean dispatch or delivery. Our current
-   conservative interpretation asks for clarification. Confirm the independent
-   inbox snapshot convention and later operational queue assumptions.
+2. Confirm the ship-date rule: a ship date equal to the recorded due date is used as
+   the deadline; any other ship date is still clarified. Use the course-defined April
+   queue snapshot; agree later operational queue assumptions.
 3. Agree the prototype's essential workflow and choose owners for tools/data,
    language intake, UI/state, and evaluation/documentation. Names remain unassigned.
 4. Split independent annotation work before discussing expected answers. Decide
    held-out coverage and the rule for judging multiple acceptable allocations.
-5. Review the first live evaluation, resolve the clarification defects, then finalize
-   the Phase D persistence contract. Defer multi-agent/DeepAgents and sophisticated split
-   planning until a demonstrated need justifies them.
+5. Review the first live evaluation, resolve the clarification defects, and define
+   the remaining deadline-amendment workflow. Decide whether dispatchers may confirm a
+   split plan; if so, extend the record contract for two-part allocations. Defer
+   multi-agent/DeepAgents until a demonstrated need justifies it.
 
 ## Reproduce this increment
 

@@ -2,7 +2,9 @@
 
 Track 2: the Quick-Response Subcontracting Desk. The first working increment is
 an offline, configurable allocator evaluated with the course's shared simulator.
-The next increment adds structured dispatch previews and an interactive product prototype.
+The Streamlit prototype adds natural-language intake and structured dispatch previews.
+Course sources: Spec v5, Tracks v4 and Data v3. See [the update review](docs/V3_REFINEMENT.md)
+and [refreshed evaluation evidence](docs/V3_EVALUATION.md).
 
 ## Quickstart
 
@@ -26,15 +28,28 @@ sh scripts/run_app.sh
 
 Open `http://localhost:8501` in Chrome. The page supports request selection, live
 Python previews, objective presets and custom weight sliders, candidate comparison,
-exclusion reasons, evidence export, and demo confirmation. Supplied examples need no API key.
-Choose **Natural language** to submit a request and answer clarification questions
-using the configured model. Provider calls happen only on send/retry; Python tools
-still calculate every estimate. See [the language guide](docs/NATURAL_LANGUAGE.md).
+exclusion reasons, evidence export, and confirmation. Supplied examples need no API key.
+The default **Independent previews** workspace keeps the course snapshot unchanged.
+Choose **Saved local plan**, review an on-time recommendation, enter the confirming
+dispatcher's name, and select **Confirm and save allocation** to persist a record
+and update local planning queues. Saved records survive restarts and can be exported.
+They live in Git-ignored `runtime/dispatch.sqlite3`; no workshop is contacted.
+See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md) for queue semantics,
+duplicate/stale-preview protection, and local-prototype limitations.
+The page opens on **Group-chat request**: paste a message or start from a course
+inbox message, and answer clarification questions using the configured model.
+Each reply is a card built by Python from tool output. Answer buttons for ambiguous
+orders and refused workshops apply the choice without another model call.
+Provider calls happen only on send/retry. **Supplied examples** is the offline mode
+with no model and no API key. See [the language guide](docs/NATURAL_LANGUAGE.md).
 The launcher keeps caches/temp files in this project and does not open a browser.
+The default port is fixed at 8501. Saved Python, CSS, data and example-input changes
+automatically rerun the open page; no model call or allocation is triggered by a rerun.
 See [the web app guide](docs/STREAMLIT_APP.md) for examples, tests, and limitations.
 
-The [first real-model evaluation](docs/CHAT_EVALUATION_RESULTS.md) covers all supplied
-inbox requests and records both automated failures and manual-review findings.
+The [first real-model evaluation](docs/CHAT_EVALUATION_RESULTS.md) covers the old inbox
+and is historical evidence only. Data v3 fixture replay is refreshed; a new live
+language run on the corrected inbox is still required.
 See [the evaluation command](docs/CHAT_EVALUATION.md) to reproduce a paid run;
 default tests remain offline. Its draft-check results are not held-out accuracy.
 
@@ -65,7 +80,7 @@ open the HTML directly in Chrome.
 
 ```bash
 uv run python -m dss5105.evaluate --output results/allocation-normal.json
-uv run python -m dss5105.evaluate --shock --output results/allocation-shock.json
+uv run python -m dss5105.evaluate --shock --seeds 10 --output results/allocation-shock.json
 ```
 
 These compare the course baselines, a short earliest-finish heuristic, and

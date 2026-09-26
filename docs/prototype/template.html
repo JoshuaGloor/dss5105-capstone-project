@@ -136,7 +136,8 @@
           </section>
           <section class="panel comparison" aria-label="Workshop comparison">
             <div class="section-title"><h2>Candidate workshops</h2><small>Same order. Same queue snapshot.</small></div>
-            <div class="table-wrap"><table id="candidate-table"><thead><tr><th>Workshop</th><th>Expected days</th><th>Cost units</th><th>Defect risk</th><th>Deadline</th></tr></thead><tbody id="candidates"></tbody></table></div>
+            <p id="snapshot-note" class="fine-print"></p>
+            <div class="table-wrap"><table id="candidate-table"><thead><tr><th>Workshop</th><th>Queue</th><th>Expected days</th><th>Cost units</th><th>Defect risk</th><th>Deadline</th></tr></thead><tbody id="candidates"></tbody></table></div>
             <p class="empty" id="empty" hidden></p>
             <details id="exclusions"><summary>Why other workshops are excluded</summary><div id="excluded-list"></div></details>
           </section>
@@ -160,7 +161,7 @@
     let activeRequest = 'R25';
     let activePreset = 'lateness';
     const titles = {RECOMMEND:'Ready to review',CLARIFY:'Clarification needed',REFUSE_SUGGESTION:'Suggested workshop refused',NEEDS_REVIEW:'Exception needs review',NO_FEASIBLE_OPTION:'No feasible option',DECLINE:'Data unavailable',RECORDED_STATUS:'Recorded status only'};
-    const flagLabels = {PAST_DEADLINE:'The deadline is already in the past.',NO_ON_TIME_OPTION:'No permitted whole-batch option meets the date.',SPLIT_NOT_IMPLEMENTED:'Split planning needs a separate review.',SELECTED_OPTION_LATE:'The selected option misses the date.',SUGGESTION_REFUSED:'The proposed workshop is not permitted.'};
+    const flagLabels = {PAST_DEADLINE:'The deadline is already in the past.',NO_ON_TIME_OPTION:'No permitted whole-batch option meets the date.',SPLIT_REVIEW:'A split was requested. Its estimate is shown; split plans cannot be saved yet.',SELECTED_OPTION_LATE:'The selected option misses the date.',SUGGESTION_REFUSED:'The proposed workshop is not permitted.'};
     const current = () => data.previews[activeRequest][activePreset];
     el('as-of').textContent = 'Snapshot ' + data.as_of;
     el('inbox-count').textContent = data.inbox_count + ' requests';
@@ -180,12 +181,13 @@
       el('request-id').textContent = request.request_id;
       el('message').textContent = request.text;
       const context = result.order ? [result.order.order_id,result.order.customer,result.order.product,result.order.pieces + ' pieces', 'Delivery due ' + (result.batch ? result.batch.due_date : result.order.due_date)] : ['Order needs resolution'];
-      if (result.input.date_uncertain || result.input.date_kind === 'shipping') context[context.length - 1] = 'Delivery date needs confirmation';
+      if (result.input.date_uncertain || (result.input.date_kind === 'shipping' && !result.deadline_note)) context[context.length - 1] = 'Delivery date needs confirmation';
       el('context').innerHTML = context.map(item => '<span>' + escapeText(item) + '</span>').join('');
       el('status').textContent = titles[result.status];
       el('status').className = 'status' + (result.status === 'RECOMMEND' ? '' : ['REFUSE_SUGGESTION','DECLINE','NO_FEASIBLE_OPTION'].includes(result.status) ? ' block' : ' review');
       el('recommendation').textContent = chosen ? (result.alternative ? 'Alternative: ' : result.status === 'NEEDS_REVIEW' ? 'For discussion: ' : '') + chosen.name : titles[result.status];
-      el('explanation').textContent = result.message;
+      el('explanation').textContent = [result.message, result.deadline_note, ...result.review_options].filter(Boolean).join(' ');
+      el('snapshot-note').textContent = result.assumption;
       el('metrics').hidden = !chosen;
       if (chosen) { el('turnaround').textContent = chosen.display.turnaround; el('eta').textContent = 'ETA ' + chosen.display.eta; el('cost').textContent = chosen.display.cost; el('defects').textContent = chosen.display.defects; }
       el('flags').hidden = !result.flags.length;
@@ -197,7 +199,7 @@
       el('candidate-table').hidden = !result.candidates.length;
       el('empty').hidden = !!result.candidates.length;
       el('empty').textContent = result.status === 'CLARIFY' ? 'Resolve the request before comparing workshops.' : result.status === 'DECLINE' ? 'No estimate can answer a question about unavailable records.' : 'No permitted candidate evidence is available.';
-      el('candidates').innerHTML = result.candidates.map(row => `<tr class="${row.estimate.workshop_id === chosenId ? 'chosen' : ''}"><td><span class="workshop-name">${escapeText(row.name)}</span><small>${escapeText(row.estimate.workshop_id)}${row.estimate.workshop_id === chosenId ? ' / preview' : ''}</small></td><td>${escapeText(row.display.turnaround)}</td><td>${escapeText(row.display.cost)}</td><td>${escapeText(row.display.defects)}</td><td class="${row.meets_deadline ? 'pass' : 'late'}">${row.meets_deadline ? 'Meets estimate' : 'Late ' + escapeText(row.display.lateness)}</td></tr>`).join('');
+      el('candidates').innerHTML = result.candidates.map(row => `<tr class="${row.estimate.workshop_id === chosenId ? 'chosen' : ''}"><td><span class="workshop-name">${escapeText(row.name)}</span><small>${escapeText(row.estimate.workshop_id)}${row.estimate.workshop_id === chosenId ? ' / preview' : ''}</small></td><td>${escapeText(row.display.queue)}</td><td>${escapeText(row.display.turnaround)}</td><td>${escapeText(row.display.cost)}</td><td>${escapeText(row.display.defects)}</td><td class="${row.meets_deadline ? 'pass' : 'late'}">${row.meets_deadline ? 'Meets estimate' : 'Late ' + escapeText(row.display.lateness)}</td></tr>`).join('');
       el('exclusions').hidden = !result.excluded.length;
       el('excluded-list').innerHTML = result.excluded.map(row => `<div class="exclusion"><strong>${escapeText(row.name)}</strong><br><span>${escapeText(row.reasons.join(' '))}</span></div>`).join('');
       el('evidence').textContent = JSON.stringify({interpretation_source:data.interpretation_source,fixture_sha256:data.fixture_sha256,...result},null,2);

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
   <title id="title">SweaterCo Quick-Response Subcontracting Desk: target architecture and current implementation status</title>
-  <desc id="desc">The Streamlit dispatcher connects through a language extraction layer to deterministic Python tools. Language integration is tested with fake models; live accuracy is unevaluated. Course data feeds resolution, eligibility and configurable ranking. Future human confirmation updates versioned queues and audit storage. The shared simulator evaluates policies separately from planned live chat evaluation. Offline draft inputs also exercise the tools without a model.</desc>
+  <desc id="desc">The Streamlit dispatcher connects through a language extraction layer to deterministic Python tools. Revised live language evaluation is pending. Course data feeds resolution, eligibility and configurable ranking. Explicit human confirmation in saved-plan mode updates versioned local queues and SQLite audit storage. The shared simulator evaluates policies separately from chat evaluation. Offline draft inputs also exercise the tools without a model.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#71817b" stroke-width="1.5"/></marker>
     <style>
@@ -31,7 +31,7 @@
   <text x="79" y="403" class="body">Primary / other / hybrid</text>
   <text x="79" y="435" class="body">Candidates + explanations</text>
   <text x="79" y="467" class="body">Evidence export</text>
-  <text x="79" y="501" class="tiny">Live Python previews / demo confirm</text>
+  <text x="79" y="501" class="tiny">Previews / saved local allocations</text>
 
   <rect x="377" y="258" width="284" height="265" rx="12" class="ready"/>
   <text x="400" y="291" class="label">LANGUAGE BOUNDARY</text>
@@ -40,7 +40,7 @@
   <text x="400" y="403" class="body">Capture source constraints</text>
   <text x="400" y="435" class="body">Clarify ambiguous requests</text>
   <text x="400" y="467" class="body">Return quoted field updates</text>
-  <text x="400" y="501" class="tiny">Offline-tested / live quality unevaluated</text>
+  <text x="400" y="501" class="tiny">Offline-tested / revised live run pending</text>
 
   <rect x="698" y="239" width="481" height="303" rx="12" fill="#fff" stroke="#8aad98" stroke-width="2"/>
   <text x="723" y="272" class="label">DETERMINISTIC PYTHON BOUNDARY</text>
@@ -55,18 +55,18 @@
   <text x="738" y="490" class="tiny">Clarify / refuse / decline / review late options</text>
   <text x="738" y="510" class="tiny">Typed evidence, weights, provenance, snapshot hashes</text>
 
-  <rect x="1216" y="258" width="328" height="265" rx="12" class="planned"/>
+  <rect x="1216" y="258" width="328" height="265" rx="12" class="ready"/>
   <text x="1239" y="291" class="label">CONFIRMATION + STATE</text>
   <text x="1239" y="331" class="heading">Human-reviewed commit</text>
   <text x="1239" y="371" class="body">Revalidate queue state version</text>
   <text x="1239" y="403" class="body">Prevent duplicate allocations</text>
   <text x="1239" y="435" class="body">Update queues transactionally</text>
   <text x="1239" y="467" class="body">Retain an auditable decision</text>
-  <text x="1239" y="501" class="tiny">Prototype button is a demo only</text>
+  <text x="1239" y="501" class="tiny">Saved-plan mode / local SQLite records</text>
 
   <path d="M340 357 H374" class="line"/>
   <path d="M661 357 H695" class="line"/>
-  <path d="M1179 390 H1213" class="line" stroke-dasharray="4 4"/>
+  <path d="M1179 390 H1213" class="line"/>
   <path d="M936 542 V565 H196 V526" class="line"/>
   <rect x="400" y="552" width="365" height="26" fill="#f4f3ec"/>
   <text x="415" y="570" class="tiny">Tool evidence returns to the review interface</text>
@@ -90,5 +90,5 @@
 
   <rect x="56" y="781" width="1488" height="66" rx="10" fill="#203731"/>
   <text x="80" y="808" font-size="17" style="fill:#fff" font-weight="700">Preview is not allocation.</text>
-  <text x="80" y="832" font-size="15" style="fill:#d6e4db">Same snapshot for comparisons. Hard constraints before ranking. Objective changes never bypass eligibility. Durable commits are future work.</text>
+  <text x="80" y="832" font-size="15" style="fill:#d6e4db">Same snapshot for comparisons. Hard constraints before ranking. Explicit confirmation saves the local plan. No workshop is contacted.</text>
 </svg>

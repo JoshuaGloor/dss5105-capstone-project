@@ -10,7 +10,8 @@ be reviewed independently by teammates. It does not import the demo fixtures.
 `dss5105.evaluate_chat --live --output results/chat-first` uses `get_model()` and
 the current `LLM_MODEL`. Without `--live`, it refuses to contact a provider.
 Each supplied request starts a fresh conversation and the same independent
-2026-04-01 queue snapshot. The initial preset is lateness; explicit request
+2026-04-01 queue snapshot defined by Data v3. The revised draft rubric follows
+the corrected inbox; prior scores remain historical and must not be relabeled as v3. The initial preset is lateness; explicit request
 preferences take precedence. There are no automatic retries or queue updates.
 This tests the initial response, not successful completion of a clarification.
 

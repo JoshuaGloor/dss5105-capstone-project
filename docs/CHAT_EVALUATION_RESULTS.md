@@ -1,5 +1,10 @@
 # First live inbox evaluation
 
+Historical pre-v3 evidence. The inbox and harness hashes have changed; these live
+chat scores are not current Data v3 results. The updated draft rubric is
+`examples/chat_rubric.json`; preserve the original run and its frozen rubric.
+A paid live rerun has not been performed in this update.
+
 All 30 supplied requests completed through the real model and Python tools.
 The frozen draft checks passed for 29 requests. R14 failed: an unnecessary
 quantity question prevented the required workshop refusal. Manual review also
@@ -14,7 +19,7 @@ The observed issues remain open; this evaluation did not change dispatch behavio
 |---|---|
 | Started, UTC | 2026-09-18T04:02:02.583973+00:00 |
 | Model from existing configuration | `openai:gpt-5.6` |
-| Intake | `intake-v1`; current structured patch prompt |
+| Intake | `intake-v1` (superseded by `intake-v2`, which leaves ship dates to the dispatch tool) |
 | Requests | All supplied inbox messages, one initial response each |
 | State | Independent 2026-04-01 snapshot for every request |
 | Objective | Lateness preset, overridden by explicit request preferences |

@@ -1,5 +1,12 @@
 # Exploratory weight tuning
 
+Historical pre-v3 experiment. Normal results remain valid; the shock rows below
+are superseded and must not be reported as current results. Re-run frozen
+configurations over ten paired seeds before drawing new robustness conclusions.
+The updated objective guardrails are in EVALUATION_PLAN.md. The follow-up that
+adds a deadline buffer, with separate development and course seeds, is
+[MARGIN_STUDY.md](MARGIN_STUDY.md).
+
 Run `uv run python -m dss5105.tune` from the source checkout. The script saves all
 configurations, selection rules, source hashes, metrics, and per-order outcomes to
 `results/weight-search.json`. It does not overwrite `evaluate.PRESETS` or change
@@ -50,8 +57,8 @@ Realized defect percentage and all original metrics remain in the saved results.
 
 Expected exposure removes the immediate defect draw conditional on choices, but
 choices depend on queues and earlier random outcomes. This metric can still vary
-across seeds. Normal/shock comparisons also inherit the harness RNG coupling caveat
-in [ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md).
+across seeds. The historical shock rows below used the old coupled RNG. The Data v3 harness
+now separates shock selection from defect draws; use the revised evaluation runner.
 
 ## Initial result
 
