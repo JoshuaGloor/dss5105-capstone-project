@@ -1,0 +1,2 @@
+# Preserve official course files byte-for-byte, including supplied CRLF endings.
+track2/** -text whitespace=cr-at-eol
