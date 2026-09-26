@@ -1,31 +1,26 @@
-"""Streamlit dispatch desk: real Python previews, explicit demo-only confirmation."""
+"""Streamlit dispatch desk with independent previews and an explicit saved local plan."""
 
 import hashlib
 import html
 import json
+import sqlite3
 from dataclasses import asdict
 from pathlib import Path
+from uuid import uuid4
 
 import altair as alt
 import streamlit as st
 
 from dss5105.allocator import ObjectiveWeights
 from dss5105.chat_ui import remember_tool_reply, render_chat, reset_preview
-from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
+from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox, ship_date_is_due_date
 from dss5105.evaluate import PRESETS
 from dss5105.intake import preview_conversation
+from dss5105.records import AllocationError, AllocationStore
+from dss5105.replies import STATUS_LABELS
 
 STYLE = Path(__file__).with_name("assets") / "desk.css"
 LABELS = {"lateness": "Lateness", "defects": "Defects", "hybrid": "Hybrid", "custom": "Custom weights"}
-STATUS_LABELS = {
-    "RECOMMEND": "Ready to review",
-    "CLARIFY": "Clarification needed",
-    "REFUSE_SUGGESTION": "Suggested workshop refused",
-    "NEEDS_REVIEW": "Exception needs review",
-    "NO_FEASIBLE_OPTION": "No feasible option",
-    "DECLINE": "Data unavailable",
-    "RECORDED_STATUS": "Recorded status only",
-}
 MEETS_COLOR = "#26a37c"
 MISSES_COLOR = "#94631a"
 MEETS_LABEL = "Meets the deadline"
@@ -33,14 +28,14 @@ MISSES_LABEL = "Misses the deadline"
 FLAGS = {
     "PAST_DEADLINE": "The requested deadline is already in the past.",
     "NO_ON_TIME_OPTION": "No permitted whole-batch option meets the date.",
-    "SPLIT_NOT_IMPLEMENTED": "Split planning needs a separate review.",
+    "SPLIT_REVIEW": "A split was requested. Its estimate is shown; split plans cannot be saved yet.",
     "SELECTED_OPTION_LATE": "The selected option misses the date.",
     "SUGGESTION_REFUSED": "The proposed workshop is not permitted.",
 }
 
 
 def clear_confirmation():
-    for key in ("reviewing_preview", "confirmed_preview"):
+    for key in ("reviewing_preview", "confirmed_preview", "confirmation_key"):
         st.session_state.pop(key, None)
 
 
@@ -59,7 +54,7 @@ def request_card(envelope: dict, request: DispatchInput, desk: DispatchDesk):
     if resolution["status"] == "RESOLVED":
         order = resolution["matches"][0]
         tags.extend([order["order_id"], order["customer"], order["product"], order["pieces"] + " pieces"])
-        if request.date_uncertain or request.date_kind == "shipping":
+        if request.date_uncertain or (request.date_kind == "shipping" and not ship_date_is_due_date(request, order)):
             tags.append("Delivery date needs confirmation")
         else:
             tags.append("Delivery due " + (request.due_date or order["due_date"]))
@@ -176,6 +171,7 @@ def candidate_table(result: dict):
         cells = "".join(
             f"<td>{html.escape(value)}</td>"
             for value in (
+                values["queue"],
                 values["turnaround"],
                 values["cost"],
                 values["defects"],
@@ -189,7 +185,8 @@ def candidate_table(result: dict):
     st.html(
         '<div class="qr-table-scroll"><table class="qr-table"><caption class="qr-sr-only">'
         "Permitted workshop estimates on the same queue snapshot</caption><thead><tr>"
-        '<th scope="col">Workshop</th><th scope="col">Expected days</th><th scope="col">Cost units</th>'
+        '<th scope="col">Workshop</th><th scope="col">Queue</th>'
+        '<th scope="col">Expected days</th><th scope="col">Cost units</th>'
         '<th scope="col">Defect risk</th><th scope="col">Deadline</th></tr></thead>'
         f"<tbody>{''.join(rows)}</tbody></table></div>"
     )
@@ -236,8 +233,8 @@ def baseline_table(result: dict):
     )
 
 
-def confirmation(result: dict, preview_id: str, chosen: dict | None):
-    ready = result["status"] == "RECOMMEND"
+def confirmation(result: dict, preview_id: str, chosen: dict | None, store: AllocationStore | None = None):
+    ready = result["status"] == "RECOMMEND" and (store is None or result["commit_allowed"])
     if st.button(
         "Review confirmation" if ready else "Resolve before confirmation",
         type="primary",
@@ -245,6 +242,7 @@ def confirmation(result: dict, preview_id: str, chosen: dict | None):
         disabled=not ready,
     ):
         st.session_state["reviewing_preview"] = preview_id
+        st.session_state["confirmation_key"] = str(uuid4())
         st.session_state.pop("confirmed_preview", None)
     if ready and st.session_state.get("reviewing_preview") == preview_id:
         with st.container(border=True, key="confirmation_panel"):
@@ -254,20 +252,44 @@ def confirmation(result: dict, preview_id: str, chosen: dict | None):
                 f"Estimated delivery: {chosen['display']['eta']}. "
                 f"Cost: {chosen['display']['cost']} source units."
             )
-            st.caption("Demo only. No allocation is saved, no queue changes, and no workshop is contacted.")
+            if store is not None:
+                st.caption(
+                    "Save this allocation and reserve capacity in the local plan. No workshop will be contacted."
+                )
+                actor = st.text_input("Confirming dispatcher", key="confirmed_by")
+            else:
+                st.caption("Demo only. No allocation is saved, no queue changes, and no workshop is contacted.")
             approve, cancel = st.columns(2)
-            if approve.button("Confirm demo only", key="confirm_demo", type="primary"):
+            if store is not None and approve.button(
+                "Confirm and save allocation", key="confirm_allocation", type="primary", disabled=not actor.strip()
+            ):
+                try:
+                    receipt = store.commit_allocation(
+                        result, actor, st.session_state["confirmation_key"], confirmed=True
+                    )
+                except (AllocationError, sqlite3.Error, OSError) as error:
+                    st.error(
+                        str(error)
+                        if isinstance(error, AllocationError)
+                        else "Save failed. Refresh the plan before retrying."
+                    )
+                else:
+                    st.session_state["allocation_receipt"] = receipt
+                    clear_confirmation()
+                    st.rerun()
+            if store is None and approve.button("Confirm demo only", key="confirm_demo", type="primary"):
                 st.session_state["confirmed_preview"] = preview_id
                 st.session_state.pop("reviewing_preview", None)
+                st.session_state.pop("confirmation_key", None)
                 st.rerun()
             if cancel.button("Back to comparison", key="cancel_confirmation"):
-                st.session_state.pop("reviewing_preview", None)
+                clear_confirmation()
                 st.rerun()
     if ready and st.session_state.get("confirmed_preview") == preview_id:
         st.success("Demo confirmation recorded in this session only. No allocation was saved or capacity reserved.")
 
 
-def render_decision(result: dict, preview_id: str):
+def render_decision(result: dict, preview_id: str, store: AllocationStore | None = None):
     chosen_id = result["recommendation"] or result["alternative"]
     chosen = next((row for row in result["candidates"] if row["estimate"]["workshop_id"] == chosen_id), None)
     with st.container(border=True, key="decision"):
@@ -287,6 +309,10 @@ def render_decision(result: dict, preview_id: str):
         )
         st.subheader(prefix + chosen["name"] if chosen else STATUS_LABELS[result["status"]])
         st.write(result["message"])
+        if result.get("deadline_note"):
+            st.caption(result["deadline_note"])
+        for option in result["review_options"]:
+            st.write(option)
         if chosen:
             delivery, cost, defects = st.columns(3)
             delivery.metric("Expected turnaround", chosen["display"]["turnaround"])
@@ -300,14 +326,47 @@ def render_decision(result: dict, preview_id: str):
             st.write("Last recorded activity: " + result["order"]["last_activity_date"])
         if result["flags"]:
             st.warning(" ".join(FLAGS[flag] for flag in result["flags"]))
-        confirmation(result, preview_id, chosen)
+        confirmation(result, preview_id, chosen, store)
     with st.container(border=True, key="comparison"):
         st.subheader("Candidate workshops")
+        st.caption(result["assumption"])
         st.caption("Same order. Same queue snapshot. Ranked by effective configuration.")
         if result["candidates"]:
             candidate_chart(result)
             candidate_table(result)
-        else:
+            with st.expander("How delivery estimates are built"):
+                st.caption("Expected turnaround includes queue, processing, transport and expected rework.")
+                st.dataframe(
+                    [
+                        {
+                            "Workshop": row["name"],
+                            **{
+                                key: row["display"][key]
+                                for key in ("queue", "processing", "transport", "expected_rework", "eta")
+                            },
+                        }
+                        for row in result["candidates"]
+                    ],
+                    hide_index=True,
+                )
+        if result["split_option"]:
+            with st.expander("Two-workshop split estimate", expanded=True):
+                st.caption(
+                    "Each part uses the same estimate and eligibility rule. The course simulator does not model "
+                    "splits, so this is chat-layer evidence only."
+                )
+                st.dataframe(
+                    [
+                        {
+                            "Workshop": part["name"],
+                            "Pieces": str(part["pieces"]),
+                            **{key: part["display"][key] for key in ("queue", "turnaround", "eta", "cost")},
+                        }
+                        for part in result["split_option"]["parts"]
+                    ],
+                    hide_index=True,
+                )
+        if not result["candidates"]:
             st.info(
                 "Resolve the request before comparing workshops."
                 if result["status"] == "CLARIFY"
@@ -345,15 +404,25 @@ def main():
     with st.sidebar:
         st.html('<div class="qr-brand"><span>S</span>SweaterCo</div>')
         st.caption("QUICK-RESPONSE SUBCONTRACTING DESK")
+        workspace = st.radio(
+            "Workspace",
+            options=["independent", "saved"],
+            key="workspace_mode",
+            format_func=lambda value: {"independent": "Independent previews", "saved": "Saved local plan"}[value],
+        )
         source = st.radio(
             "Input source",
-            options=["examples", "chat"],
+            options=["chat", "examples"],
             key="input_source",
-            format_func=lambda value: {"examples": "Supplied examples (offline)", "chat": "Natural language"}[value],
+            format_func=lambda value: {
+                "chat": "Group-chat request (language model)",
+                "examples": "Supplied examples (offline, no model)",
+            }[value],
         )
-    if st.session_state.get("active_input_source") != source:
+    if st.session_state.get("active_input_source") != (workspace, source):
         reset_preview()
-        st.session_state["active_input_source"] = source
+        st.session_state["active_input_source"] = (workspace, source)
+    store = None
     try:
         inbox = {row["request_id"]: row for row in read_inbox()}
         if source == "examples":
@@ -363,7 +432,9 @@ def main():
             if set(fixtures) != set(inbox):
                 raise ValueError("Draft interpretations must match the supplied inbox")
         desk = DispatchDesk()
-    except (OSError, ValueError, TypeError, KeyError) as error:
+        if workspace == "saved":
+            store = AllocationStore()
+    except (OSError, ValueError, TypeError, KeyError, sqlite3.Error) as error:
         clear_confirmation()
         st.session_state.pop("preview", None)
         st.error("Could not load dispatch data: " + str(error))
@@ -380,18 +451,60 @@ def main():
                 format_func=lambda key: f"{key} / {inbox[key]['requester']} / {inbox[key]['time']}",
                 label_visibility="collapsed",
             )
-            st.caption("Each request starts from the same queue snapshot. Previews do not reserve capacity.")
+            st.caption(
+                "Previews use saved planning queues. Only confirmation reserves capacity."
+                if store is not None
+                else "Each request starts from the same queue snapshot. Previews do not reserve capacity."
+            )
     st.html('<div class="qr-eyebrow">SWEATERCO / DISPATCH DESK</div>')
     st.title("The right workshop. A decision you can explain.")
     st.caption("Understand the request, compare the options, keep the evidence.")
+    if store is not None:
+        st.info("Saved local plan: confirmed allocations persist across sessions and update planning queues.")
+        if receipt := st.session_state.get("allocation_receipt"):
+            st.success(
+                "Most recent saved allocation: "
+                + receipt["order_id"]
+                + " to "
+                + receipt["workshop_name"]
+                + ". "
+                + receipt["effect"]
+            )
+        try:
+            records = store.records()
+        except (sqlite3.Error, OSError):
+            st.error("Could not read saved records. Refresh the plan before continuing.")
+            st.stop()
+        with st.expander("Saved allocation records"):
+            if records:
+                st.dataframe(
+                    [
+                        {
+                            key: record[key]
+                            for key in ("allocation_id", "order_id", "workshop_name", "confirmed_by", "created_at_utc")
+                        }
+                        for record in records
+                    ],
+                    hide_index=True,
+                )
+                st.download_button(
+                    "Export saved allocation records",
+                    json.dumps(records, indent=2),
+                    file_name="allocation-records.json",
+                    mime="application/json",
+                    key="download_allocations",
+                )
+            else:
+                st.write("No allocations have been saved in this plan.")
     conversation = None
+    reply_slot = None
     if source == "chat":
-        conversation = render_chat(desk, inbox)
+        conversation, reply_slot = render_chat(desk, inbox, saved_plan=store is not None)
         request_id = "CHAT"
     else:
         st.info(
-            "Demo workspace: real Python estimates, draft request interpretations. "
-            "No model calls or actual allocations."
+            "Supplied examples use draft request interpretations and real Python estimates. No model calls. "
+            + ("Confirmation saves to the local plan." if store is not None else "No allocations are saved.")
         )
     try:
         request = conversation.request if conversation else DispatchInput(**fixtures[request_id])
@@ -403,13 +516,20 @@ def main():
             weights = settings(request)
         if conversation:
             result = preview_conversation(conversation, desk, weights)
-            remember_tool_reply(conversation, result)
         else:
             result = desk.preview(envelope, request, weights)
             result["interpretation_source"] = "Hand-authored development fixture; not model extraction or gold labels."
             result["fixture_sha256"] = hashlib.sha256(fixture_bytes).hexdigest()
+        if store is not None:
+            saved_preview = store.preview(result["request"], request, weights)
+            for key in ("conversation", "interpretation_source", "fixture_sha256"):
+                if key in result:
+                    saved_preview[key] = result[key]
+            result = saved_preview
+        if conversation:
+            remember_tool_reply(conversation, result, reply_slot)
         preview_id = bind_preview(result)
-    except (ValueError, TypeError, KeyError) as error:
+    except (ValueError, TypeError, KeyError, sqlite3.Error, OSError) as error:
         clear_confirmation()
         st.session_state.pop("preview", None)
         st.error("Cannot generate a preview: " + str(error))
@@ -421,7 +541,7 @@ def main():
             st.caption("Weights are relative preferences, not probabilities. Scales are the existing reference units.")
         st.caption("Snapshot " + result["snapshot"]["as_of"])
     with left:
-        render_decision(result, preview_id)
+        render_decision(result, preview_id, store)
     evidence = json.dumps(result, ensure_ascii=True, indent=2)
     st.download_button(
         "Export tool evidence",
@@ -436,7 +556,10 @@ def main():
     with st.expander("What is connected in this version?"):
         st.write("Inbox selection, objective presets, live custom weights, workshop comparison, and evidence export.")
         st.write("Natural-language extraction and follow-up clarification are connected through the configured model.")
-        st.write("Live extraction quality is not yet evaluated. Durable allocation records remain a future increment.")
+        st.write(
+            "Revised live extraction evaluation is pending. "
+            "Saved local plans include durable records and queue updates."
+        )
         st.caption("Current configured weights: " + json.dumps(asdict(weights)))
     st.caption(
         "Delivery estimates include expected rework. They do not guarantee delivery or predict unknown closures."

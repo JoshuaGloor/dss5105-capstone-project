@@ -20,3 +20,5 @@ eligible_workshops = _module.eligible_workshops
 random_choice = _module.random_choice
 greedy_biggest = _module.greedy_biggest
 cheapest = _module.cheapest
+average_over_seeds = _module.average_over_seeds
+print_table = _module.print_table

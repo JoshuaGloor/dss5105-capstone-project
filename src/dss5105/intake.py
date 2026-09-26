@@ -13,12 +13,11 @@ from dss5105 import llm
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import DispatchDesk, DispatchInput
 
-VERSION = "intake-v1"
+VERSION = "intake-v2"
 QUESTIONS = {
     "order": "Which order do you mean? Please confirm its order ID.",
     "quantity": "Please confirm the quantity using digits.",
     "deadline": "Please confirm the delivery deadline using an explicit date, preferably YYYY-MM-DD.",
-    "date_kind": "Does the stated date mean dispatch or delivery?",
     "scope": "This request needs a new, fully specified order request. Please start a new request.",
     "constraint_change": (
         "Existing exclusions cannot be relaxed here. Start a new request with the agreed constraints."
@@ -32,7 +31,7 @@ ENUMS = {
     "split_requested": ("true", "false"),
 }
 FIELDS = ("order_id", "customer", "product", "pieces", "due_date", "suggested_workshop", *ENUMS)
-RESOLVES = {"order_id": "order", "pieces": "quantity", "due_date": "deadline", "date_kind": "date_kind"}
+RESOLVES = {"order_id": "order", "pieces": "quantity", "due_date": "deadline"}
 
 
 def _object(properties):
@@ -91,7 +90,7 @@ Put forbidden workshops in exclusions, not suggested_workshop. Capture who impos
 Existing fields/exclusions persist automatically. Do not repeat or silently relax them.
 To remove an exclusion or handle an unsupported objective, use constraint_change or scope in needs.
 An unknown revised date sets date_uncertain=true and needs=['deadline']; never reuse the old date.
-A known date is due_date with its RAW phrase. Shipping dates require date_kind=shipping and needs=['date_kind'].
+A known date is due_date with its RAW phrase. A ship date also sets date_kind=shipping; Python decides if it is clear.
 If a follow-up confirms it is delivery, set date_kind=delivery. Missing year and relative dates are Python's work.
 Record explicit customer, product and quantity so tools can catch contradictions with CSV data.
 Questions about selling quotes or prior allocations use quote or history. Status lookup uses status.
@@ -247,8 +246,6 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         values["date_uncertain"] = False
     if values["date_uncertain"]:
         needs.add("deadline")
-    if values["date_kind"] == "shipping":
-        needs.add("date_kind")
     exclusions = {item["workshop_id"]: item for item in values["exclusions"]}
     for exclusion in patch["exclusions"]:
         _quoted(exclusion, {"workshop", "imposed_by", "evidence"}, text)
@@ -316,6 +313,18 @@ def interpret_turn(
         "prompt_sha256": hashlib.sha256((SYSTEM_PROMPT + prompt).encode()).hexdigest(),
         "patch": json.loads(json.dumps(patch)),
     }
+    return Conversation(result.request, result.turns, result.needs, result.provenance, result.traces + (trace,))
+
+
+def apply_selection(
+    previous: Conversation, field: str, value: str, text: str, desk: DispatchDesk, *, speaker: str = "Dispatcher"
+) -> Conversation:
+    """A clicked answer is a quoted patch validated like model output, with no model call."""
+    if not previous.turns:
+        raise IntakeError("Send a request before choosing an answer.")
+    patch = {"updates": [{"field": field, "value": value, "evidence": value}], "exclusions": [], "needs": []}
+    result = apply_patch(previous, text, patch, desk, speaker)
+    trace = {"version": VERSION, "model": "dispatcher selection; no model call", "patch": patch}
     return Conversation(result.request, result.turns, result.needs, result.provenance, result.traces + (trace,))
 
 

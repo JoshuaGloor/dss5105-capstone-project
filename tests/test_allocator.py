@@ -7,6 +7,7 @@ from dss5105.allocator import (
     NoEligibleWorkshop,
     ObjectiveWeights,
     ScoreScales,
+    assess_split,
     earliest_finish,
     estimate_delivery,
     make_allocator,
@@ -93,6 +94,25 @@ def test_empty_candidates_fail_explicitly(batch, workshops):
             policy(batch, workshops, {})
 
 
+def test_split_finishes_with_its_slower_part_and_beats_whole_batch_here(batch, workshops):
+    queues = dict.fromkeys(workshops, 0.0)
+    plan = assess_split(batch, workshops, queues)
+    assert sum(plan.pieces) == batch["pieces"]
+    assert plan.expected_turnaround_days == max(part.expected_turnaround_days for part in plan.parts)
+    assert plan.cost == sum(part.cost for part in plan.parts)
+    whole = min(estimate_delivery(batch, w, queues).expected_turnaround_days for w in workshops.values())
+    assert plan.expected_turnaround_days < whole
+    for part, pieces in zip(plan.parts, plan.pieces, strict=True):
+        assert part.process_days == pieces / workshops[part.workshop_id].capacity
+
+
+def test_split_parts_pass_eligibility_at_their_own_size(batch, workshops):
+    workshops["FAST"] = replace(workshops["FAST"], max_batch=50)
+    plan = assess_split(batch, workshops, dict.fromkeys(workshops, 0.0))
+    assert dict(zip((part.workshop_id for part in plan.parts), plan.pieces, strict=True))["FAST"] <= 50
+    assert assess_split(batch, {"FAST": workshops["FAST"]}, {"FAST": 0.0}) is None
+
+
 def test_ties_are_independent_of_workshop_insertion_order(batch, workshops):
     workshops["CAREFUL"] = replace(workshops["FAST"], workshop_id="CAREFUL")
     queues = dict.fromkeys(workshops, 0.0)
@@ -100,10 +120,30 @@ def test_ties_are_independent_of_workshop_insertion_order(batch, workshops):
     assert policy(batch, workshops, queues) == policy(batch, dict(reversed(list(workshops.items()))), queues)
 
 
+def test_deadline_buffer_changes_only_the_score_not_the_estimate(batch, workshops):
+    batch["due_date"] = date(2026, 4, 10)
+    queues = dict.fromkeys(workshops, 0.0)
+    plain = rank_candidates(batch, workshops, queues, ObjectiveWeights(lateness=1, cost=0.01))
+    buffered = rank_candidates(
+        batch, workshops, queues, ObjectiveWeights(lateness=1, cost=0.01, deadline_buffer_days=7)
+    )
+    # Both fit the date; the buffer stops the cheap, slower shop from using all the slack.
+    assert plain[0].estimate.workshop_id == "CAREFUL"
+    assert buffered[0].estimate.workshop_id == "FAST"
+    assert [row.estimate for row in sorted(plain, key=lambda r: r.estimate.workshop_id)] == [
+        row.estimate for row in sorted(buffered, key=lambda r: r.estimate.workshop_id)
+    ]
+    assert all(row.estimate.lateness_days == 0 for row in buffered)
+    unbuffered = ObjectiveWeights(lateness=1, cost=0.01, deadline_buffer_days=0)
+    assert rank_candidates(batch, workshops, queues, unbuffered) == plain
+
+
 @pytest.mark.parametrize("value", [-1.0, float("nan"), float("inf")])
 def test_invalid_weights_and_scales(value):
     with pytest.raises(ValueError):
         ObjectiveWeights(lateness=value)
+    with pytest.raises(ValueError, match="buffer"):
+        ObjectiveWeights(deadline_buffer_days=value)
     with pytest.raises(ValueError):
         ScoreScales(lateness_days=value)
 
@@ -111,6 +151,8 @@ def test_invalid_weights_and_scales(value):
 def test_zero_weights_and_scales():
     with pytest.raises(ValueError):
         ObjectiveWeights(lateness=0)
+    with pytest.raises(ValueError, match="not all zero"):
+        ObjectiveWeights(lateness=0, deadline_buffer_days=5)
     with pytest.raises(ValueError):
         ScoreScales(lateness_days=0)
 
