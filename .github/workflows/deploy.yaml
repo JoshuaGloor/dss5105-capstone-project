@@ -22,12 +22,7 @@ name: Deploy app
 
 on:
   push:
-    branches:
-      - main
-      # Lets the build job run before this reaches main. The deploy job cannot be
-      # tested this way: workflow_dispatch only appears once the file is on the
-      # default branch. Paired with the trust subject in bootstrap/main.tf.
-      - joshua/aws-deploy # TODO: remove before PR, together with that trust subject.
+    branches: [main]
     paths:
       # Everything baked into the image. track2/ and examples/ are included
       # because the app reads them at runtime, so a change there really does

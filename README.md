@@ -116,6 +116,16 @@ and update their evidence. Do not treat the earlier, unretained probes as establ
 findings. Finalize proposed tool contracts before implementing them. The current
 scorer supports lateness, defects and cost weights; fairness scoring is future work.
 
+## Deployment
+
+The app runs on AWS as two containers, the Streamlit app behind Caddy, on one
+EC2 instance that is stopped between demos. Merging to `main` builds an image;
+deploying is a manual **Deploy app** run in the Actions tab, and **Power**
+starts and stops the instance.
+
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for the day-to-day steps, the one-time
+setup, and teardown. Everything it describes lives in `infra/`.
+
 ## Understanding the repo
 
 Below is a brief overview of the repo.

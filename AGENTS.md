@@ -59,6 +59,20 @@ Two rules that override convenience:
 - If you change `pyproject.toml`, commit the updated `uv.lock` too. CI runs
   `uv sync --locked` and fails when the two disagree.
 
+## Deployment
+
+- Everything deployment-related lives in `infra/`: the Dockerfile, the compose
+  files, the Caddyfile, and OpenTofu under `infra/tofu/`. Workflows are in
+  `.github/workflows/`. Read [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) before
+  changing any of it.
+- `tofu`, not `terraform`. The two configs are separate on purpose: `bootstrap/`
+  creates the state bucket the main config uses as its backend.
+- Secrets reach the server from SSM Parameter Store, fetched by the instance's
+  own role. Never route them through GitHub Actions, and never put them in
+  OpenTofu state.
+- Editing `infra/tofu/user_data.sh` replaces the instance and wipes `/opt/app`,
+  so the site is down until the next deploy.
+
 ## Models
 
 - Build chat models with `get_model()` from `src/dss5105/llm.py`.

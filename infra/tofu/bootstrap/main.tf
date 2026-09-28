@@ -119,15 +119,12 @@ data "aws_iam_policy_document" "deploy_trust" {
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
-    # Which workflow runs may assume the role (subject check). Main only, plus
-    # one temporary branch so the deploy workflow can be tested before merging.
+    # Which workflow runs may assume the role (subject check). Main only: both
+    # jobs run from there, and a manual deploy dispatches main's copy anyway.
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values = [
-        "${var.github_sub_prefix}:ref:refs/heads/main",
-        "${var.github_sub_prefix}:ref:refs/heads/joshua/aws-deploy", # TODO: remove before PR (test only); then run `tofu apply` again.
-      ]
+      values   = ["${var.github_sub_prefix}:ref:refs/heads/main"]
     }
   }
 }
