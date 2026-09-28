@@ -23,10 +23,15 @@ variable "region" {
   default = "ap-southeast-1"
 }
 
-variable "github_repo" {
+# Not plain "repo:owner/name". Repos created after 2026-07-15 get immutable
+# subject claims, where owner and repo carry their numeric IDs, so a rename or
+# transfer cannot hand this trust to a different repo. Read the live value with:
+#   gh api /repos/<owner>/<repo>/actions/oidc/customization/sub
+# Ref: https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-github-actions-oidc-tokens/
+variable "github_sub_prefix" {
   type        = string
-  description = "GitHub repo as owner/name"
-  default     = "JoshuaGloor/dss5105-capstone-project"
+  description = "Immutable OIDC subject prefix; the branch part is appended below."
+  default     = "repo:JoshuaGloor@50296376/dss5105-capstone-project@1342683223"
 }
 
 provider "aws" {
@@ -87,7 +92,7 @@ resource "aws_s3_bucket_public_access_block" "tfstate" {
 # | AWS STS checks this trust policy:          |
 # | - signature valid?  (via OIDC provider)    |
 # | - aud == sts.amazonaws.com                 |
-# | - sub == repo:<repo>:ref:refs/heads/main   |
+# | - sub == <sub prefix>:ref:refs/heads/main  |
 # +--------------------------------------------+
 #           |
 #           | 4. temporary credentials (1h default)
@@ -120,8 +125,8 @@ data "aws_iam_policy_document" "deploy_trust" {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:${var.github_repo}:ref:refs/heads/main",
-        "repo:${var.github_repo}:ref:refs/heads/joshua/aws-deploy", # TODO: remove before PR (test only); then run `tofu apply` again.
+        "${var.github_sub_prefix}:ref:refs/heads/main",
+        "${var.github_sub_prefix}:ref:refs/heads/joshua/aws-deploy", # TODO: remove before PR (test only); then run `tofu apply` again.
       ]
     }
   }

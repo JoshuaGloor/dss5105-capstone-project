@@ -1,0 +1,73 @@
+# See https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax for syntax.
+#
+# The instance only needs to be up around a demo, and an idle one still bills by
+# the hour. This is the switch, so nobody needs the AWS console to flip it.
+#
+#   | action | does                   | afterwards                           |
+#   |--------|------------------------|--------------------------------------|
+#   | start  | boot, wait for running | app back in ~30s, no redeploy needed |
+#   | stop   | halt, wait for stopped | only the disk and Elastic IP bill    |
+name: Power
+
+# Manual only. Never on a push: stopping the server is not something a merge
+# should be able to do.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Start or stop the server"
+        type: choice
+        options: [start, stop]
+        required: true
+
+permissions:
+  id-token: write # Mint the OIDC token AWS checks against the role's trust policy.
+  contents: read
+
+env:
+  PROJECT: dss5105 # Also the tag AWS resources carry, which is how they are found below.
+
+jobs:
+  power:
+    runs-on: ubuntu-latest
+    steps:
+      # No checkout: this job uses nothing from the repo.
+      # Same deploy role as the Deploy workflow. Its permission to start and stop
+      # is scoped by the Project tag, so it cannot touch any other instance.
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # The state filter includes the in-between states on purpose: running this
+      # while the instance is still stopping should report the instance, not
+      # claim the infrastructure is missing.
+      - name: ${{ inputs.action }} instance
+        env:
+          ACTION: ${{ inputs.action }}
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Project,Values=$PROJECT" \
+                      "Name=instance-state-name,Values=pending,running,stopping,stopped" \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text)
+          if [ -z "$INSTANCE_ID" ] || [ "$INSTANCE_ID" = "None" ]; then
+            echo "::error::No instance found. Has the infrastructure been created?"
+            exit 1
+          fi
+
+          # `wait` blocks until AWS reports the new state, so the summary below
+          # is true when it is printed rather than merely requested.
+          if [ "$ACTION" = "start" ]; then
+            aws ec2 start-instances --instance-ids "$INSTANCE_ID" > /dev/null
+            aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+            # Unchanged across stop/start, because of the Elastic IP.
+            IP=$(aws ec2 describe-instances --instance-ids "$INSTANCE_ID" \
+              --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+            # restart: unless-stopped plus an enabled docker service means the
+            # containers come back on their own. No redeploy is needed.
+            echo "### Running at http://$IP (containers need ~30s to come up)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            aws ec2 stop-instances --instance-ids "$INSTANCE_ID" > /dev/null
+            aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID"
+            echo "### Stopped." >> "$GITHUB_STEP_SUMMARY"
+          fi
