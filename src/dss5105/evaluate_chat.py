@@ -13,7 +13,7 @@ from math import ceil
 from pathlib import Path
 
 from dss5105 import llm
-from dss5105.allocator import ObjectiveWeights
+from dss5105.allocator import ObjectiveWeights, estimate_delivery
 from dss5105.dispatch import ROOT, DispatchDesk, read_inbox
 from dss5105.harness import eligible_workshops
 from dss5105.intake import (
@@ -128,6 +128,10 @@ def check_tool_integrity(result: dict, desk: DispatchDesk) -> dict:
             "cost": f"{estimate['cost']:,.2f}",
             "defects": f"{estimate['defect_risk']:.1%}",
             "score": f"{row['score']:.4f}",
+            "queue": f"{estimate['queue_days']:.2f} days",
+            "processing": f"{estimate['process_days']:.2f} days",
+            "transport": f"{estimate['transport_days']:.2f} days",
+            "expected_rework": f"{estimate['expected_turnaround_days'] - estimate['turnaround_days']:.2f} days",
         }
         for field, value in expected.items():
             claims += 1
@@ -145,6 +149,31 @@ def check_tool_integrity(result: dict, desk: DispatchDesk) -> dict:
                 (row["estimate"]["cost"] for row in on_time), default=None
             ):
                 errors.append("Cheapest-on-time selection violates the date or minimum cost")
+    split = result.get("split_option")
+    if split:
+        parts = split["parts"]
+        if sum(part["pieces"] for part in parts) != result["batch"]["pieces"] or len(parts) != 2:
+            errors.append("Split parts do not cover the batch")
+        for part in parts:
+            workshop = desk.workshops[part["workshop_id"]]
+            batch = {
+                **result["batch"],
+                "pieces": part["pieces"],
+                "sent_date": date.fromisoformat(result["batch"]["sent_date"]),
+                "due_date": date.fromisoformat(result["batch"]["due_date"]),
+            }
+            if part["workshop_id"] not in by_id or workshop not in eligible_workshops(batch, desk.workshops):
+                errors.append(f"Split part {part['workshop_id']} is not permitted at its size")
+            if asdict(estimate_delivery(batch, workshop, result["snapshot"]["queues"])) != part["estimate"]:
+                errors.append(f"Split part {part['workshop_id']} estimate does not recompute")
+        finish = max(part["estimate"]["expected_turnaround_days"] for part in parts)
+        earliest = result["earliest_option"]["estimate"]["expected_turnaround_days"]
+        if split["expected_turnaround_days"] != finish or split["days_saved"] != earliest - finish:
+            errors.append("Split finish or saving does not match its parts")
+        for field in ("eta", "cost", "days_saved"):
+            claims += 1
+            if split["display"][field] not in split["summary"]:
+                errors.append(f"Split summary omits tool field {field}")
     if result["status"] in ("CLARIFY", "DECLINE") and (candidates or result["recommendation"]):
         errors.append("Unresolved request received an allocation")
     if result["status"] == "RECOMMEND":
@@ -156,7 +185,12 @@ def check_tool_integrity(result: dict, desk: DispatchDesk) -> dict:
 
 def evaluate_case(envelope: dict, rule: dict, desk: DispatchDesk, model: RecordedModel) -> dict:
     started = time.monotonic()
-    record = {"request": envelope, "category": rule["category"], "status": "not_completed"}
+    record = {
+        "request": envelope,
+        "course_kind": rule.get("course_kind", "unlabelled"),
+        "category": rule["category"],
+        "status": "not_completed",
+    }
     try:
         conversation = interpret_turn(
             Conversation(), envelope["text"], desk, speaker=envelope["requester"], model=model
@@ -189,7 +223,17 @@ def summarize(records: list[dict], planned: int) -> dict:
     def passed(record):
         return record["status"] == "completed" and not any(record["rubric"].values())
 
-    categories = sorted({record["category"] for record in records})
+    def breakdown(key):
+        return {
+            value: {
+                "attempted": sum(record.get(key, "unlabelled") == value for record in records),
+                "draft_rubric_passed": sum(
+                    passed(record) for record in records if record.get(key, "unlabelled") == value
+                ),
+            }
+            for value in sorted({record.get(key, "unlabelled") for record in records})
+        }
+
     return {
         "planned": planned,
         "attempted": len(records),
@@ -202,13 +246,8 @@ def summarize(records: list[dict], planned: int) -> dict:
         "tool_integrity_passed": sum(not record["tool_integrity"]["errors"] for record in completed),
         "display_fields_checked": sum(record["tool_integrity"]["display_fields_checked"] for record in completed),
         "cases_with_candidates": sum(bool(record["preview"]["candidates"]) for record in completed),
-        "by_category": {
-            category: {
-                "attempted": sum(record["category"] == category for record in records),
-                "draft_rubric_passed": sum(passed(record) for record in records if record["category"] == category),
-            }
-            for category in categories
-        },
+        "by_course_kind": breakdown("course_kind"),
+        "by_category": breakdown("category"),
         "failed_case_ids": [record["request"]["request_id"] for record in records if not passed(record)],
         "usage": dict(
             sum(

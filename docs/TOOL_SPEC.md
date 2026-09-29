@@ -1,6 +1,6 @@
 # Tool specification
 
-The course requires tools to be specified before they are built (Tracks v3, p. 6).
+The course requires tools to be specified before they are built (Tracks v4, p. 5).
 This document distinguishes implemented Python interfaces from proposed agent
 interfaces. The offline functions are not yet registered as LLM-callable tools.
 
@@ -54,13 +54,31 @@ measurements produced by the course harness.
 - Non-goals: chat constraints, eligibility explanations for excluded workshops,
   fairness optimization, split plans, or committing an allocation.
 - Failure behavior: an empty candidate set returns an empty list. Weights must
-  be finite, nonnegative, and not all zero; scales must be finite and positive.
+  be finite, nonnegative, and not all zero; the optional `deadline_buffer_days`
+  must be finite and nonnegative; scales must be finite and positive.
   Invalid configurations raise `ValueError` when constructed.
 - Tie-breaking: expected turnaround, then workshop ID, for every configuration.
 
 The score definition and scale assumptions are in
 [ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md). Changing a policy name does not
 change allocation logic; only configuration changes the objective.
+
+### `assess_split(batch, workshops, queues)`
+
+- Input: a resolved batch, the permitted workshop mapping (eligibility and chat
+  exclusions already applied by the caller), and the queue snapshot.
+- Output: `SplitPlan` with two `DeliveryEstimate` parts, their piece counts, the
+  plan's expected turnaround (its slower part), lateness and total cost; or None.
+- Purpose: answer "would splitting across two shops get it back sooner?" with
+  numbers, for split requests and for deadlines no whole batch can meet.
+- Method: every workshop pair and every integer division of the pieces. Each part
+  must pass `eligible_workshops` at its own size. Ties prefer lower total cost,
+  then workshop IDs. The search is exhaustive, so the result is the fastest split.
+- Non-goals: three-way splits, reserving capacity, or a simulator policy. The
+  harness sends one batch to one workshop, so split results are chat-layer evidence
+  only and never appear in simulator metrics.
+- Failure behavior: fewer than two workshops able to take a part returns None.
+  A late plan is a valid result.
 
 ### `make_allocator(weights, scales)` and `earliest_finish(...)`
 
@@ -79,12 +97,15 @@ The structured preview boundary is specified in
 [DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md). It finalizes resolution, exclusions,
 date handling, request preferences, independent queue snapshots, and preview
 failure states. It composes the offline tools; it is not free-text extraction or
-a durable allocation service. The remaining proposed interfaces below describe
-the later agent and persistence layers.
+a durable allocation service. The saved-plan wrapper is specified separately below.
 
 The [Streamlit page](STREAMLIT_APP.md) calls this preview boundary directly. Its
-custom sliders change configuration without changing allocation logic. Its demo
-confirmation is session-only UI behavior, not an implementation of `commit_allocation`.
+custom sliders change configuration without changing allocation logic. Independent
+mode uses session-only demo confirmation. Saved-plan mode calls the implemented
+`AllocationStore.preview`, `commit_allocation` and `records` interfaces described
+in [ALLOCATION_RECORD_CONTRACT.md](ALLOCATION_RECORD_CONTRACT.md). They use local
+SQLite transactions, regenerate reviewed evidence, reject stale/duplicate requests,
+and export auditable records. Previewing never reserves capacity.
 
 Natural-language extraction and multi-turn patch validation are specified in
 [INTAKE_CONTRACT.md](INTAKE_CONTRACT.md) and implemented in `intake.py`. The model
@@ -111,8 +132,8 @@ and an explicit state snapshot. Do not infer these from simulator replay outcome
 | `estimate_delivery` adapter | Resolved request, workshop ID, as-of date and queue state | Internal estimate plus calendar dates, source references and assumptions | Expose Python estimates to the agent | Silent use of stale state or an unconditional promise | Surface missing state, invalid inputs, and ineligible candidate handling explicitly |
 | `check_feasibility` | Resolved request, effective deadline, exclusions, queue state | Whether any permitted candidate meets the estimate criterion, with candidate dates and slips | Explain whether the request can be met under stated assumptions | Automatically committing a late order | Unknown deadline requires clarification; no feasible candidate returns options |
 | `rank_candidates` adapter | Resolved request, weights/scales, hard constraints and provenance | Full considered-candidate record, exclusions, ranked scores, and tie-break details | Recommend within the permitted set | Relaxing a hard constraint or committing | All candidates excluded returns a reason and escalation options |
-| `evaluate_options` | Resolved request and state, explicitly allowed alternatives | Compared whole-batch/split/load scenarios with assumptions | Examine overload and no-good-option cases | Assuming a split is commercially permitted or simulator-supported | Unsupported scenarios or no improvement must be reported explicitly |
-| `commit_allocation` | Confirmed proposed decision, requester, state version and candidate evidence | Persisted allocation ID, timestamp and audit record | Record the approved decision | Contacting workshops or silently changing source orders | Reject stale/unconfirmed decisions; define retry and duplicate handling before building |
+| `evaluate_options` | Resolved request and state, explicitly allowed alternatives | Compared whole-batch/split/load scenarios with assumptions | Examine overload and no-good-option cases. The two-workshop split part is implemented as `assess_split`; the overload probe is still proposed | Assuming a split is commercially permitted or simulator-supported | Unsupported scenarios or no improvement must be reported explicitly |
+| `commit_allocation` (implemented local subset) | Reviewed preview, dispatcher, idempotency key, explicit confirmation | Persisted allocation ID, timestamp, queue change and audit record | Save a local planning decision | Workshop contact, source edits, cancellations, authentication | Reject stale/unconfirmed/duplicate requests; exact retries return the existing record; see record contract |
 
 The course requires explicit handling of awkward cases; it does not require a
 particular split optimizer. The original allocator callback returns one workshop ID,
@@ -133,7 +154,7 @@ so split execution needs separate evaluation or a documented harness wrapper.
 - Every numerical claim in a chat explanation must trace to a tool result and the
   correct order, workshop, field, and unit. An automated checker is planned.
 
-Before building the chat tools, decide how new requests update queues, whether inbox
-cases are independent or sequential, how to handle past deadlines and changed order
-quantities, and what confirmation does to state. Current simulation traces are
-experiment logs, not confirmed operational allocation records.
+The record contract now defines queue reservations and confirmation for the local
+saved plan. Inbox evaluation cases remain independent. Deadline/quantity amendments
+and real operational deployment still need separate contracts. Simulation traces
+remain experiment logs; they are not saved allocation records.

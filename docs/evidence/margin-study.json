@@ -1,0 +1,677 @@
+{
+  "selection_rule": "Lowest mean late days over the development normal and shock runs, then lowest mean % late, then lowest mean cost, then name. The lateness preset is a candidate, so 'no change' can win.",
+  "grid": {
+    "lateness": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "deadline_buffer_days": 0.0
+    },
+    "cost_buffer0": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.01,
+      "deadline_buffer_days": 0.0
+    },
+    "cost_buffer2": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.01,
+      "deadline_buffer_days": 2.0
+    },
+    "cost_buffer5": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.01,
+      "deadline_buffer_days": 5.0
+    },
+    "cost_buffer7": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.01,
+      "deadline_buffer_days": 7.0
+    },
+    "cost_buffer10": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.01,
+      "deadline_buffer_days": 10.0
+    },
+    "cost_buffer14": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.01,
+      "deadline_buffer_days": 14.0
+    },
+    "defects_buffer0": {
+      "lateness": 1.0,
+      "defects": 0.01,
+      "cost": 0.0,
+      "deadline_buffer_days": 0.0
+    },
+    "defects_buffer2": {
+      "lateness": 1.0,
+      "defects": 0.01,
+      "cost": 0.0,
+      "deadline_buffer_days": 2.0
+    },
+    "defects_buffer5": {
+      "lateness": 1.0,
+      "defects": 0.01,
+      "cost": 0.0,
+      "deadline_buffer_days": 5.0
+    },
+    "defects_buffer7": {
+      "lateness": 1.0,
+      "defects": 0.01,
+      "cost": 0.0,
+      "deadline_buffer_days": 7.0
+    },
+    "defects_buffer10": {
+      "lateness": 1.0,
+      "defects": 0.01,
+      "cost": 0.0,
+      "deadline_buffer_days": 10.0
+    },
+    "defects_buffer14": {
+      "lateness": 1.0,
+      "defects": 0.01,
+      "cost": 0.0,
+      "deadline_buffer_days": 14.0
+    }
+  },
+  "selected": "cost_buffer10",
+  "selected_weights": {
+    "lateness": 1.0,
+    "defects": 0.0,
+    "cost": 0.01,
+    "deadline_buffer_days": 10.0
+  },
+  "development": {
+    "seeds": [
+      6000,
+      6001,
+      6002,
+      6003,
+      6004,
+      6005,
+      6006,
+      6007,
+      6008,
+      6009
+    ],
+    "normal": {
+      "random": {
+        "% late": 34.41666666666667,
+        "late days": 6.076666666666666,
+        "% def pcs": 5.834224598930481,
+        "cost": 111780.0,
+        "max share": 22.620320855614974,
+        "mean days": 21.87033999594821
+      },
+      "greedy_biggest": {
+        "% late": 84.33333333333334,
+        "late days": 26.6625,
+        "% def pcs": 5.235294117647059,
+        "cost": 108430.0,
+        "max share": 70.16042780748663,
+        "mean days": 50.457754289215686
+      },
+      "cheapest": {
+        "% late": 91.83333333333334,
+        "late days": 81.80166666666666,
+        "% def pcs": 7.508021390374331,
+        "cost": 85960.0,
+        "max share": 70.16042780748663,
+        "mean days": 106.0889492753623
+      },
+      "earliest_finish": {
+        "% late": 1.8333333333333335,
+        "late days": 0.1716666666666667,
+        "% def pcs": 6.556149732620321,
+        "cost": 115741.5,
+        "max share": 26.342245989304814,
+        "mean days": 8.184519264924477
+      },
+      "lateness": {
+        "% late": 1.8333333333333335,
+        "late days": 0.16916666666666666,
+        "% def pcs": 6.342245989304812,
+        "cost": 115660.5,
+        "max share": 26.18181818181818,
+        "mean days": 8.129366518764696
+      },
+      "cost_buffer0": {
+        "% late": 2.666666666666667,
+        "late days": 0.21833333333333332,
+        "% def pcs": 5.780748663101605,
+        "cost": 101245.0,
+        "max share": 37.49732620320856,
+        "mean days": 16.871357902274617
+      },
+      "cost_buffer2": {
+        "% late": 2.583333333333333,
+        "late days": 0.1875,
+        "% def pcs": 5.652406417112299,
+        "cost": 102339.0,
+        "max share": 36.652406417112296,
+        "mean days": 15.400746664886686
+      },
+      "cost_buffer5": {
+        "% late": 1.6666666666666667,
+        "late days": 0.155,
+        "% def pcs": 5.951871657754011,
+        "cost": 103146.0,
+        "max share": 35.50802139037433,
+        "mean days": 13.736141624431264
+      },
+      "cost_buffer7": {
+        "% late": 1.75,
+        "late days": 0.15833333333333333,
+        "% def pcs": 6.176470588235294,
+        "cost": 103992.0,
+        "max share": 34.417112299465245,
+        "mean days": 12.802073609822969
+      },
+      "cost_buffer10": {
+        "% late": 1.75,
+        "late days": 0.13166666666666665,
+        "% def pcs": 6.497326203208556,
+        "cost": 106881.5,
+        "max share": 29.62566844919786,
+        "mean days": 10.815254958170557
+      },
+      "cost_buffer14": {
+        "% late": 1.8333333333333335,
+        "late days": 0.145,
+        "% def pcs": 6.497326203208556,
+        "cost": 109751.5,
+        "max share": 24.74866310160428,
+        "mean days": 9.572123374015158
+      },
+      "defects_buffer0": {
+        "% late": 18.166666666666668,
+        "late days": 1.4533333333333334,
+        "% def pcs": 5.235294117647059,
+        "cost": 109058.0,
+        "max share": 40.13903743315508,
+        "mean days": 19.984116463335614
+      },
+      "defects_buffer2": {
+        "% late": 16.416666666666668,
+        "late days": 1.2333333333333334,
+        "% def pcs": 5.25668449197861,
+        "cost": 109007.5,
+        "max share": 39.294117647058826,
+        "mean days": 18.50497842949889
+      },
+      "defects_buffer5": {
+        "% late": 13.333333333333334,
+        "late days": 0.8491666666666667,
+        "% def pcs": 5.614973262032086,
+        "cost": 109701.0,
+        "max share": 38.32085561497326,
+        "mean days": 16.612195363513298
+      },
+      "defects_buffer7": {
+        "% late": 8.583333333333332,
+        "late days": 0.58,
+        "% def pcs": 5.299465240641711,
+        "cost": 112194.0,
+        "max share": 37.00534759358289,
+        "mean days": 15.358974004735671
+      },
+      "defects_buffer10": {
+        "% late": 5.333333333333334,
+        "late days": 0.3875,
+        "% def pcs": 5.925133689839572,
+        "cost": 113911.5,
+        "max share": 34.24598930481283,
+        "mean days": 12.759426147967549
+      },
+      "defects_buffer14": {
+        "% late": 3.3333333333333335,
+        "late days": 0.2841666666666667,
+        "% def pcs": 6.053475935828877,
+        "cost": 116684.5,
+        "max share": 31.540106951871657,
+        "mean days": 10.947584897253217
+      }
+    },
+    "shock": {
+      "random": {
+        "% late": 37.75,
+        "late days": 6.806666666666667,
+        "% def pcs": 5.834224598930481,
+        "cost": 111780.0,
+        "max share": 22.620320855614974,
+        "mean days": 22.975756662614877
+      },
+      "greedy_biggest": {
+        "% late": 84.83333333333334,
+        "late days": 28.77,
+        "% def pcs": 5.235294117647059,
+        "cost": 108430.0,
+        "max share": 70.16042780748663,
+        "mean days": 52.58108762254902
+      },
+      "cheapest": {
+        "% late": 91.83333333333334,
+        "late days": 84.94,
+        "% def pcs": 7.508021390374331,
+        "cost": 85960.0,
+        "max share": 70.16042780748663,
+        "mean days": 109.22728260869562
+      },
+      "earliest_finish": {
+        "% late": 2.0,
+        "late days": 0.18,
+        "% def pcs": 6.8663101604278065,
+        "cost": 115637.0,
+        "max share": 26.39572192513369,
+        "mean days": 8.447379378312082
+      },
+      "lateness": {
+        "% late": 2.0,
+        "late days": 0.1775,
+        "% def pcs": 6.6524064171123,
+        "cost": 115626.0,
+        "max share": 26.267379679144387,
+        "mean days": 8.389689471245578
+      },
+      "cost_buffer0": {
+        "% late": 3.25,
+        "late days": 0.25,
+        "% def pcs": 5.759358288770054,
+        "cost": 102251.0,
+        "max share": 36.342245989304814,
+        "mean days": 17.057936077580415
+      },
+      "cost_buffer2": {
+        "% late": 3.166666666666667,
+        "late days": 0.22583333333333333,
+        "% def pcs": 5.641711229946525,
+        "cost": 103238.5,
+        "max share": 35.68983957219251,
+        "mean days": 15.566024312874532
+      },
+      "cost_buffer5": {
+        "% late": 2.083333333333333,
+        "late days": 0.17666666666666667,
+        "% def pcs": 5.834224598930481,
+        "cost": 104215.0,
+        "max share": 34.481283422459896,
+        "mean days": 13.870067766933971
+      },
+      "cost_buffer7": {
+        "% late": 2.166666666666667,
+        "late days": 0.17250000000000001,
+        "% def pcs": 6.165775401069519,
+        "cost": 105053.0,
+        "max share": 33.54010695187166,
+        "mean days": 12.901042800620804
+      },
+      "cost_buffer10": {
+        "% late": 2.166666666666667,
+        "late days": 0.14333333333333334,
+        "% def pcs": 6.497326203208556,
+        "cost": 107513.0,
+        "max share": 29.56149732620321,
+        "mean days": 10.990162865870985
+      },
+      "cost_buffer14": {
+        "% late": 2.166666666666667,
+        "late days": 0.1675,
+        "% def pcs": 6.165775401069519,
+        "cost": 110165.5,
+        "max share": 25.36898395721925,
+        "mean days": 9.877472418175742
+      },
+      "defects_buffer0": {
+        "% late": 18.0,
+        "late days": 1.4766666666666666,
+        "% def pcs": 5.449197860962567,
+        "cost": 108779.0,
+        "max share": 39.01604278074866,
+        "mean days": 20.033040685337678
+      },
+      "defects_buffer2": {
+        "% late": 16.166666666666668,
+        "late days": 1.27,
+        "% def pcs": 5.470588235294118,
+        "cost": 109114.0,
+        "max share": 38.149732620320854,
+        "mean days": 18.540229156322507
+      },
+      "defects_buffer5": {
+        "% late": 13.666666666666666,
+        "late days": 0.8875,
+        "% def pcs": 5.786096256684492,
+        "cost": 109973.0,
+        "max share": 37.080213903743314,
+        "mean days": 16.709096717700458
+      },
+      "defects_buffer7": {
+        "% late": 9.333333333333332,
+        "late days": 0.6425,
+        "% def pcs": 5.385026737967914,
+        "cost": 112180.5,
+        "max share": 36.042780748663105,
+        "mean days": 15.461778470446149
+      },
+      "defects_buffer10": {
+        "% late": 6.0,
+        "late days": 0.425,
+        "% def pcs": 5.925133689839572,
+        "cost": 114181.0,
+        "max share": 33.72192513368984,
+        "mean days": 12.920540694120458
+      },
+      "defects_buffer14": {
+        "% late": 3.8333333333333335,
+        "late days": 0.305,
+        "% def pcs": 6.053475935828877,
+        "cost": 116393.0,
+        "max share": 30.652406417112296,
+        "mean days": 11.157396871652788
+      }
+    },
+    "paired_deltas": {
+      "random": {
+        "% late": 3.333333333333332,
+        "late days": 0.7299999999999999
+      },
+      "greedy_biggest": {
+        "% late": 0.5,
+        "late days": 2.1075
+      },
+      "cheapest": {
+        "% late": 0.0,
+        "late days": 3.138333333333334
+      },
+      "earliest_finish": {
+        "% late": 0.16666666666666666,
+        "late days": 0.008333333333333335
+      },
+      "lateness": {
+        "% late": 0.16666666666666666,
+        "late days": 0.008333333333333335
+      },
+      "cost_buffer0": {
+        "% late": 0.5833333333333334,
+        "late days": 0.03166666666666666
+      },
+      "cost_buffer2": {
+        "% late": 0.5833333333333333,
+        "late days": 0.038333333333333344
+      },
+      "cost_buffer5": {
+        "% late": 0.41666666666666663,
+        "late days": 0.021666666666666667
+      },
+      "cost_buffer7": {
+        "% late": 0.41666666666666663,
+        "late days": 0.014166666666666666
+      },
+      "cost_buffer10": {
+        "% late": 0.41666666666666663,
+        "late days": 0.011666666666666664
+      },
+      "cost_buffer14": {
+        "% late": 0.3333333333333333,
+        "late days": 0.022500000000000003
+      },
+      "defects_buffer0": {
+        "% late": -0.1666666666666668,
+        "late days": 0.023333333333333317
+      },
+      "defects_buffer2": {
+        "% late": -0.25,
+        "late days": 0.03666666666666667
+      },
+      "defects_buffer5": {
+        "% late": 0.33333333333333337,
+        "late days": 0.038333333333333344
+      },
+      "defects_buffer7": {
+        "% late": 0.75,
+        "late days": 0.06250000000000001
+      },
+      "defects_buffer10": {
+        "% late": 0.6666666666666666,
+        "late days": 0.037500000000000006
+      },
+      "defects_buffer14": {
+        "% late": 0.5,
+        "late days": 0.020833333333333332
+      }
+    },
+    "normal_lateness_guardrail": {
+      "random": true,
+      "greedy_biggest": false,
+      "cheapest": false,
+      "earliest_finish": true,
+      "lateness": true,
+      "cost_buffer0": true,
+      "cost_buffer2": true,
+      "cost_buffer5": true,
+      "cost_buffer7": true,
+      "cost_buffer10": true,
+      "cost_buffer14": true,
+      "defects_buffer0": true,
+      "defects_buffer2": true,
+      "defects_buffer5": true,
+      "defects_buffer7": true,
+      "defects_buffer10": true,
+      "defects_buffer14": true
+    }
+  },
+  "report": {
+    "seeds": [
+      5105,
+      5106,
+      5107,
+      5108,
+      5109,
+      5110,
+      5111,
+      5112,
+      5113,
+      5114
+    ],
+    "normal": {
+      "random": {
+        "% late": 34.166666666666664,
+        "late days": 6.1325,
+        "% def pcs": 5.598930481283422,
+        "cost": 111780.0,
+        "max share": 22.620320855614974,
+        "mean days": 21.86567451534683
+      },
+      "greedy_biggest": {
+        "% late": 84.25,
+        "late days": 26.528333333333336,
+        "% def pcs": 5.278074866310161,
+        "cost": 108430.0,
+        "max share": 70.16042780748663,
+        "mean days": 50.30266544117647
+      },
+      "cheapest": {
+        "% late": 91.83333333333334,
+        "late days": 81.91583333333332,
+        "% def pcs": 8.240641711229946,
+        "cost": 85960.0,
+        "max share": 70.16042780748663,
+        "mean days": 106.19995122630989
+      },
+      "earliest_finish": {
+        "% late": 1.6666666666666667,
+        "late days": 0.17833333333333332,
+        "% def pcs": 7.181818181818182,
+        "cost": 115566.5,
+        "max share": 26.283422459893046,
+        "mean days": 8.259823326627195
+      },
+      "lateness": {
+        "% late": 1.6666666666666667,
+        "late days": 0.18,
+        "% def pcs": 7.491978609625669,
+        "cost": 115591.5,
+        "max share": 26.20855614973262,
+        "mean days": 8.235178088375818
+      },
+      "defects": {
+        "% late": 95.08333333333334,
+        "late days": 139.86833333333334,
+        "% def pcs": 2.914438502673797,
+        "cost": 129920.0,
+        "max share": 70.16042780748663,
+        "mean days": 164.36498599439773
+      },
+      "hybrid": {
+        "% late": 18.833333333333336,
+        "late days": 1.8008333333333333,
+        "% def pcs": 5.754010695187166,
+        "cost": 109456.0,
+        "max share": 40.86631016042781,
+        "mean days": 20.330771215676908
+      },
+      "selected_cost_buffer10": {
+        "% late": 1.75,
+        "late days": 0.13833333333333334,
+        "% def pcs": 6.475935828877004,
+        "cost": 106668.0,
+        "max share": 29.668449197860962,
+        "mean days": 10.993986889070008
+      }
+    },
+    "shock": {
+      "random": {
+        "% late": 38.166666666666664,
+        "late days": 7.1658333333333335,
+        "% def pcs": 5.598930481283422,
+        "cost": 111780.0,
+        "max share": 22.620320855614974,
+        "mean days": 23.27539673756905
+      },
+      "greedy_biggest": {
+        "% late": 84.91666666666667,
+        "late days": 28.04666666666667,
+        "% def pcs": 5.278074866310161,
+        "cost": 108430.0,
+        "max share": 70.16042780748663,
+        "mean days": 51.84266544117647
+      },
+      "cheapest": {
+        "% late": 91.83333333333334,
+        "late days": 84.12,
+        "% def pcs": 8.240641711229946,
+        "cost": 85960.0,
+        "max share": 70.16042780748663,
+        "mean days": 108.40495122630989
+      },
+      "earliest_finish": {
+        "% late": 1.9166666666666667,
+        "late days": 0.19083333333333335,
+        "% def pcs": 7.117647058823529,
+        "cost": 115459.5,
+        "max share": 26.524064171122994,
+        "mean days": 8.509129897081463
+      },
+      "lateness": {
+        "% late": 1.9166666666666667,
+        "late days": 0.18083333333333335,
+        "% def pcs": 7.37433155080214,
+        "cost": 115283.5,
+        "max share": 26.37967914438503,
+        "mean days": 8.456065878832025
+      },
+      "defects": {
+        "% late": 95.08333333333334,
+        "late days": 142.48166666666665,
+        "% def pcs": 2.914438502673797,
+        "cost": 129920.0,
+        "max share": 70.16042780748663,
+        "mean days": 166.97831932773107
+      },
+      "hybrid": {
+        "% late": 20.5,
+        "late days": 1.8675000000000002,
+        "% def pcs": 6.160427807486631,
+        "cost": 109185.0,
+        "max share": 40.38502673796792,
+        "mean days": 20.226001540108797
+      },
+      "selected_cost_buffer10": {
+        "% late": 2.25,
+        "late days": 0.155,
+        "% def pcs": 6.347593582887701,
+        "cost": 107047.0,
+        "max share": 29.668449197860962,
+        "mean days": 11.237281186861589
+      }
+    },
+    "paired_deltas": {
+      "random": {
+        "% late": 4.0,
+        "late days": 1.0333333333333332
+      },
+      "greedy_biggest": {
+        "% late": 0.6666666666666657,
+        "late days": 1.5183333333333333
+      },
+      "cheapest": {
+        "% late": 0.0,
+        "late days": 2.2041666666666657
+      },
+      "earliest_finish": {
+        "% late": 0.25,
+        "late days": 0.012500000000000002
+      },
+      "lateness": {
+        "% late": 0.25,
+        "late days": 0.0008333333333333359
+      },
+      "defects": {
+        "% late": 0.0,
+        "late days": 2.6133333333333324
+      },
+      "hybrid": {
+        "% late": 1.6666666666666665,
+        "late days": 0.06666666666666668
+      },
+      "selected_cost_buffer10": {
+        "% late": 0.5,
+        "late days": 0.016666666666666663
+      }
+    },
+    "normal_lateness_guardrail": {
+      "random": true,
+      "greedy_biggest": false,
+      "cheapest": false,
+      "earliest_finish": true,
+      "lateness": true,
+      "defects": false,
+      "hybrid": true,
+      "selected_cost_buffer10": true
+    }
+  },
+  "shock_headroom": {
+    "lateness": {
+      "% late": 1.916666666666667,
+      "late days": 0.18083333333333335
+    },
+    "closure_oracle": {
+      "% late": 1.8333333333333337,
+      "late days": 0.18333333333333335
+    }
+  },
+  "source_sha256": {
+    "simulate.py": "b845804ad1229f593627b6ef1a6482258331178dbc4ec535274103fc3244593b",
+    "orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+    "workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+    "allocator.py": "cae34aeb11d46a36ca7721d7f4386d6d82525ffa8d78f0269e8fe956ccda161d",
+    "evaluate.py": "4852c9b337d42435f9dec5f94ade6c710ccfcbf1789686e3dff325fc5ff85016",
+    "margin_study.py": "f4351032363edd6f9b5d1c02663cce03a7dd9722f5180e638f0b7ae120e17529"
+  }
+}

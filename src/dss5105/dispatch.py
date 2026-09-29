@@ -10,9 +10,16 @@ from datetime import date, datetime, time, timedelta
 from math import ceil, isfinite
 from pathlib import Path
 
-from dss5105.allocator import ObjectiveWeights, ScoreScales, rank_candidates
+from dss5105.allocator import (
+    ObjectiveWeights,
+    ScoreScales,
+    assess_split,
+    earliest_finish,
+    estimate_delivery,
+    rank_candidates,
+)
 from dss5105.evaluate import PRESETS
-from dss5105.harness import HARNESS_PATH, Simulator, eligible_workshops
+from dss5105.harness import HARNESS_PATH, Simulator, cheapest, eligible_workshops, greedy_biggest, random_choice
 
 ROOT = HARNESS_PATH.parents[2]
 DATA = ROOT / "track2" / "data"
@@ -21,6 +28,12 @@ PREFERENCES = {
     "fastest": ObjectiveWeights(lateness=1),
     "lowest_defects": ObjectiveWeights(lateness=0, defects=1),
     "cheapest_on_time": ObjectiveWeights(lateness=0, cost=1),
+}
+BASELINES = {
+    "earliest_finish": ("Earliest finish (short heuristic)", earliest_finish),
+    "cheapest": ("Cheapest eligible", cheapest),
+    "greedy_biggest": ("Biggest capacity", greedy_biggest),
+    "random_choice": ("Random eligible (seeded)", random_choice),
 }
 
 
@@ -70,6 +83,11 @@ class DispatchInput:
             raise ValueError("Duplicate workshop exclusions must be consolidated with their provenance")
 
 
+def ship_date_is_due_date(request: DispatchInput, order: dict) -> bool:
+    """A stated ship date needs no question when it is the order's recorded due date."""
+    return request.date_kind == "shipping" and request.due_date == order["due_date"]
+
+
 def read_inbox(path: Path = DATA / "dispatch_requests.txt") -> list[dict]:
     """Parse envelopes only; message interpretation is a separate boundary."""
     requests = []
@@ -97,6 +115,67 @@ class DispatchDesk:
         self.source_hashes = {
             path.name: hashlib.sha256(path.read_bytes()).hexdigest()
             for path in (DATA / "orders.csv", DATA / "workshops.csv", DATA / "dispatch_requests.txt", HARNESS_PATH)
+        }
+
+    def display_fields(self, estimate, score=None) -> dict:
+        """Single source of the formatted strings shown to a user, for every policy."""
+        eta = datetime.combine(self.as_of, time()) + timedelta(minutes=ceil(estimate.expected_turnaround_days * 1440))
+        values = {
+            "eta": eta.isoformat(sep=" ", timespec="minutes"),
+            "turnaround": f"{estimate.expected_turnaround_days:.2f} days",
+            "lateness": f"{estimate.lateness_days:.2f} days",
+            "cost": f"{estimate.cost:,.2f}",
+            "defects": f"{estimate.defect_risk:.1%}",
+            "queue": f"{estimate.queue_days:.2f} days",
+            "processing": f"{estimate.process_days:.2f} days",
+            "transport": f"{estimate.transport_days:.2f} days",
+            "expected_rework": f"{estimate.expected_turnaround_days - estimate.turnaround_days:.2f} days",
+        }
+        if score is not None:
+            values["score"] = f"{score:.4f}"
+        return values
+
+    def split_fields(self, batch: dict, permitted: dict, earliest: dict) -> dict | None:
+        """Tool-authored two-workshop split evidence; never an allocation."""
+        plan = assess_split(batch, permitted, self.queues)
+        if plan is None:
+            return None
+        slowest = max(plan.parts, key=lambda estimate: estimate.expected_turnaround_days)
+        saved = earliest["estimate"]["expected_turnaround_days"] - plan.expected_turnaround_days
+        parts = [
+            {
+                "workshop_id": estimate.workshop_id,
+                "name": self.workshops[estimate.workshop_id].name,
+                "pieces": pieces,
+                "estimate": asdict(estimate),
+                "display": self.display_fields(estimate),
+            }
+            for estimate, pieces in zip(plan.parts, plan.pieces, strict=True)
+        ]
+        display = {
+            **self.display_fields(slowest),
+            "cost": f"{plan.cost:,.2f}",
+            "days_saved": f"{saved:.2f} days",
+        }
+        meets = plan.lateness_days == 0
+        pieces = " + ".join(f"{part['name']} {part['pieces']} pieces" for part in parts)
+        timing = "meets the deadline" if meets else f"{display['lateness']} late"
+        if saved > 0:
+            comparison = f"{display['days_saved']} sooner than the earliest whole batch"
+        else:
+            comparison = "no sooner than the earliest whole batch"
+        return {
+            "parts": parts,
+            "expected_turnaround_days": plan.expected_turnaround_days,
+            "lateness_days": plan.lateness_days,
+            "meets_deadline": meets,
+            "cost": plan.cost,
+            "days_saved": saved,
+            "display": display,
+            "summary": (
+                f"Two-workshop split: {pieces}, estimated back {display['eta']} ({timing}; {comparison}). "
+                f"Total cost {display['cost']}. Splits are outside the course simulator and need dispatcher approval."
+            ),
         }
 
     def resolve_order(self, request: DispatchInput) -> dict:
@@ -143,16 +222,23 @@ class DispatchDesk:
             "effective_weights": asdict(effective),
             "scales": asdict(ScoreScales()),
             "candidates": [],
+            "baselines": [],
             "excluded": [],
             "flags": [],
             "recommendation": None,
             "alternative": None,
+            "earliest_option": None,
+            "split_option": None,
+            "review_options": [],
             "commit_allowed": False,
             "tool_sources": {
                 name: hashlib.sha256((ROOT / "src" / "dss5105" / name).read_bytes()).hexdigest()
                 for name in ("allocator.py", "dispatch.py")
             },
-            "assumption": "Independent hypothetical preview; source queue days reused as of inbox date.",
+            "assumption": (
+                f"Independent preview using workshops.csv queues as the {self.as_of.isoformat()} inbox snapshot. "
+                "Queues are used directly, not derived from the simulator replay."
+            ),
         }
 
         def finish(status, message):
@@ -165,6 +251,12 @@ class DispatchDesk:
             )
         resolution = self.resolve_order(request)
         result["resolution"] = resolution
+        if request.intent == "status" and resolution["status"] == "NOT_FOUND":
+            return finish(
+                "DECLINE",
+                "No matching order is recorded in orders.csv, so there is no status or movement to report. "
+                "Please check the order reference.",
+            )
         if resolution["status"] != "RESOLVED":
             message = (
                 "No matching order is recorded. Please check the order reference."
@@ -189,8 +281,11 @@ class DispatchDesk:
             issues.append("Confirm a quantity amendment; the message conflicts with the source order.")
         if request.date_uncertain:
             issues.append("Confirm the revised delivery deadline before ranking workshops.")
-        if request.date_kind == "shipping":
-            issues.append("Confirm whether the stated ship date is dispatch or delivery; the tool estimates delivery.")
+        if request.date_kind == "shipping" and not ship_date_is_due_date(request, order):
+            issues.append(
+                "Confirm whether the stated ship date is dispatch or delivery; it is not the recorded due date "
+                "and the tool estimates delivery."
+            )
         if request.clarification:
             issues.append(request.clarification)
         if issues:
@@ -205,6 +300,11 @@ class DispatchDesk:
         }
         result["batch"] = {**batch, "sent_date": self.as_of.isoformat(), "due_date": due.isoformat()}
         result["deadline_source"] = "request" if request.due_date else "orders.csv"
+        if ship_date_is_due_date(request, order):
+            result["deadline_note"] = (
+                "The stated ship date equals the recorded due date in orders.csv, so it is used as the "
+                "delivery deadline."
+            )
         eligible = {w.workshop_id for w in eligible_workshops(batch, self.workshops)}
         constraints = {item["workshop_id"]: item for item in request.exclusions}
         permitted = {key: w for key, w in self.workshops.items() if key in eligible and key not in constraints}
@@ -226,35 +326,64 @@ class DispatchDesk:
                 result["excluded"].append({"workshop_id": key, "name": workshop.name, "reasons": reasons})
         for candidate in rank_candidates(batch, permitted, self.queues, effective):
             estimate = candidate.estimate
-            eta = datetime.combine(self.as_of, time()) + timedelta(
-                minutes=ceil(estimate.expected_turnaround_days * 1440)
-            )
             result["candidates"].append(
                 {
                     **asdict(candidate),
                     "name": self.workshops[estimate.workshop_id].name,
                     "meets_deadline": estimate.lateness_days == 0,
-                    "display": {
-                        "eta": eta.isoformat(sep=" ", timespec="minutes"),
-                        "turnaround": f"{estimate.expected_turnaround_days:.2f} days",
-                        "lateness": f"{estimate.lateness_days:.2f} days",
-                        "cost": f"{estimate.cost:,.2f}",
-                        "defects": f"{estimate.defect_risk:.1%}",
-                        "score": f"{candidate.score:.4f}",
-                    },
+                    "display": self.display_fields(estimate, candidate.score),
                 }
             )
+        if eligible:
+            for policy, (label, choose) in BASELINES.items():
+                workshop_id = choose(batch, self.workshops, self.queues)
+                reference = estimate_delivery(batch, self.workshops[workshop_id], self.queues)
+                result["baselines"].append(
+                    {
+                        "policy": policy,
+                        "label": label,
+                        "workshop_id": workshop_id,
+                        "name": self.workshops[workshop_id].name,
+                        "meets_deadline": reference.lateness_days == 0,
+                        "respects_exclusions": workshop_id not in constraints,
+                        "estimate": asdict(reference),
+                        "display": self.display_fields(reference),
+                    }
+                )
         candidates = result["candidates"]
+        if candidates:
+            result["earliest_option"] = min(
+                candidates,
+                key=lambda row: (row["estimate"]["expected_turnaround_days"], row["estimate"]["workshop_id"]),
+            )
         selectable = candidates
         if request.preference == "cheapest_on_time":
             selectable = [row for row in candidates if row["meets_deadline"]]
         result["has_on_time_option"] = any(row["meets_deadline"] for row in candidates)
         if due < self.as_of:
             result["flags"].append("PAST_DEADLINE")
+        if candidates and (request.split_requested or not result["has_on_time_option"]):
+            result["split_option"] = self.split_fields(batch, permitted, result["earliest_option"])
+        split = result["split_option"]
         if not result["has_on_time_option"]:
             result["flags"].append("NO_ON_TIME_OPTION")
+            earliest = result["earliest_option"]
+            if earliest:
+                result["review_options"].append(
+                    f"No permitted workshop meets the deadline. Earliest estimated whole-batch delivery: "
+                    f"{earliest['name']} on {earliest['display']['eta']}, "
+                    f"{earliest['display']['lateness']} late. Ask the customer to approve a revised deadline."
+                )
+        if split:
+            result["review_options"].append(split["summary"])
+        elif request.split_requested:
+            result["review_options"].append("No two-workshop split is possible among the permitted workshops.")
         if request.split_requested:
-            result["flags"].append("SPLIT_NOT_IMPLEMENTED")
+            result["flags"].append("SPLIT_REVIEW")
+        if not result["has_on_time_option"]:
+            result["review_options"].append(
+                "Escalate to the dispatcher for other capacity or a revised request before allocating."
+            )
         suggestion = request.suggested_workshop
         if suggestion and suggestion not in permitted:
             result["flags"].append("SUGGESTION_REFUSED")
@@ -276,9 +405,11 @@ class DispatchDesk:
             result["flags"].append("SELECTED_OPTION_LATE")
         result["recommendation"] = chosen["estimate"]["workshop_id"]
         if request.split_requested or not chosen["meets_deadline"]:
+            shown = "Whole-batch and split estimates" if split else "Whole-batch option"
             return finish(
                 "NEEDS_REVIEW",
-                "Whole-batch option shown for discussion. Agree a deadline or split plan before allocation.",
+                f"{shown} shown for discussion. Agree a deadline or split plan before allocation; "
+                "split plans cannot be saved yet.",
             )
         return finish(
             "RECOMMEND", "Eligible whole-batch preview ready for review. Delivery is an estimate, not a guarantee."

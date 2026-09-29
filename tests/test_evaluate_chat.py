@@ -1,5 +1,7 @@
 import copy
 import json
+import re
+from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -108,6 +110,32 @@ def test_candidate_bound_audit_detects_wrong_workshop_values_and_ineligible_choi
     errors = check_tool_integrity(changed, desk)["errors"]
     assert any("display.cost" in error for error in errors)
     assert any("not a permitted" in error for error in errors)
+
+
+def test_rubric_labelling_matches_the_published_request_mix():
+    rubric = json.loads(evaluate_chat.RUBRIC.read_text())
+    labelled = Counter(case["course_kind"] for case in rubric["cases"].values())
+    assert labelled == rubric["course_kind_counts"]
+    dictionary = (evaluate_chat.ROOT / "track2" / "data" / "data_dictionary.md").read_text()
+    mix = dictionary[dictionary.index("| Kind | How many |") :]
+    published = [int(count) for count in re.findall(r"^\| [^|]+ \| (\d+) \| ", mix, re.MULTILINE)]
+    assert published == list(rubric["course_kind_counts"].values())
+
+
+def test_split_audit_recomputes_parts_and_summary():
+    desk = DispatchDesk()
+    request = DispatchInput(order_id="ORD-005", split_requested=True)
+    result = desk.preview(read_inbox()[22], request, ObjectiveWeights())
+    assert not check_tool_integrity(result, desk)["errors"]
+    changed = copy.deepcopy(result)
+    changed["split_option"]["parts"][0]["pieces"] += 1
+    changed["split_option"]["summary"] = changed["split_option"]["summary"].replace(
+        changed["split_option"]["display"]["eta"], "2026-04-02 00:00"
+    )
+    errors = check_tool_integrity(changed, desk)["errors"]
+    assert any("cover the batch" in error for error in errors)
+    assert any("does not recompute" in error for error in errors)
+    assert any("omits tool field eta" in error for error in errors)
 
 
 def test_rubric_covers_raw_inbox_without_importing_demo_fixtures():

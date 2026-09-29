@@ -13,7 +13,8 @@ Sources: [data dictionary](../track2/data/data_dictionary.md),
 - The course supplies 120 orders, 8 workshop profiles, and 30 chat requests.
 - The chat inbox is dated 2026-04-01. The simulator instead replays all orders in
   `order_date` order, starting at the first order's date. Do not apply the inbox's
-  "today" to the historical replay.
+  "today" to the historical replay. Use workshop queue values directly as the
+  April inbox snapshot; the replay separately reuses them as its January start.
 - The simulator uses order ID, category, pieces, order date, and due date. It
   simulates new outcomes rather than scoring the historical `completed_date` or
   `days_late` columns. It does not restrict replay to IN_PROGRESS orders.
@@ -29,50 +30,26 @@ Sources: [data dictionary](../track2/data/data_dictionary.md),
 - `simulate.py` does not read `dispatch_requests.txt`. Language evaluation is a
   separate task.
 
-## Reproducible initial experiments
+## Current Data v3 experiments
 
-The tables below are copied from the current runner's `Simulator.report()` output
-using seed 5105. They use the existing course data and unmodified harness. The
-saved outputs' source hashes were checked against the current files.
+The official data release replaces the inbox and fixes shock execution. Original
+orders and workshop profiles remain unchanged. Normal-run results remain valid;
+pre-v3 shock results are superseded.
 
 ```bash
-uv run python -m dss5105.evaluate --output results/allocation-normal.json
-uv run python -m dss5105.evaluate --shock --output results/allocation-shock.json
+uv run python scripts/refresh_v3_evidence.py
+uv run python -m dss5105.prototype
 ```
 
-Run from a source checkout after `uv sync --all-groups`. JSON records include
-source hashes, seed, weights, scales, choices, queue snapshots, and outcomes.
-Weighted policies include eligible candidate estimates and score components.
-`results/` is generated and Git-ignored; these tables and the runner preserve the
-reproduction route. Retain selected raw artifacts with the final evaluation.
+See [V3_EVALUATION.md](V3_EVALUATION.md) for generated normal, ten-seed shock,
+paired controls and robustness changes. [The retained evidence](evidence/data-v3.json)
+includes source hashes, weights, scales, per-seed metrics and fixture outcomes.
+Full per-order traces are regenerated in `results/allocation-v3-*.json`.
+No weights were changed for this rerun and no provider was called.
 
-See [ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md) for exact score definitions,
-normalization scales, tie-breaking, and exploratory weights. In particular,
-`lateness` is a greedy point-estimate penalty, not a proven late-rate optimizer.
-
-### Normal scenario
-
-| Policy | Mean days | P90 days | % late | % defect | Cost | Max share |
-|---|---|---|---|---|---|---|
-| random | 21.5 | 45.6 | 34% | 4% | 111,780 | 23% |
-| greedy_biggest | 49.0 | 80.6 | 84% | 4% | 108,430 | 70% |
-| cheapest | 105.1 | 192.9 | 93% | 8% | 85,960 | 70% |
-| earliest_finish | 8.1 | 13.7 | 2% | 5% | 115,640 | 26% |
-| lateness | 8.1 | 13.7 | 2% | 6% | 115,360 | 25% |
-| defects | 162.5 | 282.1 | 95% | 2% | 129,920 | 70% |
-| hybrid | 20.1 | 32.8 | 17% | 3% | 109,355 | 42% |
-
-### Shock scenario
-
-| Policy | Mean days | P90 days | % late | % defect | Cost | Max share |
-|---|---|---|---|---|---|---|
-| random | 23.4 | 48.4 | 39% | 4% | 111,780 | 23% |
-| greedy_biggest | 51.0 | 81.2 | 87% | 4% | 108,430 | 70% |
-| cheapest | 103.9 | 190.0 | 92% | 5% | 85,960 | 70% |
-| earliest_finish | 8.4 | 15.4 | 2% | 5% | 115,805 | 26% |
-| lateness | 8.3 | 15.4 | 2% | 6% | 115,665 | 27% |
-| defects | 165.0 | 285.1 | 95% | 2% | 129,920 | 70% |
-| hybrid | 19.6 | 34.1 | 22% | 3% | 109,165 | 41% |
+The course now explicitly declares R20, R28 and R30 impossible. The nine corrected
+requests are listed in [the official changelog](../track2/CHANGELOG.md). This is
+source information, not an inferred infeasibility count from an old probe.
 
 ## What these runs support
 
@@ -83,7 +60,8 @@ normalization scales, tie-breaking, and exploratory weights. In particular,
 - The weighted lateness policy does not show a substantial advantage over that
   short heuristic in the displayed turnaround and late-rate metrics. This is an
   important comparator, not a result to hide.
-- Quality-first routing performs poorly on timeliness in this experiment. It is
+- Quality-first routing fails the new random-lateness guardrail and cannot
+  qualify as a primary defects win. It performs poorly on timeliness. It is
   evidence of a tradeoff for this policy and dataset, not proof that fast and
   low-defect allocation is mathematically impossible.
 - The hybrid changes the tradeoff: in the normal run it costs less and has fewer
@@ -97,26 +75,28 @@ normalization scales, tie-breaking, and exploratory weights. In particular,
 
 `mean days` and `p90 days` measure turnaround from dispatch to delivery, not days
 past the deadline. `% late` counts batches whose rounded completion date exceeds
-the due date. It does not measure the severity of lateness. `% defect` counts
-batch-level defect events, not defective garments. `max share` is the largest
-workshop's share of allocated pieces, a concentration proxy rather than a complete
-definition of fairness. The printed percentages are rounded.
+the due date. The new `late days` metric is mean positive rounded overdue days over all
+batches, with on-time batches counting as zero. `% defect` counts
+batch-level defect events, not defective garments. `% def pcs` weights those
+batch events by their pieces; it is not an inspection count of defective garments.
+`max share` is the largest workshop's share of allocated pieces, a concentration
+proxy rather than a complete definition of fairness. Printed percentages are rounded.
 
 Defect draws are stochastic but seeded. Decisions change future queues, so one
 seed does not establish performance across possible runs. A proposed expected
 quality metric can remove the immediate defect-draw noise conditional on a fixed
-allocation; allocations themselves can still change across seeds. No such extra
-metric is exported by the initial `evaluate` runner. The separate weight-search
-runner now reports conditional expected batch-defect exposure; see
+allocation; allocations themselves can still change across seeds. The `evaluate`
+runner now exports all official metrics without display rounding. The separate
+weight-search runner reports conditional expected batch-defect exposure; see
 [WEIGHT_TUNING.md](WEIGHT_TUNING.md) for its definition and results.
 
-In the shock scenario, the target is selected from ACTIVE workshops. The closure
-rule adjusts a chosen batch's start time if it falls in the closure interval; it
-does not change the workshop's status to SUSPENDED. Later queue inputs may expose
-that delay. Current policies use these queues, not explicit failure detection.
-Selecting the shock target also consumes RNG state, so normal/shock differences
-include changed defect draws and are not a clean estimate of the closure alone.
-A dedicated controlled experiment would need a documented wrapper or variant.
+In Data v3, a separate random stream chooses the shock target from ACTIVE
+workshops. Work in progress pauses across the closure, and work arriving during it
+waits. The workshop is not marked SUSPENDED. Later queue inputs expose the delay;
+our policies adapt to queues without explicit failure detection. Paired normal and
+shock runs align random draws, although changed workshop choices can change defect
+probabilities and realized events. Robustness reporting averages per-seed changes
+over the required ten seeds.
 
 ## Questions not yet settled
 
@@ -126,13 +106,14 @@ Reproduce its development inputs with `uv run python -m dss5105.prototype`; the
 generated `results/dispatch-previews.json` retains every preset's tool evidence.
 These hand-authored interpretations are not gold chat labels or measured extraction
 accuracy. A first live initial-response evaluation now exists in
-[CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md). It reports frozen draft
-checks and manual findings separately; it is not held-out or full-system validation.
+[CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md). That run is historical
+pre-v3 evidence; a new paid live rerun is pending.
+The refreshed fixture replay is not language accuracy or full-system validation.
 
 The earlier weight-sweep and cost-frontier claims have no retained reproduction
 script and are not included as current results. There is no established optimal
-hybrid, proof of incompatible objectives, or verified count of infeasible chat
-requests. Do not tune toward those old numbers.
+hybrid or proof of incompatible objectives. The v3 impossible-request IDs now
+come from the course announcement. Do not tune toward old inferred counts.
 
 Before computing chat feasibility, establish the intended order, quantities,
 requested date, exclusions, and queue-state convention. R12 explicitly excludes

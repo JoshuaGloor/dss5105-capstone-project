@@ -22,14 +22,24 @@ class NoEligibleWorkshop(ValueError):
 
 @dataclass(frozen=True)
 class ObjectiveWeights:
+    """Objective configuration: three relative weights and a deadline safety buffer.
+
+    The buffer only changes the lateness score: a candidate is penalized unless its
+    expected turnaround plus the buffer fits before the due date. Estimates and the
+    "meets deadline" test are unchanged. A buffer of 0 is the original score.
+    """
+
     lateness: float = 1.0
     defects: float = 0.0
     cost: float = 0.0
+    deadline_buffer_days: float = 0.0
 
     def __post_init__(self):
-        values = asdict(self).values()
-        if any(not isfinite(value) or value < 0 for value in values) or not any(values):
+        weights = (self.lateness, self.defects, self.cost)
+        if any(not isfinite(value) or value < 0 for value in weights) or not any(weights):
             raise ValueError("Weights must be finite, nonnegative, and not all zero")
+        if not isfinite(self.deadline_buffer_days) or self.deadline_buffer_days < 0:
+            raise ValueError("The deadline buffer must be finite and nonnegative")
 
 
 @dataclass(frozen=True)
@@ -53,6 +63,7 @@ class DeliveryEstimate:
     transport_days: float
     turnaround_days: float
     expected_turnaround_days: float
+    available_days: float
     lateness_days: float
     defect_risk: float
     cost: float
@@ -76,6 +87,7 @@ def estimate_delivery(batch: Batch, workshop: Workshop, queues: dict[str, float]
         transport_days=workshop.lead_days,
         turnaround_days=turnaround,
         expected_turnaround_days=expected,
+        available_days=float(time_available),
         lateness_days=max(0.0, expected - time_available),
         defect_risk=workshop.defect_rate,
         cost=batch["pieces"] * workshop.cost,
@@ -106,7 +118,8 @@ def rank_candidates(
     ranked = []
     for workshop in eligible_workshops(batch, workshops):
         estimate = estimate_delivery(batch, workshop, queues)
-        lateness = weights.lateness * estimate.lateness_days / scales.lateness_days
+        buffered = estimate.expected_turnaround_days + weights.deadline_buffer_days - estimate.available_days
+        lateness = weights.lateness * max(0.0, buffered) / scales.lateness_days
         defects = weights.defects * estimate.defect_risk / scales.defect_probability
         cost = weights.cost * workshop.cost / scales.cost_per_piece
         ranked.append(CandidateScore(estimate, lateness, defects, cost, lateness + defects + cost))
@@ -123,6 +136,55 @@ def make_allocator(weights: ObjectiveWeights, scales: ScoreScales = ScoreScales(
         return ranked[0].estimate.workshop_id
 
     return allocate
+
+
+@dataclass(frozen=True)
+class SplitPlan:
+    parts: tuple[DeliveryEstimate, DeliveryEstimate]
+    pieces: tuple[int, int]
+    expected_turnaround_days: float
+    lateness_days: float
+    cost: float
+
+
+def assess_split(batch: Batch, workshops: dict[str, Workshop], queues: dict[str, float]) -> SplitPlan | None:
+    """Fastest two-workshop split of one batch, for the chat layer only.
+
+    Each part must pass the course eligibility rule at its own size. The plan
+    finishes when its slower part does; ties prefer lower total cost, then IDs.
+    The simulator sends one batch to one workshop, so it never evaluates this.
+    Returns None when fewer than two workshops can take a part.
+    """
+    total = batch["pieces"]
+    estimates = {}
+    for pieces in range(1, total):
+        part = {**batch, "pieces": pieces}
+        for workshop in eligible_workshops(part, workshops):
+            estimates[workshop.workshop_id, pieces] = estimate_delivery(part, workshop, queues)
+    best = None
+    for first in sorted(workshops):
+        for second in sorted(workshops):
+            if second <= first:
+                continue
+            for pieces in range(1, total):
+                a = estimates.get((first, pieces))
+                b = estimates.get((second, total - pieces))
+                if a is None or b is None:
+                    continue
+                finish = max(a.expected_turnaround_days, b.expected_turnaround_days)
+                key = (finish, a.cost + b.cost, first, second, pieces)
+                if best is None or key < best[0]:
+                    best = (key, a, b, pieces)
+    if best is None:
+        return None
+    (finish, cost, *_), a, b, pieces = best
+    return SplitPlan(
+        parts=(a, b),
+        pieces=(pieces, total - pieces),
+        expected_turnaround_days=finish,
+        lateness_days=max(a.lateness_days, b.lateness_days),
+        cost=cost,
+    )
 
 
 def earliest_finish(batch: Batch, workshops: dict[str, Workshop], queues: dict[str, float]) -> str:

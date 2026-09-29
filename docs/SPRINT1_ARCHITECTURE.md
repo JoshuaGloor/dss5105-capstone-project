@@ -5,7 +5,8 @@ vector image with a widescreen canvas; it can also be opened directly in a brows
 The diagram distinguishes implemented tools, the product prototype, and planned
 language/state features. It is a target architecture with current status labels.
 The language path is now implemented and tested with fake models; real-provider
-accuracy remains unevaluated. Durable confirmation and chat evaluation are still planned.
+the revised live evaluation is pending. Local durable confirmation is implemented;
+held-out chat evaluation and full explanation review remain planned.
 The Streamlit web interface now runs live Python previews with native controls.
 The standalone HTML remains the design prototype and opens directly in Chrome.
 
@@ -20,9 +21,9 @@ flowchart LR
     R --> A[Existing Python estimates + weighted scorer]
     A --> E[Candidate evidence + exception states]
     E --> U
-    U --> C[Explicit confirmation: demo only]
-    C -.-> S[Versioned state + durable audit: planned]
-    S -.-> V
+    U --> C[Explicit confirmation in saved-plan mode]
+    C --> S[Versioned queues + SQLite audit: implemented]
+    S --> V
     A --> H[Shared simulator: policy evaluation]
     L -.-> Q[Chat behavior + faithfulness evaluation: planned]
     E -.-> Q
@@ -32,8 +33,8 @@ flowchart LR
 
 The browser displays the Streamlit application. Streamlit calls the Python tools
 directly; a separate frontend framework or REST service is not required for the
-first version. Offline examples use fixtures; Natural language uses model-extracted,
-validated patches. Keep conversational session state separate from durable allocations.
+first version. The group-chat mode (the default) uses model-extracted, validated
+patches and answer buttons; offline examples use fixtures. Keep conversational session state separate from durable allocations.
 
 The language layer interprets what the dispatcher means and asks questions when
 necessary. It does not calculate dates, costs, probabilities, or allocation scores.
@@ -42,9 +43,9 @@ explicit exclusions are hard constraints; objective weights affect ranking only
 inside the permitted set. The same scorer serves both the application and the
 shared policy evaluation, while chat behavior has its own evaluation path.
 
-Comparisons are previews on the same snapshot. The target application commits only
-after human confirmation and a current-state check. In this increment, all previews
-are read-only; the confirmation interaction is explicitly a demonstration.
+Comparisons are previews on the same snapshot. Saved-plan mode commits only after
+human confirmation and a current-state check, using SQLite transactions. Independent
+previews and the HTML reference retain the demo-only confirmation interaction.
 
 One well-tooled dispatcher agent is the starting design. No DeepAgents or multi-agent
 architecture is required for this boundary. Add orchestration complexity only if
@@ -75,8 +76,9 @@ the prototype's default for a justified objective declaration.
 3. Select R03 or R05: ambiguity or an unknown revised date blocks a recommendation.
 4. Select R21: the request explicitly asks for cheapest while meeting the date.
    The request preference overrides global presets and filters infeasible candidates.
-5. Return to an on-time recommendation, open confirmation, and point out the demo
-   label. Export evidence to show exactly what the future audit will retain.
+5. In Streamlit, switch to Saved local plan, review an on-time recommendation, enter
+   the dispatcher name and confirm. Show the saved record and changed queue evidence.
+   Independent mode and the standalone HTML still demonstrate confirmation only.
 
 Use one or two cases if time is tight. R20 demonstrates an infeasible delivery date;
 R13 demonstrates unavailable quote data. These are development fixtures, not a live

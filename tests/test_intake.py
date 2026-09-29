@@ -5,7 +5,14 @@ import pytest
 
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import DispatchDesk
-from dss5105.intake import Conversation, IntakeError, interpret_turn, parse_date_phrase, preview_conversation
+from dss5105.intake import (
+    Conversation,
+    IntakeError,
+    apply_selection,
+    interpret_turn,
+    parse_date_phrase,
+    preview_conversation,
+)
 
 
 class Extractor:
@@ -53,7 +60,7 @@ def test_reference_and_raw_date_reach_allocator_without_model_arithmetic():
     assert result["status"] == "RECOMMEND"
     assert result["batch"]["due_date"] == "2026-04-13"
     assert result["batch"]["pieces"] == 500
-    assert result["conversation"]["traces"][0]["version"] == "intake-v1"
+    assert result["conversation"]["traces"][0]["version"] == "intake-v2"
     prompt = json.loads(model.calls[0][1].content)
     assert "queues" not in prompt and "cost" not in prompt
     assert prompt["latest_user_message"] == text
@@ -115,13 +122,23 @@ def test_fabricated_quotation_and_imposer_are_rejected():
         )
 
 
-def test_shipping_date_requires_separate_delivery_clarification():
-    first = turn(
+def test_shipping_date_is_checked_against_the_order_record_by_python():
+    recorded = turn(
         "ORD-109 ship Apr 13",
         patch(
             ("order_id", "ORD-109", "ORD-109"),
             ("due_date", "Apr 13", "Apr 13"),
             ("date_kind", "shipping", "ship Apr 13"),
+        ),
+    )
+    assert recorded.needs == ()
+    assert preview_conversation(recorded, DispatchDesk(), ObjectiveWeights())["status"] == "RECOMMEND"
+    first = turn(
+        "ORD-109 ship Apr 11",
+        patch(
+            ("order_id", "ORD-109", "ORD-109"),
+            ("due_date", "Apr 11", "Apr 11"),
+            ("date_kind", "shipping", "ship Apr 11"),
         ),
     )
     assert preview_conversation(first, DispatchDesk(), ObjectiveWeights())["status"] == "CLARIFY"
@@ -170,7 +187,7 @@ def test_lowest_cost_with_deadline_maps_to_tool_constraint():
         ),
     )
     result = preview_conversation(state, DispatchDesk(), ObjectiveWeights(lateness=0, defects=1))
-    assert result["effective_weights"] == {"lateness": 0, "defects": 0, "cost": 1}
+    assert result["effective_weights"] == {"lateness": 0, "defects": 0, "cost": 1, "deadline_buffer_days": 0}
     choice = next(row for row in result["candidates"] if row["estimate"]["workshop_id"] == result["recommendation"])
     assert choice["meets_deadline"]
 
@@ -211,3 +228,20 @@ def test_production_factory_is_only_called_on_interpret(monkeypatch):
     preview_conversation(state, DispatchDesk(), ObjectiveWeights())
     preview_conversation(state, DispatchDesk(), ObjectiveWeights(lateness=0, defects=1))
     assert len(called) == 1
+
+
+def test_clicked_answer_is_validated_like_model_output_without_a_model():
+    desk = DispatchDesk()
+    first = turn("Can we get the TrendCart order moving?", patch(("customer", "TrendCart", "TrendCart")))
+    chosen = apply_selection(first, "order_id", "ORD-017", "ORD-017", desk)
+    assert chosen.request.order_id == "ORD-017"
+    assert chosen.request.customer == "TrendCart"
+    assert chosen.turns[-1] == {"speaker": "Dispatcher", "text": "ORD-017"}
+    assert chosen.traces[-1]["model"] == "dispatcher selection; no model call"
+    assert preview_conversation(chosen, desk, ObjectiveWeights())["status"] == "RECOMMEND"
+    with pytest.raises(IntakeError, match="different order"):
+        apply_selection(chosen, "order_id", "ORD-010", "ORD-010", desk)
+    with pytest.raises(IntakeError):
+        apply_selection(first, "suggested_workshop", "Nowhere", "Use Nowhere instead.", desk)
+    with pytest.raises(IntakeError, match="Send a request"):
+        apply_selection(Conversation(), "order_id", "ORD-017", "ORD-017", desk)

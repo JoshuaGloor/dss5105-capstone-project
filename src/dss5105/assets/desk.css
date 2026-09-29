@@ -25,6 +25,22 @@ h3 { letter-spacing: -0.4px; }
 .qr-table small { display: block; color: #60726c; font-size: 11px; margin-top: 3px; }
 .qr-selected { background: #edf6eb; }
 .qr-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.st-key-chat_start { background: #fff; border-radius: 12px; }
+.qr-reply { background: #fff; border: 1px solid #dce3db; border-left: 4px solid #94631a; border-radius: 10px; padding: 14px 16px; }
+.qr-reply.qr-ok { border-left-color: #26a37c; }
+.qr-reply.qr-ask { border-left-color: #1c5948; }
+.qr-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: #f6ecdb; color: #6d4812; }
+.qr-ok .qr-badge { background: #e3f3ec; color: #17664c; }
+.qr-ask .qr-badge { background: #e7eeeb; color: #1c5948; }
+.qr-headline { font-size: 17px; font-weight: 650; margin: 10px 0 8px; line-height: 1.4; }
+.qr-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; margin: 10px 0 6px; }
+.qr-facts div { background: #fbfbf7; border: 1px solid #e9eee6; border-radius: 8px; padding: 8px 10px; }
+.qr-facts dt { font-size: 11px; color: #60726c; }
+.qr-facts dd { margin: 2px 0 0; font-size: 14px; font-weight: 600; }
+.qr-notes { margin: 8px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.5; }
+.qr-notes li + li { margin-top: 4px; }
+.qr-steps { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.55; }
+.qr-steps strong { margin-right: 4px; }
 @media (max-width: 760px) {
   .block-container { padding: 1.5rem 1rem; }
   .qr-message { padding: 18px 14px; }

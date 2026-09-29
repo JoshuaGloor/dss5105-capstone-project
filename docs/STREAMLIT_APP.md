@@ -1,5 +1,11 @@
 # Streamlit dispatch desk
 
+Data v3 is now loaded. Candidate tables show the April queue values; the Streamlit
+estimate breakdown also shows processing, transport and expected rework. Impossible
+requests show the earliest permitted estimated delivery and review options, with
+confirmation disabled. See [the update review](V3_REFINEMENT.md).
+
+
 The web app follows the [HTML prototype](prototype/index.html) and calls the existing
 Python dispatch tools directly. Request selection, objective presets, and custom
 weight sliders produce new tool previews; the app does not read the prototype's
@@ -28,10 +34,20 @@ sh scripts/run_app.sh --server.port 8502
 
 The Streamlit entrypoint is `streamlit_app.py`. Application code and local styling
 live in `src/dss5105/web_app.py` and `src/dss5105/assets/desk.css`. Project config
-sets a local-only listener, headless operation, no file watcher, and disabled usage
-telemetry. No separate frontend build or API service is needed.
+sets a local-only listener on port 8501, headless operation, automatic file watching,
+save-triggered reruns and disabled usage telemetry. The launcher also watches CSS
+assets, course data and example inputs. Keep the page open to see saved changes;
+ordinary reruns do not submit model requests or confirm allocations. Generated
+results, saved state and caches are excluded from watching to avoid rerun loops.
+Dependency or server-configuration changes can still require a server restart.
+No separate frontend build or API service is needed.
 
 ## Try the workflow
+
+The page opens on **Group-chat request**, which needs the model configured in `.env`
+(see [NATURAL_LANGUAGE.md](NATURAL_LANGUAGE.md)). For the steps below, choose
+**Supplied examples (offline, no model)** in the sidebar.
+Start in **Independent previews** for the original reproducible inbox demo.
 
 1. Start with R25. BudgetWorks must remain excluded regardless of objective.
 2. Switch Lateness / Defects / Hybrid and inspect candidates on the same snapshot.
@@ -53,6 +69,26 @@ The source dates, independent snapshot convention, estimates, and interpretation
 limits are specified in [DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md). Each session's
 UI choices are independent; no process-wide mutable desk is cached between users.
 
+## Save a local allocation
+
+Choose **Saved local plan** in the sidebar. Select a ready request, click **Review
+confirmation**, enter the confirming dispatcher name, and click **Confirm and save
+allocation**. This persists the audited decision and updates shared local planning
+queues. Review and export records in **Saved allocation records**. Supplied examples
+can exercise this complete flow without calling a provider.
+
+Queues start from the course inbox snapshot and remain at that planning date.
+Saved reservations add expected processing/rework occupancy and exclude transport.
+The original course files, independent previews and simulator are unaffected.
+Switching modes or changing a preview cancels a pending confirmation.
+
+Saved state lives in Git-ignored `runtime/dispatch.sqlite3`. Keep that file to retain
+the plan across restarts. Do not delete it to recover from a stale preview; refresh
+and review again. Source changes require a separate workspace migration and fail
+explicitly. Concurrent saves cannot silently reuse an old state. The same order
+cannot be saved again under a new chat message. This version has no cancellation
+or reset workflow. See [the record contract](ALLOCATION_RECORD_CONTRACT.md).
+
 ## Current boundaries
 
 - Supplied examples use hand-authored fixtures. The separate Natural language mode
@@ -64,8 +100,10 @@ UI choices are independent; no process-wide mutable desk is cached between users
 - Global weights cannot relax eligibility, exclusions, or explicit request preferences.
 - Custom sliders span nonnegative relative weights. The app keeps the existing
   reference scales and exposes them; those scales are not empirically validated.
-- Confirmation is a two-step interaction demonstration only. The tool continues to
-  report `commit_allowed=false`. Durable, concurrent allocation is a later phase.
+- Independent mode retains demo confirmation and `commit_allowed=false`. Saved
+  mode allows explicit durable confirmation only for an on-time, unallocated,
+  in-progress order. The local dispatcher identity is self-declared, not authenticated;
+  this is a local planning prototype, not a deployed workshop-booking service.
 - Static HTML remains independently viewable in Chrome. It is a design reference;
   the running Streamlit app uses native Streamlit controls with the same layout and
   color direction, rather than embedding a fake interactive screenshot.
@@ -75,7 +113,9 @@ UI choices are independent; no process-wide mutable desk is cached between users
 Tests use Streamlit's [AppTest](https://docs.streamlit.io/develop/api-reference/app-testing)
 to execute the page and interact with its controls without launching a browser.
 They check numerical tool integration, errors, request-preference precedence,
-confirmation invalidation, and session isolation. No live provider is called.
+confirmation invalidation, saved-plan restart durability, failure handling and session
+isolation. Storage tests also cover concurrent stale saves, idempotency, tampering,
+and transactional rollback. No live provider is called.
 
 Keep verification caches and temporary files local:
 

@@ -1,6 +1,6 @@
 # Evaluation plan
 
-Source of mandatory requirements: Spec v4 p. 6 and Tracks v3 pp. 6-7. Evaluation
+Source of mandatory requirements: Spec v5 p. 5 and Tracks v4 pp. 5-7. Evaluation
 quality carries 15% of the project rubric; the simulator does not produce a final
 course grade. This document is a plan, not a claim that the complete system has
 already been evaluated.
@@ -12,10 +12,10 @@ already been evaluated.
 | Use the shared simulator against all three provided baselines | Initial offline runs complete; reproducible runner and traces available |
 | Declare a primary objective at Sprint 1 | Not selected; current presets do not constitute a team declaration |
 | Report primary, another objective, and a justified weighted hybrid | Lateness, defects, and hybrid experiments available; final choice and weight rationale pending |
-| Include at least one shock run | Initial shock run complete; broader robustness analysis pending |
+| Report shock averaged over ten seeds | Data v3 runs and paired normal controls complete; see V3_EVALUATION.md |
 | Beat all three baselines on the primary objective and report where baselines win | Initial late-rate results are favorable; primary not declared; metric tradeoffs recorded in DATA_FINDINGS.md |
-| Compare with a short heuristic and explain the system's added value | earliest_finish implemented; full-system added value not yet measured |
-| Evaluate all 30 supplied chat requests by behavior | First live initial-response run complete; independent gold annotations and held-out evaluation pending |
+| Compare with a short heuristic and explain the system's added value | Allocator measured in [MARGIN_STUDY.md](MARGIN_STUDY.md): it ties earliest finish on lateness and adds a configurable cost/late-days tradeoff; language-layer value still to be measured |
+| Evaluate all 30 supplied chat requests by behavior | Data v3 fixture replay refreshed; prior live run is historical; v3 live rerun, independent gold and held-out evaluation pending |
 | Judge decisions and explanation faithfulness separately | Behavior and tool-field integrity checked separately; full explanation/UX review still pending |
 | Explain metrics, evaluation-set construction, per-category results, and limitations | Initial simulator method documented; full report pending |
 | Analyze at least 10 failure cases individually | Pending; collect cases as features are built |
@@ -25,10 +25,26 @@ already been evaluated.
 A tool specification, usable interface, and auditable output are also core Track 2
 capabilities. Completing the simulator rows does not complete the project.
 
+## Objective acceptance criteria (Tracks v4)
+
+| Primary objective | Required metric | Guardrail |
+|---|---|---|
+| Lateness | Beat all three baselines on both `% late` and `late days` | No additional stated guardrail |
+| Defects | Beat all three on `% def pcs` | `% late` no worse than random |
+| Fairness | `max share`; matching random's share while delivering on time counts as a win | `% late` no worse than random |
+| Robustness | Change in `% late` and `late days`, normal to shock, averaged over ten paired seeds | Normal `% late` no worse than random |
+
+Do not substitute batch defect percentage for `% def pcs`, or turnaround for late
+days. A low defect result with unusable lateness is not a primary-objective win.
+The rule-based comparator has no literal line-count requirement. Keep the shipped
+baselines and our earliest-finish rule visible, including where they win.
+The optional stage extension remains off for our default evaluation and chat UI.
+
 ## Allocation experiments
 
 Use the commands and definitions in [ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md).
-Current observations and both scenario tables are in [DATA_FINDINGS.md](DATA_FINDINGS.md).
+Current observations are in [DATA_FINDINGS.md](DATA_FINDINGS.md); refreshed scenario
+tables and paired comparisons are in [V3_EVALUATION.md](V3_EVALUATION.md).
 Each policy run starts fresh queues. Preserve the seed, configuration, scales,
 source versions, and raw per-order evidence when reporting results.
 
@@ -43,7 +59,8 @@ source versions, and raw per-order evidence when reporting results.
 
 Report the original metrics even if adding better-suited ones. The separate
 [weight-search runner](WEIGHT_TUNING.md) adds batch-average expected defect probability.
-Actual overdue duration and pieces-weighted defect exposure remain proposed additions.
+Data v3 now exports `late days` (mean positive rounded overdue days over all batches)
+and `% def pcs` (the percentage of pieces assigned to batches marked defective).
 Distinguish these definitions:
 weighting workshop defect probabilities by pieces does not measure actual defective
 garment counts in the harness. Conditional expected exposure avoids immediate defect
@@ -59,10 +76,11 @@ documented in [WEIGHT_TUNING.md](WEIGHT_TUNING.md). Avoid presenting tuning on t
 held-out performance. Use documented additional data/scenarios and freeze any held-out
 set before tuning against it. Preserve the shared run for cross-team comparison.
 
-For shock analysis, disclose that target selection consumes RNG state and changes
-subsequent defect draws. Current queue-aware policies do not explicitly detect a
-closure. A causal estimate of closure impact or a claim of failure detection needs
-additional controlled evidence, not just the normal/shock table difference.
+Data v3 chooses the shock target on a separate random stream and pauses work
+that overlaps closure. Use paired normal/shock runs over seeds 5105-5114; report
+the mean per-seed change in `% late` (percentage points) and `late days` (days).
+The random draws are aligned, but changed choices can change defect events because
+workshop probabilities differ. Queue adaptation is not explicit failure detection.
 
 ## Chat evaluation: define the rubric before implementing language intake
 
@@ -77,8 +95,10 @@ The generator never copies predicted outcomes into expected-label columns.
 The [Streamlit page](STREAMLIT_APP.md) now has offline AppTest coverage for request
 selection, live custom weights, exception states, preference precedence, and demo
 confirmation invalidation. These are application behavior checks using draft
-structured inputs, not NLP accuracy, human usability results, or durable commitment
-tests. Browser layout still needs manual review in Chrome.
+structured inputs, not NLP accuracy or human usability results. Saved-plan AppTests
+and storage tests additionally check durable records, transaction rollback, retries,
+concurrent stale confirmations and queue occupancy. Browser layout still needs
+manual review in Chrome. These checks do not establish deployed access control.
 
 Natural-language intake now has fake-model and AppTest coverage for typed extraction,
 literal evidence validation, clarification state, preserved constraints, explicit
@@ -100,7 +120,9 @@ request, decision, and explanation for each case.
 | Unanswerable question | Explicit limitation tied to missing records or fields; no invented answer |
 
 Overlay labels should capture deadline infeasibility, exclusion provenance, objective
-preferences, and split requests. Behaviors need not be mutually exclusive: a request
+preferences, and split requests. The draft rubric tags each request with one of the
+dictionary's seven kinds, and the live runner reports results by kind as well as by
+our finer categories. A test keeps the labelled counts equal to the dictionary's. Behaviors need not be mutually exclusive: a request
 may be resolvable but infeasible, or need clarification before a recommendation.
 
 Do not assume a single gold workshop for every valid request. Some outcomes admit

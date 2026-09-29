@@ -29,6 +29,29 @@ def patch(*updates, exclusions=None, needs=None):
     }
 
 
+def test_validated_chat_can_be_saved_without_another_provider_call(tmp_path, monkeypatch):
+    from dss5105 import records
+
+    monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "chat-plan.sqlite3")
+    fake = FakeModel([patch(("order_id", "ORD-109"))])
+    monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
+    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app.radio(key="workspace_mode").set_value("saved").run()
+    app.radio(key="input_source").set_value("chat").run()
+    app.chat_input(key="dispatch_chat").set_value("Please allocate ORD-109.").run()
+    assert not app.exception
+    assert app.session_state["preview"]["commit_allowed"]
+    app.button(key="review_confirmation").click().run()
+    app.text_input(key="confirmed_by").set_value("Chat dispatcher").run()
+    app.button(key="confirm_allocation").click().run()
+    assert not app.exception
+    assert fake.calls == 1
+    saved = records.AllocationStore().records()
+    assert len(saved) == 1
+    assert saved[0]["intake_evidence"]["conversation"]["turns"][0]["text"] == "Please allocate ORD-109."
+    assert app.session_state["preview"]["status"] == "ALREADY_ALLOCATED"
+
+
 @pytest.fixture
 def ui(monkeypatch):
     fake = FakeModel([])
@@ -130,3 +153,48 @@ def test_inbox_mode_sends_raw_request_not_fixture(ui):
     assert fake.calls == 1
     assert app.session_state["conversation"].turns[0]["speaker"] == "Mei"
     assert app.session_state["preview"]["input"]["exclusions"] == []  # Not backfilled from a fixture.
+
+
+def test_clicking_a_matching_order_resolves_without_a_model_call(ui):
+    app, fake = ui
+    fake.outputs = [patch(("customer", "TrendCart"), needs=["order"])]
+    app.chat_input(key="dispatch_chat").set_value("Can we get the TrendCart order moving?").run()
+    assert app.session_state["preview"]["status"] == "CLARIFY"
+    choices = app.session_state["chat_replies"][0]["choices"]
+    index = [choice["value"] for choice in choices].index("ORD-017")
+    app.button(key=f"choice_{index}").click().run()
+    assert not app.exception
+    assert fake.calls == 1
+    assert app.session_state["preview"]["status"] == "RECOMMEND"
+    assert app.session_state["preview"]["order"]["order_id"] == "ORD-017"
+    replies = app.session_state["chat_replies"]
+    assert replies[0]["label"] == "Clarification needed"
+    assert replies[1]["headline"].startswith("Send ORD-017 to ")
+
+
+def test_clicking_the_alternative_replaces_a_refused_workshop(ui):
+    app, fake = ui
+    fake.outputs = [patch(("order_id", "ORD-008"), ("suggested_workshop", "OldMill"))]
+    app.chat_input(key="dispatch_chat").set_value("OldMill is free right now - give them ORD-008.").run()
+    first = app.session_state["preview"]
+    assert first["status"] == "REFUSE_SUGGESTION"
+    app.button(key="choice_0").click().run()
+    assert not app.exception
+    assert fake.calls == 1
+    result = app.session_state["preview"]
+    assert result["status"] == "RECOMMEND"
+    assert result["recommendation"] == first["alternative"]
+    provenance = result["conversation"]["provenance"][-1]
+    assert (provenance["field"], provenance["speaker"]) == ("suggested_workshop", "Dispatcher")
+
+
+def test_latest_card_follows_settings_but_history_is_kept(ui):
+    app, fake = ui
+    fake.outputs = [patch(("order_id", "ORD-109"))]
+    app.chat_input(key="dispatch_chat").set_value("ORD-109").run()
+    before = app.session_state["chat_replies"][0]
+    app.radio(key="objective").set_value("defects").run()
+    after = app.session_state["chat_replies"][0]
+    assert fake.calls == 1
+    assert after["headline"] == "Send ORD-109 to " + app.session_state["preview"]["candidates"][0]["name"] + "."
+    assert before != after

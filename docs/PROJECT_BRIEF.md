@@ -6,13 +6,14 @@ records the evidence behind the recommendation.
 
 ## Sources and how to use these documents
 
-Course requirements come from `Capstone_Project_Spec_v4.pdf` and
-`Capstone_Project_Tracks_v3.pdf` under Week 0 / Capstone Project. The TA announcement
+Course requirements come from `Capstone_Project_Spec_v5.pdf` and
+`Capstone_Project_Tracks_v4.pdf` under Week 0 / Capstone Project. The TA announcement
 clarifies that teams choose their own primary objective and declare it at Sprint 1.
-The announcement references older document versions; use the versions above.
+Use Data v3 and the updated announcement for inbox dates, queue snapshots and shock evaluation.
+See [the migration review](V3_REFINEMENT.md) for the implemented changes and remaining gates.
 
 - Spec pp. 2-4: objective declaration and sprint requirements.
-- Spec pp. 5-7: final deliverables, evaluation, and grading.
+- Spec pp. 4-7: final deliverables, evaluation, and grading.
 - Tracks pp. 4-7: Track 2 capabilities, simulator, and language evaluation.
 - [Course data dictionary](../track2/data/data_dictionary.md): data definitions.
 - [Data findings](DATA_FINDINGS.md): reproducible observations and their limits.
@@ -40,21 +41,26 @@ covers only part of Track 2.
 
 | Component | Status | Location |
 |---|---|---|
-| Course simulator and eligibility rule | Provided, unchanged | `track2/harness/simulate.py` |
+| Course simulator and eligibility rule | Official Data v3, imported byte-for-byte | `track2/harness/simulate.py` |
 | Queue-aware earliest-finish reference | Implemented | `src/dss5105/allocator.py` |
 | Weighted scorer and allocator callback | Implemented: lateness, defects, cost weights | `src/dss5105/allocator.py` |
-| Baseline and preset experiments | Implemented: normal and shock, JSON traces | `src/dss5105/evaluate.py` |
+| Baseline and preset experiments | Implemented: normal, ten-seed shock and paired controls, JSON traces | `src/dss5105/evaluate.py` |
 | Exploratory weight search | Implemented: fixed grid, frozen candidates, additional seed checks | `src/dss5105/tune.py` |
 | Model construction helper | Implemented; not used by allocation experiments | `src/dss5105/llm.py` |
 | Structured request resolution and constraints | Implemented read-only previews; hand-authored inputs | `src/dss5105/dispatch.py` |
-| Natural-language extraction and clarification conversation | Implemented; initial live development evaluation available, known clarification issues | `src/dss5105/intake.py`, `src/dss5105/chat_ui.py` |
-| Dispatcher UI | Streamlit page with live previews, sliders, and demo confirmation; HTML design reference retained | `streamlit_app.py`, `docs/prototype/index.html` |
-| Confirmed allocation records and queue updates | Planned; prototype confirmation is demo only | Technology and owners undecided |
+| Natural-language extraction and clarification conversation | Implemented; pre-v3 live evaluation historical, revised live run pending | `src/dss5105/intake.py`, `src/dss5105/chat_ui.py` |
+| Dispatcher UI | Streamlit with independent previews and saved local plan; HTML design reference retained | `streamlit_app.py`, `docs/prototype/index.html` |
+| Confirmed allocation records and queue updates | Implemented in local saved-plan mode: SQLite transactions, retries, stale-state checks, audit export | `src/dss5105/records.py` |
 | Chat evaluation and faithfulness checker | Live inbox runner and partial tool-integrity checks implemented; independent gold/held-out/full faithfulness pending | See evaluation plan |
 
 Offline tests cover eligibility, queue sensitivity, configuration changes,
 estimates, empty candidates, and reproducible simulator runs. They do not establish
 chat accuracy, deployed usability, or optimal allocation quality.
+
+The [local record contract](ALLOCATION_RECORD_CONTRACT.md) defines confirmed saves.
+It uses fixed-date planning queues, expected processing occupancy and a self-declared
+dispatcher identity. Authentication, cancellations and real workshop booking are not
+implemented. Independent inbox evaluation continues to use the untouched snapshot.
 
 The first dispatch increment is documented in [DISPATCH_PREVIEW.md](DISPATCH_PREVIEW.md).
 See [PLAN.md](../PLAN.md) for phased acceptance gates and the
@@ -83,7 +89,10 @@ require bidding, negotiation, or a particular scorer formula. Our current design
 uses one deterministic weighted scorer. Objectives are parameters, never separate
 branches in allocation logic. Eligibility remains a hard constraint.
 
-The primary objective is **not yet selected**. The course candidates are:
+The primary objective is **not yet selected**. Lateness is the current recommendation
+for team discussion: evaluate both late fraction and mean late days. The pure-defects
+preset fails the new random-lateness guardrail and is a tradeoff diagnostic, not a
+successful defects policy. See [current evidence](V3_EVALUATION.md). The course candidates are:
 minimise lateness, minimise defects, fair allocation, or robustness to workshop
 failure. Cost is an additional measured tradeoff, not one of these primary choices.
 

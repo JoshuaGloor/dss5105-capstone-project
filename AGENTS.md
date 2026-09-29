@@ -18,7 +18,7 @@ writing code, in this order:
 - [docs/EVALUATION_PLAN.md](docs/EVALUATION_PLAN.md) - what "working" means and how it is
   measured.
 
-Course requirements come from Spec v4 and Tracks v3; implementation status comes from
+Course requirements come from Spec v5 and Tracks v4 (Data v3); implementation status comes from
 code and reproducible evidence. Keep team proposals distinct from requirements and
 results. The primary objective is not yet selected. See
 [docs/ALLOCATION_ENGINE.md](docs/ALLOCATION_ENGINE.md) for the current offline allocator.
@@ -51,6 +51,9 @@ Two rules that override convenience:
   automation for prototype review; the user opens the standalone HTML in Chrome.
 - The final web interface uses Streamlit. The HTML prototype is a design reference;
   do not introduce a separate frontend stack or API service without a concrete need.
+- Independent previews and simulator evaluation never use saved planning queues.
+  Saved local allocations use `records.py` and the contract in
+  `docs/ALLOCATION_RECORD_CONTRACT.md`; keep `runtime/` out of version control.
 - `uv` only. `uv sync --all-groups` to install, `uv run <cmd>` to run anything.
 - Never `pip install`, never activate a venv by hand.
 - If you change `pyproject.toml`, commit the updated `uv.lock` too. CI runs

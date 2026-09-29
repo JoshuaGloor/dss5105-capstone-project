@@ -9,7 +9,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from dss5105.allocator import ObjectiveWeights, ScoreScales, earliest_finish, make_allocator, rank_candidates
-from dss5105.harness import HARNESS_PATH, Simulator, cheapest, greedy_biggest, random_choice
+from dss5105.harness import HARNESS_PATH, Simulator, cheapest, greedy_biggest, print_table, random_choice
 
 # Exploratory configurations, chosen before running experiments, not tuned winners.
 PRESETS = {
@@ -74,8 +74,54 @@ def run_experiment(
         "weights": {name: asdict(weights) for name, weights in configurations.items()},
         "scales": asdict(scales),
         "report": report.getvalue(),
+        "metrics": {name: sim.metrics(outcomes) for name, outcomes in sim.results.items()},
         "policies": traces,
     }
+
+
+def run_seed_series(shock=False, seed=5105, seeds=10, configurations=None):
+    """Average official per-run metrics; retain paired controls and every trace."""
+    if type(seeds) is not int or seeds < 1:
+        raise ValueError("seeds must be a positive integer")
+    runs = [run_experiment(shock, current, configurations) for current in range(seed, seed + seeds)]
+
+    def average(records):
+        return {
+            name: {key: sum(run["metrics"][name][key] for run in records) / len(records) for key in metrics}
+            for name, metrics in records[0]["metrics"].items()
+        }
+
+    metrics = average(runs)
+    report = io.StringIO()
+    with redirect_stdout(report):
+        print_table(metrics)
+    result = {
+        "shock": shock,
+        "seeds": [run["seed"] for run in runs],
+        "weights": runs[0]["weights"],
+        "scales": runs[0]["scales"],
+        "source_sha256": runs[0]["source_sha256"],
+        "metrics": metrics,
+        "report": report.getvalue(),
+        "runs": runs,
+    }
+    if shock:
+        normal = [run_experiment(False, current, configurations) for current in range(seed, seed + seeds)]
+        result["normal_runs"] = normal
+        result["normal_metrics"] = average(normal)
+        result["paired_deltas"] = {
+            name: {
+                key: sum(s["metrics"][name][key] - n["metrics"][name][key] for s, n in zip(runs, normal, strict=True))
+                / seeds
+                for key in ("% late", "late days")
+            }
+            for name in metrics
+        }
+        result["normal_lateness_guardrail"] = {
+            name: row["% late"] <= result["normal_metrics"]["random"]["% late"]
+            for name, row in result["normal_metrics"].items()
+        }
+    return result
 
 
 def main(argv=None):
@@ -87,10 +133,18 @@ def main(argv=None):
             type=float,
             help="Custom nonnegative weight; unspecified custom weights are zero; cannot combine with --preset",
         )
+    parser.add_argument(
+        "--deadline-buffer-days",
+        type=float,
+        help="Safety buffer for a custom configuration; needs at least one custom weight",
+    )
     parser.add_argument("--shock", action="store_true", help="Use the course's hidden workshop closure")
     parser.add_argument("--seed", type=int, default=5105)
+    parser.add_argument("--seeds", type=int, help="Average N consecutive seeds; use 10 for reported shock results")
     parser.add_argument("--output", type=Path, help="Save configuration, report, and per-order traces as JSON")
     args = parser.parse_args(argv)
+    if args.seeds is not None and args.seeds < 1:
+        parser.error("--seeds must be positive")
     requested_weights = {
         "lateness": args.lateness_weight,
         "defects": args.defects_weight,
@@ -99,22 +153,35 @@ def main(argv=None):
     custom = any(value is not None for value in requested_weights.values())
     if args.preset and custom:
         parser.error("--preset cannot be combined with custom weight arguments")
+    if args.deadline_buffer_days is not None and not custom:
+        parser.error("--deadline-buffer-days needs at least one custom weight argument")
     configurations = None
     if args.preset:
         configurations = {args.preset: PRESETS[args.preset]}
     elif custom:
         try:
             weights = ObjectiveWeights(
-                **{key: 0.0 if value is None else value for key, value in requested_weights.items()}
+                **{key: 0.0 if value is None else value for key, value in requested_weights.items()},
+                deadline_buffer_days=args.deadline_buffer_days or 0.0,
             )
         except ValueError as exc:
             parser.error(str(exc))
         configurations = {"custom": weights}
-    result = run_experiment(shock=args.shock, seed=args.seed, configurations=configurations)
+    if args.seeds is not None:
+        result = run_seed_series(args.shock, args.seed, args.seeds, configurations)
+    else:
+        result = run_experiment(shock=args.shock, seed=args.seed, configurations=configurations)
     print(f"Scenario: {'shock' if args.shock else 'normal'}; seed: {args.seed}")
+    if args.seeds:
+        print(f"Averaged over seeds: {result['seeds']}")
+    if args.shock and args.seeds != 10:
+        print("Diagnostic run only: course shock reporting requires --seeds 10.")
     print(f"Objective weights: {json.dumps(result['weights'], sort_keys=True)}")
     print(f"Score scales: {json.dumps(result['scales'], sort_keys=True)}")
     print(result["report"], end="")
+    if "paired_deltas" in result:
+        print("Paired shock-minus-normal changes (% late in percentage points; late days in days):")
+        print(json.dumps(result["paired_deltas"], indent=2))
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8")
