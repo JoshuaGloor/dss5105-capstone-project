@@ -25,17 +25,29 @@ are not part of the team and do not know the password but want to try out the
 deploy):
 
 ```bash
-{ docker | podman } run --rm docker.io/library/caddy:2 caddy hash-password --plaintext 'new-password'
+{docker | podman} run --rm docker.io/library/caddy:2 caddy hash-password --plaintext 'new-password'
 ```
 
 Paste the hash into the `basic_auth` block in the `infra/Caddyfile` and deploy.
+
+## Saved allocations
+
+Confirmed allocations and the desk's live queue state live in SQLite, in a
+docker volume on the instance. They survive deploys, reboots, and Power
+stop/start.
+
+They are lost if the instance is **replaced**, which only an infrastructure
+change can cause: editing `infra/tofu/user_data.sh` or `docker_compose_version`,
+or running `tofu destroy`. No workflow can do it, and `tofu plan` says when a
+change would replace the instance. Export the records from the app first
+(**Export saved allocation records**).
 
 ## Local development
 
 ```bash
 cp .env.example .env # set LLM_MODEL and one provider key
 cd infra
-{ docker | podman } compose up --build
+{docker | podman} compose up --build
 ```
 
 Open <http://localhost:8080> and click something.

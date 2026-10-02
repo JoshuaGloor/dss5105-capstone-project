@@ -18,6 +18,10 @@ services:
     # built; on the server .env sets REGISTRY to the ECR host.
     image: ${REGISTRY:-localhost}/dss5105-app:${TAG:-dev}
     restart: unless-stopped
+    volumes:
+      # Confirmed allocations are an audit record, so they must outlive the container.
+      # Every deploy recreates it, and without this the SQLite file would go with it.
+      - app_runtime:/app/runtime
     healthcheck:
       # We use Streamlit's own readiness endpoint, so caddy can wait for it below (service_healthy)
       test:
@@ -49,4 +53,5 @@ services:
     logging: *logging
 
 volumes:
+  app_runtime:
   caddy_data:

@@ -230,7 +230,9 @@ resource "aws_instance" "app" {
 
   # user_data only runs on first boot, so editing user_data.sh or bumping
   # docker_compose_version has no effect unless the instance is replaced.
-  # Replacement wipes /opt/app, so the site is down until the next Deploy run.
+  # Replacement wipes /opt/app AND the docker volume holding confirmed
+  # allocations and live queue state, so it is data loss and downtime.
+  # Export the records from the app first. Stop/start is safe; only replacement is not.
   # The Elastic IP re-associates, so the URL itself survives.
   # On update of user_data, this causes downtime, which is ok for this school project.
   user_data_replace_on_change = true

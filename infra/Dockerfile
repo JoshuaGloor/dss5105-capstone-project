@@ -60,6 +60,11 @@ COPY examples/ ./examples/
 COPY .streamlit/ ./.streamlit/
 COPY streamlit_app.py ./
 
+# records.py stores confirmed allocations in SQLite under /app/runtime, creating
+# the directory on first use. The rest of /app is root-owned and read-only to the
+# app user, so this one directory has to be writable.
+RUN mkdir -p /app/runtime && chown app:app /app/runtime
+
 # Python runtime settings, see
 # https://dev.to/cod3mason/python-env-variables-in-dockerfile-5920
 #   UNBUFFERED=1         Logs leave the process immediately, so `podman logs`
