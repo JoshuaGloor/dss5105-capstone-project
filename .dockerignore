@@ -1,0 +1,20 @@
+# Tells docker which files it can ignore during `docker build`.
+# We use default-deny: exclude everything, then reopen exactly what
+# infra/Dockerfile copies. Anything added to the repo later stays out by default.
+# Ref of this pattern: https://docs.docker.com/build/concepts/context/#negating-matches
+
+*
+
+# Include what we need.
+!pyproject.toml
+!uv.lock
+!streamlit_app.py
+!src
+!track2
+!examples
+!.streamlit
+
+# Exclude junk inside the trees above; last match wins.
+**/__pycache__
+**/*.py[cod]
+**/.DS_Store

@@ -1,0 +1,25 @@
+# Local development only. Compose loads this automatically from the working
+# directory, run:  cd infra && {podman | docker} compose up --build
+# The server passes -f explicitly and never sees this file.
+services:
+  app:
+    build:
+      # The Dockerfile needs the repo root (src/, track2/, examples/, uv.lock).
+      context: ..
+      dockerfile: infra/Dockerfile
+    # Build it, never reach for a registry.
+    pull_policy: build
+    environment:
+      # Streamlit otherwise logs its own address, 0.0.0.0:8501, which is inside
+      # the container and not how you reach it.
+      STREAMLIT_BROWSER_SERVER_ADDRESS: localhost
+      STREAMLIT_BROWSER_SERVER_PORT: "8080"
+    env_file:
+      # Optional on purpose: a key is only needed for natural-language intake.
+      # On the server this comes from SSM Parameter Store, see compose.prod.yaml.
+      - path: ../.env
+        required: false
+
+  caddy:
+    ports:
+      - "8080:80" # open http://localhost:8080

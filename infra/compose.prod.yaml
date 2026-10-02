@@ -1,0 +1,12 @@
+# Server-only: real ports and the secrets file. Merged with -f, see compose.yaml.
+services:
+  app:
+    env_file:
+      # Fetched from SSM Parameter Store by the instance at deploy time.
+      # Not /opt/app/.env, which only feeds ${REGISTRY}/${TAG} interpolation.
+      - .env.secrets
+
+  caddy:
+    ports:
+      - "80:80"
+      - "443:443"
