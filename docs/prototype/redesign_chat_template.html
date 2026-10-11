@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SweaterCo | Dispatch Desk (chat-first redesign)</title>
+  <style>
+    /* Redesign prototype. Local fonts and styles only. Visual numerals come from tool output (display.*);
+       bar lengths are drawing geometry only. */
+    :root {
+      color-scheme: light;
+      --ink:#203731; --ink-2:#44574f; --muted:#60726c;
+      --oat:#f4f3ec; --card:#fbfbf7; --line:#dce3db; --line-2:#e9eee6;
+      --indigo:#1c5948; --indigo-d:#123d31; --indigo-t:#e9f3e9;
+      --coral:#cf923e; --coral-t:#faf0db;
+      --ok:#26a37c; --ok-t:#e1f1e8; --warn:#94631a; --warn-t:#fbefd5; --bad:#a8473f; --bad-t:#f9e9e5;
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+      --r:16px;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--oat); color:var(--ink); font:18px/1.55 var(--sans); }
+    button { font:inherit; cursor:pointer; color:inherit; }
+    button:disabled { cursor:not-allowed; opacity:.5; }
+    :focus-visible { outline:3px solid var(--coral); outline-offset:2px; border-radius:6px; }
+    [hidden] { display:none !important; }
+    .eyebrow { text-transform:uppercase; letter-spacing:.14em; font-size:13px; font-weight:700; color:var(--muted); }
+
+    /* top bar with a knit-stitch strip */
+    .top { background:var(--indigo-d); color:#fff; position:relative; }
+    .top::after { content:""; display:block; height:6px;
+      background:repeating-linear-gradient(135deg,var(--coral) 0 6px,transparent 6px 9px,#e7c98f 9px 15px,transparent 15px 18px); }
+    .top-in { max-width:1500px; margin:0 auto; padding:30px 28px; display:grid; grid-template-columns:auto 1fr auto; gap:28px; align-items:center; }
+    .brand { font-family:var(--serif); font-size:28px; font-weight:700; letter-spacing:-.5px; display:flex; align-items:center; gap:10px; }
+    .brand { font-size:38px !important; gap:16px !important; } .brand i { font-style:normal; display:grid; place-items:center; width:34px; height:34px; border-radius:9px; background:var(--indigo); border:1px solid #6f9a88; font-family:var(--sans); font-size:20px; }
+    .brand small { font:600 12px/1.2 var(--sans); letter-spacing:.14em; text-transform:uppercase; color:#a9c9bb; display:block; margin-top:2px; }
+    .steps { display:flex; justify-content:center; gap:6px; list-style:none; margin:0; padding:0; }
+    .steps li { display:flex; align-items:center; gap:8px; font-size:15px; color:#a9c9bb; padding:6px 14px; border-radius:999px; }
+    .steps li b { display:grid; place-items:center; width:22px; height:22px; border-radius:50%; border:1.5px solid #6f9a88; font-size:13px; }
+    .steps li.on { background:#ffffff1c; color:#fff; }
+    .steps li.on b { background:var(--coral); border-color:var(--coral); color:#1b2a22; }
+    .steps li.done b { background:#a9c9bb; border-color:#a9c9bb; color:var(--indigo-d); }
+    .snap { font-size:14px; color:#a9c9bb; text-align:right; }
+    .snap span { display:block; }
+    .snap strong { color:#fff; font-weight:600; }
+
+    .shell { max-width:1500px; margin:0 auto; display:grid; grid-template-columns:310px minmax(0,1fr); gap:28px; padding:26px 28px 48px; }
+
+    /* inbox rail */
+    .rail h2 { font-family:var(--serif); font-size:24px; margin:0 0 4px; }
+    .rail p { font-size:14px; color:var(--muted); margin:0 0 14px; }
+    #inbox { display:flex; flex-direction:column; gap:8px; max-height:calc(100vh - 190px); overflow-y:auto; padding:2px 4px 2px 2px; position:sticky; top:12px; }
+    .req { text-align:left; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:11px 13px; display:block; width:100%; transition:transform .12s, box-shadow .12s; }
+    .req:hover { transform:translateY(-1px); box-shadow:0 4px 14px #20373114; }
+    .req[aria-pressed=true] { border-color:var(--indigo); box-shadow:inset 3px 0 0 var(--coral), 0 4px 14px #1c594826; background:#fff; }
+    .req-top { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:650; }
+    .req-top .dot { width:9px; height:9px; border-radius:50%; background:var(--ok); flex:none; }
+    .req-top .dot.review { background:var(--warn); } .req-top .dot.block { background:var(--bad); }
+    .req-top .t { margin-left:auto; color:var(--muted); font-weight:500; }
+    .req-text { font-size:15px; color:var(--ink-2); margin-top:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .legend { display:flex; gap:12px; font-size:13px; color:var(--muted); margin-top:12px; flex-wrap:wrap; }
+    .legend span::before { content:""; display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; background:var(--ok); }
+    .legend .r::before { background:var(--warn); } .legend .b::before { background:var(--bad); }
+
+    main { min-width:0; display:flex; flex-direction:column; gap:20px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:var(--r); }
+
+    /* request bubble */
+    .ask { padding:20px 24px; display:grid; grid-template-columns:44px 1fr; gap:16px; position:relative; }
+    .avatar { width:44px; height:44px; border-radius:50%; background:var(--indigo); color:#fff; display:grid; place-items:center; font-family:var(--serif); font-size:24px; font-weight:700; }
+    .ask-meta { font-size:14px; color:var(--muted); display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .ask-meta strong { color:var(--ink); font-size:17px; }
+    .pill { background:var(--indigo-t); color:var(--indigo); border-radius:999px; padding:2px 10px; font-size:13px; font-weight:700; }
+    #message { font-family:var(--serif); font-size:25px; line-height:1.4; margin:8px 0 0; letter-spacing:-.2px; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .chips span { background:var(--oat); border:1px solid var(--line); border-radius:8px; padding:3px 10px; font-size:14px; color:var(--ink-2); }
+
+
+    /* verdict hero */
+    .hero { border-radius:var(--r); padding:28px 30px; color:#fff; background:var(--indigo); position:relative; overflow:hidden; }
+    .hero::before { content:""; position:absolute; right:-60px; top:-60px; width:260px; height:260px; border-radius:50%;
+      background:repeating-radial-gradient(circle at center,#ffffff10 0 8px,transparent 8px 16px); }
+    .hero.review { background:#7f5618; } .hero.block { background:#8e4740; }
+    .hero > * { position:relative; }
+    .hero-top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .hero .eyebrow { color:#ffffffb0; }
+    .status { background:#ffffff24; border-radius:999px; padding:4px 14px; font-size:14px; font-weight:700; }
+    #recommendation { font-family:var(--serif); font-size:47px; line-height:1.1; letter-spacing:-1px; margin:14px 0 8px; font-weight:700; }
+    #explanation { margin:0; max-width:760px; color:#ffffffd0; font-size:17px; }
+    .metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:24px; }
+    .metric { background:#ffffff17; border-radius:12px; padding:14px 16px; }
+    .metric span { font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#ffffffa8; display:block; }
+    .metric strong { display:block; font-family:var(--serif); font-size:35px; line-height:1.15; margin:2px 0; font-weight:700; }
+    .metric small { font-size:13px; color:#ffffffa8; }
+    #flags { margin:16px 0 0; font-size:15px; background:#00000026; border-radius:10px; padding:10px 14px; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; align-items:center; }
+    .btn { border:0; border-radius:10px; padding:11px 18px; font-weight:650; font-size:17px; }
+    .btn.main { background:var(--coral); color:#1b2a22; } .btn.main:hover:not(:disabled) { background:#b87f2b; }
+    .btn.ghost { background:#ffffff1f; color:#fff; } .btn.ghost:hover { background:#ffffff33; }
+    .btn.plain { background:var(--oat); border:1px solid var(--line); color:var(--ink); }
+    .receipt { margin-top:16px; background:#ffffff24; border-radius:10px; padding:10px 14px; font-size:15px; }
+
+    /* objective strip */
+    .objective { padding:18px 22px; display:grid; grid-template-columns:auto 1fr; gap:10px 28px; align-items:center; }
+    .objective h2 { font-family:var(--serif); font-size:21px; margin:2px 0 0; }
+    .seg { display:inline-flex; background:var(--oat); border:1px solid var(--line); border-radius:12px; padding:4px; gap:2px; flex-wrap:wrap; }
+    .seg button { background:transparent; border:0; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; color:var(--ink-2); text-align:left; }
+    .seg button small { display:block; font-weight:400; font-size:12px; color:var(--muted); }
+    .seg button[aria-pressed=true] { background:var(--indigo); color:#fff; box-shadow:0 2px 8px #1c594840; }
+    .seg button[aria-pressed=true] small { color:#c7ded4; }
+    .weights { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; font-size:14px; color:var(--ink-2); border-top:1px dashed var(--line); padding-top:12px; }
+    .weights b { font-variant-numeric:tabular-nums; background:var(--indigo-t); color:var(--indigo); border-radius:6px; padding:1px 8px; margin-left:4px; }
+    .weights em { font-style:normal; color:var(--muted); flex-basis:100%; font-size:13px; }
+
+    /* comparison: lanes */
+    .compare { padding:22px 24px; }
+    .sec-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+    .sec-head h2 { font-family:var(--serif); font-size:26px; margin:0; letter-spacing:-.3px; }
+    .sec-head small, .fine { font-size:14px; color:var(--muted); }
+    .tabs { display:inline-flex; gap:4px; }
+    .tabs button { background:transparent; border:1px solid transparent; border-radius:8px; padding:4px 12px; font-size:14px; color:var(--ink-2); }
+    .tabs button[aria-pressed=true] { background:var(--indigo-t); color:var(--indigo); font-weight:700; }
+    .lanes { margin-top:16px; display:flex; flex-direction:column; gap:12px; position:relative; }
+    .lane { display:grid; grid-template-columns:190px minmax(0,1fr) 120px; gap:16px; align-items:center; padding:10px 12px; border-radius:12px; border:1px solid transparent; }
+    .lane.chosen { background:var(--ok-t); border-color:#b8dcc9; }
+    .lane-name strong { display:block; font-size:18px; } .lane-name small { color:var(--muted); font-size:13px; }
+    .track { position:relative; height:26px; background:var(--line-2); border-radius:8px; }
+    .bar { position:absolute; inset:0 auto 0 0; border-radius:8px; background:var(--indigo); min-width:6px; }
+    .lane .late-bar { background:var(--warn); }
+    .deadline { position:absolute; top:-6px; bottom:-6px; width:0; border-left:2px dashed var(--coral); z-index:2; }
+    .deadline::after { content:"Deadline"; position:absolute; top:-16px; left:4px; font-size:12px; font-weight:700; color:var(--ink); white-space:nowrap; }
+    .lane-val { text-align:right; font-weight:700; font-variant-numeric:tabular-nums; }
+    .lane-val small { display:block; font-weight:600; font-size:13px; }
+    .ontime { color:var(--ok); } .late { color:var(--warn); }
+    .lane-facts { grid-column:2/4; display:flex; flex-wrap:wrap; gap:6px 18px; font-size:14px; color:var(--ink-2); margin-top:-4px; }
+    .lane-facts b { color:var(--ink); }
+    .table-wrap { overflow-x:auto; margin-top:14px; }
+    table { width:100%; border-collapse:collapse; font-size:15px; text-align:left; }
+    th { font-size:13px; color:var(--muted); font-weight:600; padding:8px; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+    td { padding:11px 8px; border-top:1px solid var(--line-2); white-space:nowrap; }
+    tr.chosen td { background:var(--ok-t); }
+    .empty { color:var(--muted); padding:22px 0 6px; }
+    summary { cursor:pointer; padding:8px 0; font-weight:650; font-size:15px; color:var(--ink-2); }
+    .xp .row { font-size:15px; padding:8px 0; border-top:1px solid var(--line-2); } .xp .row span { color:var(--muted); }
+    h3.sub { font-family:var(--serif); font-size:21px; margin:22px 0 2px; }
+    .foot { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-size:14px; color:var(--muted); }
+    .foot a { color:var(--indigo); }
+
+    /* dialog + evidence drawer */
+    dialog { border:0; border-radius:20px; padding:30px; width:min(520px,92vw); color:var(--ink); box-shadow:0 30px 100px #13281d66; }
+    dialog::backdrop { background:#13281d90; }
+    dialog h2 { font-family:var(--serif); font-size:31px; margin:6px 0; }
+    dialog p { color:var(--ink-2); }
+    dialog .actions .btn.main { background:var(--coral); }
+    dialog.drawer { margin:0 0 0 auto; height:100vh; max-height:none; width:min(620px,100vw); border-radius:20px 0 0 20px; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:13px; background:var(--oat); border-radius:10px; padding:14px; max-height:70vh; overflow:auto; }
+
+    /* rail mode switches */
+    .modes { display:flex; flex-direction:column; gap:12px; margin-bottom:18px; padding:14px; background:var(--card); border:1px solid var(--line); border-radius:12px; }
+    .modes .eyebrow { margin-bottom:5px; }
+    .mini { display:flex; background:var(--oat); border:1px solid var(--line); border-radius:10px; padding:3px; gap:2px; }
+    .mini button { flex:1; border:0; background:transparent; border-radius:8px; padding:7px 8px; font-size:14px; font-weight:600; color:var(--ink-2); }
+    .mini button[aria-pressed=true] { background:var(--indigo); color:#fff; }
+    .mode-note { font-size:13px; color:var(--muted); margin:0; }
+    .rail .btn.plain { width:100%; }
+
+    .banner { border-radius:12px; padding:11px 16px; font-size:15px; border:1px solid var(--line); background:var(--indigo-t); color:var(--indigo-d); }
+    .banner.ok { background:var(--ok-t); border-color:#b8dcc9; } .banner.warn { background:var(--warn-t); border-color:#ecd5a2; color:#5d3f0c; }
+    .banner.bad { background:var(--bad-t); border-color:#e9c4bd; color:#6d2b25; }
+
+    /* chat mode */
+    .chat { padding:22px 24px; display:flex; flex-direction:column; gap:16px; }
+    .chat-start h2 { font-family:var(--serif); font-size:26px; margin:2px 0 10px; }
+    .chat select { width:100%; font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); }
+    .chat-quote { font-family:var(--serif); font-size:20px; margin:12px 0; padding-left:14px; border-left:3px solid var(--coral); color:var(--ink-2); }
+    .bubble { display:grid; grid-template-columns:40px 1fr; gap:14px; }
+    .bubble .avatar { width:40px; height:40px; font-size:20px; }
+    .bubble.bot .avatar { background:var(--coral); color:#1b2a22; }
+    .bubble .who { font-size:14px; color:var(--muted); margin-bottom:4px; } .bubble .who strong { color:var(--ink); }
+    .bubble .say { margin:0; font-family:var(--serif); font-size:22px; line-height:1.4; }
+    .reply { background:#fff; border:1px solid var(--line); border-left:5px solid var(--warn); border-radius:12px; padding:16px 18px; }
+    .reply.ok { border-left-color:var(--ok); } .reply.ask { border-left-color:var(--indigo); } .reply.bad { border-left-color:var(--bad); }
+    .badge { display:inline-block; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:3px 10px; border-radius:999px; background:var(--warn-t); color:#6d4812; }
+    .reply.ok .badge { background:var(--ok-t); color:#17664c; } .reply.ask .badge { background:var(--indigo-t); color:var(--indigo); } .reply.bad .badge { background:var(--bad-t); color:var(--bad); }
+    .headline { font-size:21px; font-weight:650; margin:10px 0 8px; line-height:1.35; }
+    .facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin:10px 0; }
+    .facts div { background:var(--oat); border:1px solid var(--line-2); border-radius:8px; padding:8px 10px; }
+    .facts dt { font-size:13px; color:var(--muted); } .facts dd { margin:2px 0 0; font-weight:650; font-size:17px; }
+    .notes { margin:8px 0 0; padding-left:18px; font-size:17px; } .notes li + li { margin-top:4px; }
+    .choices { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .choices .btn { font-size:15px; padding:8px 14px; }
+    .trace { margin:6px 0 0; padding-left:20px; font-size:15px; line-height:1.55; } .trace strong { margin-right:4px; }
+    .chat-input { display:flex; gap:10px; border-top:1px dashed var(--line); padding-top:14px; }
+    .chat-input input { flex:1; font:inherit; padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:var(--oat); color:var(--muted); }
+    .typing { color:var(--muted); font-size:15px; }
+
+    /* expanders (shared) */
+    .xp { border-top:1px solid var(--line-2); margin-top:12px; padding-top:2px; }
+    .xp > summary { list-style:none; display:flex; align-items:center; gap:8px; }
+    .xp > summary::before { content:"+"; display:grid; place-items:center; width:20px; height:20px; border-radius:6px; background:var(--indigo-t); color:var(--indigo); font-weight:700; font-size:17px; }
+    .xp[open] > summary::before { content:"\2212"; }
+    .xp .xp-body { padding:4px 0 8px; font-size:15px; }
+    .xp p.fine { margin:2px 0 8px; }
+    .stack { display:flex; flex-direction:column; gap:20px; }
+    .card.plain-pad { padding:8px 24px 14px; }
+    .card.plain-pad .xp:first-child { border-top:0; margin-top:0; }
+    .scales { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; }
+    .scales div { background:var(--oat); border:1px solid var(--line-2); border-radius:8px; padding:8px 12px; } .scales dt { font-size:13px; color:var(--muted); } .scales dd { margin:0; font-weight:650; }
+
+    /* custom sliders */
+    .sliders { grid-column:1/-1; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px 26px; border-top:1px dashed var(--line); padding-top:14px; }
+    .sliders label { font-size:14px; color:var(--ink-2); display:block; font-weight:600; }
+    .sliders label b { float:right; font-variant-numeric:tabular-nums; color:var(--indigo); }
+    .sliders input[type=range] { width:100%; accent-color:var(--indigo); }
+    .sliders .banner { grid-column:1/-1; }
+
+    /* saved-plan dialog field */
+    .field { display:block; margin:14px 0 0; font-size:15px; font-weight:600; }
+    .field input { display:block; width:100%; margin-top:6px; font:inherit; font-weight:400; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); }
+    .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--indigo-d); color:#fff; padding:10px 18px; border-radius:10px; font-size:15px; box-shadow:0 10px 30px #13281d55; z-index:50; max-width:90vw; }
+    .hero .earliest { margin:12px 0 0; font-size:15px; color:#ffffffd0; }
+    @media (max-width:1100px) {
+      .top-in { grid-template-columns:1fr auto; } .steps { display:none; }
+      .shell { grid-template-columns:1fr; gap:18px; padding:18px; }
+      #inbox { flex-direction:row; max-height:none; overflow-x:auto; position:static; padding-bottom:8px; } .req { min-width:230px; max-width:230px; }
+      .objective { grid-template-columns:1fr; }
+    }
+    @media (max-width:700px) {
+      .top-in { padding:12px 16px; } .snap { display:none; }
+      #recommendation { font-size:35px; } .metrics { grid-template-columns:1fr; } .hero { padding:22px 18px; }
+      .lane { grid-template-columns:1fr; gap:6px; } .lane-facts { grid-column:1; } .lane-val { text-align:left; }
+      #message { font-size:21px; } .ask { grid-template-columns:36px 1fr; padding:16px; }
+    }
+    @media print { .toast, .rail, .actions, .objective, .top { display:none; } .shell { display:block; } }
+
+    /* ---- chat-first layout ---- */
+    .top-in { grid-template-columns:auto 1fr auto; }
+    .top-tools { display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap; }
+    .tbtn { background:#ffffff1c; border:1px solid #ffffff30; color:#fff; border-radius:999px; padding:6px 14px; font-size:14px; font-weight:600; }
+    .tbtn:hover { background:#ffffff33; }
+    .tbtn b { color:var(--coral); }
+    .shell { grid-template-columns:290px minmax(0,1fr); }
+    .shell.with-work { grid-template-columns:290px minmax(0,1fr) minmax(360px,460px); }
+    .rail .req .done-tick { margin-left:6px; color:var(--ok); font-weight:700; }
+    .thread-wrap { display:flex; flex-direction:column; gap:16px; min-height:calc(100vh - 150px); }
+    .thread { display:flex; flex-direction:column; gap:22px; flex:1; }
+    .empty-state { text-align:center; padding:40px 24px 28px; }
+    .empty-state h1 { font-family:var(--serif); font-size:38px; letter-spacing:-.6px; margin:6px 0 8px; }
+    .empty-state p { max-width:56ch; margin:0 auto 22px; color:var(--ink-2); }
+    .paths { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; text-align:left; }
+    .path { background:#fff; border:1px solid var(--line); border-top:5px solid var(--ok); border-radius:12px; padding:14px 16px; text-align:left; }
+    .path:hover { box-shadow:0 6px 18px #20373120; transform:translateY(-1px); }
+    .path.ask { border-top-color:var(--indigo); } .path.warn { border-top-color:var(--warn); } .path.bad { border-top-color:var(--bad); } .path.limit { border-top-color:#8a9892; }
+    .path strong { display:block; font-size:17px; } .path small { color:var(--muted); display:block; margin-top:2px; font-size:14px; }
+    .path q { display:block; margin-top:8px; font-family:var(--serif); font-size:17px; color:var(--ink-2); quotes:none; }
+    .msg { display:grid; grid-template-columns:40px minmax(0,1fr); gap:14px; }
+    .msg .avatar { width:40px; height:40px; font-size:20px; }
+    .msg.bot .avatar { background:var(--coral); color:#1b2a22; }
+    .msg .who { font-size:14px; color:var(--muted); margin-bottom:4px; } .msg .who strong { color:var(--ink); font-size:17px; }
+    .msg .say { margin:0; font-family:var(--serif); font-size:22px; line-height:1.4; }
+    .sysnote { text-align:center; font-size:14px; color:var(--muted); display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
+    .sysnote::before, .sysnote::after { content:""; height:1px; background:var(--line); flex:1; min-width:20px; }
+    .progress { list-style:none; margin:0; padding:12px 16px; background:#fff; border:1px solid var(--line); border-radius:12px; font-size:15px; }
+    .progress li { padding:3px 0; color:var(--muted); display:flex; gap:8px; align-items:center; }
+    .progress li::before { content:""; width:10px; height:10px; border-radius:50%; border:2px solid var(--line); flex:none; }
+    .progress li.on { color:var(--ink); font-weight:650; } .progress li.on::before { border-color:var(--coral); background:var(--coral-t); }
+    .progress li.ok { color:var(--ink-2); } .progress li.ok::before { background:var(--ok); border-color:var(--ok); }
+    .oc { background:#fff; border:1px solid var(--line); border-left:6px solid var(--ok); border-radius:14px; padding:18px 20px; box-shadow:0 2px 10px #20373110; }
+    .oc.ask { border-left-color:var(--indigo); } .oc.warn { border-left-color:var(--warn); } .oc.bad { border-left-color:var(--bad); } .oc.limit { border-left-color:#8a9892; }
+    .oc-top { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; }
+    .oc .badge { background:var(--ok-t); color:#17664c; }
+    .oc.ask .badge { background:var(--indigo-t); color:var(--indigo); } .oc.warn .badge { background:var(--warn-t); color:#6d4812; }
+    .oc.bad .badge { background:var(--bad-t); color:var(--bad); } .oc.limit .badge { background:#eceeed; color:#4a5753; }
+    .prio { font-size:13px; color:var(--muted); background:var(--oat); border:1px solid var(--line); border-radius:999px; padding:2px 10px; }
+    .prio b { color:var(--ink); }
+    .oc h3 { font-family:var(--serif); font-size:28px; line-height:1.2; margin:12px 0 4px; letter-spacing:-.4px; }
+    .oc .lede { margin:0 0 4px; color:var(--ink-2); font-size:17px; }
+    .oc .key { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px; }
+    .oc .key span { background:var(--ok-t); border-radius:10px; padding:7px 12px; font-size:15px; } .oc .key b { display:block; font-size:19px; }
+    .oc.warn .key span { background:var(--warn-t); } .oc.bad .key span { background:var(--bad-t); }
+    .oc .actions { margin-top:16px; }
+    .oc .btn.main { background:var(--indigo); color:#fff; } .oc .btn.main:hover:not(:disabled) { background:var(--indigo-d); }
+    .btn.link { background:transparent; border:0; color:var(--indigo); text-decoration:underline; padding:11px 6px; }
+    .oc .earliest { margin:10px 0 0; font-size:15px; background:var(--oat); border-radius:8px; padding:8px 12px; }
+    .saved-pill { display:inline-block; background:var(--ok-t); color:#17664c; font-weight:700; border-radius:999px; padding:6px 14px; font-size:15px; }
+    .composer { position:sticky; bottom:0; background:linear-gradient(transparent,var(--oat) 18px); padding:22px 0 4px; }
+    .composer-in { display:flex; gap:10px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:8px; box-shadow:0 6px 24px #20373118; }
+    .composer select { flex:1; min-width:0; font:inherit; border:0; background:transparent; color:var(--ink); padding:8px 10px; }
+    .composer .btn.main { background:var(--indigo); color:#fff; }
+    .composer small { display:block; margin:6px 4px 0; color:var(--muted); font-size:13px; }
+    /* working panel */
+    .work { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:20px 22px; position:sticky; top:12px; align-self:start; max-height:calc(100vh - 36px); overflow:auto; }
+    .work-head { display:flex; justify-content:space-between; align-items:start; gap:10px; }
+    .work h2 { font-family:var(--serif); font-size:26px; margin:2px 0 4px; }
+    .work .x { background:var(--oat); border:1px solid var(--line); border-radius:8px; width:32px; height:32px; font-size:19px; }
+    .work .lane { grid-template-columns:1fr; gap:6px; padding:10px; } .work .lane-facts { grid-column:1; margin-top:0; } .work .lane-val { text-align:left; }
+    .work .lane-val small { display:inline; margin-left:8px; }
+    .work .table-wrap table { font-size:14px; }
+    .work .xp:first-of-type { margin-top:16px; }
+    .work h4 { margin:18px 0 0; font-size:14px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+    .seg.vert { display:flex; flex-direction:column; width:100%; }
+    .seg.vert button { width:100%; padding:10px 14px; }
+    dialog.settings { width:min(560px,94vw); }
+    dialog .group { margin:16px 0 0; } dialog .group > .eyebrow { margin-bottom:6px; }
+    @media (max-width:1280px) { .shell.with-work { grid-template-columns:minmax(0,1fr) !important; } .shell.with-work .work { position:fixed; inset:0 0 0 auto; width:min(520px,100vw); z-index:30; border-radius:16px 0 0 16px; max-height:none; box-shadow:-20px 0 60px #13281d55; } }
+    @media (max-width:1100px) { .shell.with-work { grid-template-columns:1fr; } .thread-wrap { min-height:0; } }
+      .brand i { width:56px !important; height:56px !important; font-size:28px !important; border-radius:14px !important; }
+    .brand small { font-size:13px !important; margin-top:4px !important; }
+    .top::after { height:10px !important; }
+    .snap { font-size:15px !important; }
+    .shell { grid-template-columns:minmax(0,1fr) !important; padding-bottom:12px !important; }
+    .shell.with-work { grid-template-columns:minmax(0,1fr) minmax(380px,480px) !important; }
+    .thread-wrap { min-height:calc(100vh - 260px) !important; }
+    .empty-state { padding:48px 40px 40px !important; }
+    .empty-state p { max-width:72ch !important; }
+    .paths { grid-template-columns:repeat(auto-fit,minmax(220px,1fr)) !important; grid-auto-rows:1fr; align-items:stretch; gap:16px !important; }
+    .path { display:flex !important; flex-direction:column; height:100%; width:100%; padding:18px 20px !important; }
+    .path strong { min-height:2.6em; line-height:1.3; }
+    .path small { min-height:2.6em; }
+    .path q { margin-top:auto !important; padding-top:12px; border-top:1px dashed var(--line); }
+    .inbox-sec { background:var(--card); border-top:1px solid var(--line); margin-top:24px; }
+    .inbox-in { max-width:1500px; margin:0 auto; padding:30px 28px 56px; }
+    .inbox-head h2 { font-family:var(--serif); margin:0 0 4px; }
+    .inbox-head p { max-width:80ch; }
+    .inbox-sec #inbox { display:grid !important; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; max-height:none !important; overflow:visible !important; position:static !important; padding:0 !important; flex-direction:unset !important; }
+    .inbox-sec .req { min-width:0 !important; max-width:none !important; height:100%; }
+    /* prominent priority box */
+    .prio-box { display:flex; align-items:center; gap:14px; background:var(--coral); color:#1b2a22; border:0; border-radius:16px; padding:12px 22px; text-align:left; box-shadow:0 6px 20px #00000040, inset 0 0 0 3px #ffffff55; }
+    .prio-box:hover { background:#dca24c; transform:translateY(-1px); }
+    .prio-box small { display:block; font-size:12px; letter-spacing:.14em; text-transform:uppercase; font-weight:800; opacity:.75; }
+    .prio-box strong { display:block; font-family:var(--serif); font-size:26px; line-height:1.1; }
+    .prio-box .gear { font-size:26px; line-height:1; }
+    .tbtn { font-size:15px !important; padding:10px 18px !important; }
+    /* tidier result cards */
+    .thread { max-width:1060px; width:100%; margin:0 auto; }
+    .composer { max-width:1060px; width:100%; margin:0 auto; }
+    .msg .say { background:#fff; border:1px solid var(--line); border-radius:4px 16px 16px 16px; padding:12px 18px; display:inline-block; max-width:760px; box-shadow:0 1px 4px #20373110; }
+    .oc { padding:22px 26px !important; }
+    .oc h3 { font-size:30px !important; margin:14px 0 14px !important; }
+    .oc h3.small { font-size:23px !important; line-height:1.3 !important; font-family:var(--sans) !important; font-weight:650; letter-spacing:0 !important; }
+    .option { background:var(--oat); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:0 0 16px; }
+    .option-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .option-head strong { font-family:var(--serif); font-size:24px; } .option-head small { font:600 13px var(--sans); color:var(--muted); margin-left:6px; }
+    .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; }
+    .tile { background:#fff; border:1px solid var(--line-2); border-radius:10px; padding:10px 14px; min-height:74px; }
+    .tile span { display:block; font-size:13px; color:var(--muted); }
+    .tile strong { display:block; font-size:19px; margin-top:3px; line-height:1.25; font-variant-numeric:tabular-nums; }
+    .tile.good strong { color:#17664c; } .tile.late { background:var(--warn-t); border-color:#ecd5a2; } .tile.late strong { color:#6d4812; }
+    .callout { background:#fff; border:1px solid var(--line); border-left:4px solid var(--line); border-radius:10px; padding:12px 16px; margin:0 0 14px; }
+    .callout p { margin:6px 0 0; font-size:16px; color:var(--ink-2); line-height:1.5; }
+    .callout.one { margin:0 0 14px; font-size:16px; }
+    .choice-box { margin:0 0 14px; }
+    .choice-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+    .choice { display:flex; justify-content:space-between; align-items:center; gap:12px; text-align:left; background:#fff; border:1.5px solid var(--indigo); color:var(--indigo-d); border-radius:12px; padding:13px 18px; font-size:16px; font-weight:600; }
+    .choice:hover { background:var(--indigo-t); } .choice i { font-style:normal; font-size:24px; line-height:1; }
+    .oc-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; border-top:1px solid var(--line-2); padding-top:16px; margin-top:6px; }
+    @media (max-width:700px) { .oc { padding:16px !important; } .oc h3 { font-size:24px !important; } .msg .say { max-width:none; } }
+    /* overlap-proof card layout: stacked blocks with gap, nothing floats or sticks */
+    .thread-wrap { display:block !important; min-height:0 !important; }
+    .thread { display:flex !important; flex-direction:column !important; flex:none !important; gap:24px !important; }
+    .thread > * { flex:none !important; min-height:0; }
+    .composer { position:static !important; background:none !important; padding:0 !important; margin:28px auto 0 !important; }
+    .msg > div { min-width:0; }
+    .oc { display:flex !important; flex-direction:column !important; gap:16px !important; position:static !important; overflow:visible; }
+    .oc > * { flex:none !important; margin:0 !important; position:static !important; }
+    .oc h3 { margin:0 !important; }
+    .oc .eyebrow { display:block; line-height:1.4; margin:0 0 8px; position:static; }
+    .callout, .choice-box, .option { display:block; height:auto !important; }
+    .callout p { margin:8px 0 0 !important; }
+    .callout p:first-of-type { margin-top:0 !important; }
+    .choice-list { margin-top:0 !important; }
+    .oc-actions { margin-top:0 !important; }
+    /* plain stacked sections for notes and answers */
+    .blk { display:block; border-top:1px solid var(--line); padding-top:14px; }
+    .blk-t { display:block; margin:0 0 10px; font:700 14px/1.4 var(--sans); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+    .blk-list { margin:0; padding-left:22px; font-size:17px; line-height:1.55; color:var(--ink-2); }
+    .blk-list li + li { margin-top:8px; }
+    /* start-here refinement */
+    .thread.is-empty { max-width:1320px; }
+    .empty-state { text-align:left !important; padding:44px 44px 40px !important; }
+    .empty-state .eyebrow { font-size:15px; }
+    .empty-state h1 { font-size:46px !important; margin:8px 0 14px !important; }
+    .empty-state p.lead { font-size:21px; line-height:1.6; max-width:none !important; margin:0 0 26px !important; color:var(--ink-2); }
+    .kinds-h { font-family:var(--serif); font-size:28px; margin:0 0 16px; letter-spacing:-.3px; }
+    .paths { grid-template-columns:repeat(auto-fit,minmax(270px,1fr)) !important; gap:18px !important; }
+    .path { position:relative; padding:22px 22px 18px !important; gap:10px; font-size:18px; text-align:left; }
+    .path strong { font-size:22px !important; line-height:1.25 !important; min-height:2.5em; padding-right:34px; }
+    .path-no { position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; background:var(--oat); border:1px solid var(--line); display:grid; place-items:center; font-weight:700; font-size:15px; color:var(--ink-2); }
+    .path-does { font-size:17px; line-height:1.5; color:var(--ink-2); } .path-does b { color:var(--ink); }
+    .path q { font-size:18px !important; line-height:1.45; }
+    .path-go { margin-top:10px; font-weight:700; font-size:16px; color:var(--indigo); }
+    .path small { display:none; }
+    .path.more { border-top-color:var(--coral); background:var(--coral-t); text-decoration:none; color:var(--ink); }
+    .path.more strong { min-height:0; padding-right:0; }
+    html { scroll-behavior:smooth; }
+    /* free-text boxes */
+    .ft textarea { width:100%; font:inherit; resize:vertical; color:var(--ink); background:#fff; }
+    .ft-big { margin:0 0 34px; }
+    .ft-label { display:block; font-weight:700; font-size:20px; margin:0 0 10px; }
+    .ft-big textarea { font-family:var(--serif); font-size:24px; line-height:1.45; min-height:170px; padding:20px 24px; border:2.5px solid var(--indigo); border-radius:18px; box-shadow:0 6px 24px #1c594820; }
+    .ft-big textarea:focus { outline:4px solid var(--coral); outline-offset:2px; }
+    .ft-row { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-top:12px; }
+    .ft-row small { color:var(--muted); font-size:15px; }
+    .ft-big .btn.main, .composer .btn.main { background:var(--indigo); color:#fff; font-size:19px; padding:14px 30px; }
+    .ft-big .btn.main:hover, .composer .btn.main:hover { background:var(--indigo-d); }
+    .composer-in textarea { flex:1; min-width:0; border:0; outline:0; font-size:19px; font-family:var(--serif); padding:10px 12px; background:transparent; }
+    /* keep the example scenarios visible without scrolling */
+    .empty-state { padding:28px 40px 30px !important; }
+    .empty-state h1 { font-size:40px !important; margin:4px 0 8px !important; }
+    .empty-state p.lead { font-size:19px !important; margin:0 0 16px !important; }
+    .ft-big { margin:0 0 22px !important; }
+    .ft-label { font-size:18px !important; margin-bottom:8px !important; }
+    .ft-big textarea { min-height:112px !important; font-size:22px !important; padding:14px 20px !important; }
+    .ft-row { margin-top:10px !important; }
+    .kinds-h { font-size:24px !important; margin:0 0 12px !important; }
+    .path { padding:16px 18px 14px !important; gap:6px !important; }
+    .path strong { font-size:20px !important; min-height:2.5em; }
+    .path q { font-size:16px !important; }
+    .path-does { font-size:16px !important; }
+    /* wider "Show working" panel */
+    .shell.with-work { grid-template-columns:minmax(0,1fr) minmax(600px,48%) !important; }
+    .work { padding:26px 30px !important; }
+    .work .lane { grid-template-columns:200px minmax(0,1fr) 150px !important; gap:14px 18px !important; }
+    .work .lane-facts { grid-column:2 / 4 !important; }
+    .work .lane-val { text-align:right !important; } .work .lane-val small { display:block !important; margin-left:0 !important; }
+    .work .table-wrap table { font-size:15px !important; }
+    @media (max-width:1400px) { .shell.with-work { grid-template-columns:minmax(0,1fr) !important; }
+      .shell.with-work .work { position:fixed !important; inset:0 0 0 auto !important; width:min(860px,100vw) !important; z-index:30; border-radius:16px 0 0 16px; max-height:none !important; box-shadow:-20px 0 60px #13281d55; } }
+    @media (max-width:760px) { .work .lane { grid-template-columns:1fr !important; } .work .lane-facts { grid-column:1 !important; } .work .lane-val { text-align:left !important; } }
+    /* highlighted card headers, larger descriptions */
+    .path strong { display:inline-block !important; align-self:flex-start; min-height:0 !important; padding:6px 14px !important; border-radius:10px; font-size:22px !important; line-height:1.25 !important; font-weight:800; letter-spacing:-.2px; background:var(--ok-t); color:#17664c; }
+    .path.ask strong { background:var(--indigo-t); color:var(--indigo-d); }
+    .path.warn strong { background:var(--warn-t); color:#6d4812; }
+    .path.bad strong { background:var(--bad-t); color:#8a2f28; }
+    .path.limit strong { background:#eceeed; color:#34423d; }
+    .path.more strong { background:var(--coral); color:#1b2a22; padding:6px 14px !important; }
+    .path { gap:12px !important; }
+    .path-no { top:14px !important; }
+    .path-does { font-size:20px !important; line-height:1.5 !important; color:var(--ink) !important; }
+    .path q { font-size:17px !important; }
+    /* examples list: no request text, status label only */
+    .inbox-sec #inbox { grid-template-columns:repeat(auto-fill,minmax(250px,1fr)) !important; }
+    .inbox-sec .req { padding:16px 18px !important; }
+    .inbox-sec #inbox { grid-template-columns:repeat(auto-fill,minmax(230px,1fr)) !important; }
+    /* centred start heading and text box */
+    .empty-state .eyebrow, .empty-state h1, .empty-state p.lead, .kinds-h { text-align:center !important; }
+    .empty-state p.lead { max-width:60ch !important; margin-left:auto !important; margin-right:auto !important; }
+    .empty-state h1 { margin-top:10px !important; }
+    .ft-big { max-width:900px; margin-left:auto !important; margin-right:auto !important; }
+    .ft-label { text-align:center; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="brand"><i aria-hidden="true">S</i><div>SweaterCo<small>Quick-response subcontracting desk</small></div></div>
+      <div class="snap" style="text-align:left"><span id="as-of"></span><span id="ws-line"></span><span style="opacity:.7">Prototype build 19:22</span></div>
+      <div class="top-tools">
+        <button class="prio-box" id="open-settings" type="button" aria-label="Open objective settings"><span class="gear" aria-hidden="true">&#9881;</span><span><small>Objective</small><strong id="prio-name"></strong></span></button>
+        <button class="tbtn" id="open-records" type="button">Saved plan</button>
+        <button class="tbtn" id="reset" type="button">Clear chat</button>
+      </div>
+    </div>
+  </header>
+  <div class="shell" id="shell">
+    <main id="main">
+      <div class="thread-wrap">
+        <div class="thread" id="thread" aria-live="polite"></div>
+        <div class="composer ft" id="composer">
+          <div class="composer-in"><textarea id="ft-text" rows="2" aria-label="Type a message from the group chat" placeholder="Type or paste the next message from the group chat"></textarea><button class="btn main" data-ft-send type="button">Send to desk</button></div>
+          <small>Reading free text needs the language model, which this prototype does not include. Paste one of the example messages.</small>
+        </div>
+      </div>
+      <div class="foot"><span>Delivery estimates include expected rework. This preview does not predict unknown workshop closures.</span><a href="../sprint1-architecture.svg">System architecture</a></div>
+    </main>
+    <aside class="work" id="work" aria-label="How this was worked out" hidden></aside>
+  </div>
+
+  <section class="inbox-sec" id="examples" aria-label="Examples">
+    <div class="inbox-in">
+      <div class="inbox-head"><h2>Examples <span class="pill" id="inbox-count"></span></h2>
+        <p>Click a message to send it to the desk, as if it arrived in the group chat. Nothing is allocated until you save.</p>
+        <div class="legend"><span>Ready</span><span class="r">Check first</span><span class="b">Blocked</span></div></div>
+      <nav id="inbox" aria-label="Example messages"></nav>
+    </div>
+  </section>
+
+  <dialog id="settings" class="settings" aria-labelledby="set-title">
+    <div class="eyebrow">Settings</div><h2 id="set-title">Objectives</h2>
+    <div class="group"><div class="eyebrow">Choose the objective</div>
+      <div class="seg vert" role="group" aria-label="Objective">
+        <button data-preset="lateness" aria-pressed="true">Lateness<small>Primary objective</small></button>
+        <button data-preset="defects" aria-pressed="false">Defect<small>Secondary objective</small></button>
+        <button data-preset="hybrid" aria-pressed="false">Hybrid<small>Hybrid objective with fixed weights</small></button>
+        <button data-preset="custom" aria-pressed="false">Custom<small>Customizable weights for objectives</small></button>
+      </div></div>
+    <div class="sliders" id="sliders" hidden style="margin-top:14px">
+      <label>Lateness weight <b id="v-lateness"></b><input type="range" id="w-lateness" min="0" max="1" step="0.01" value="1"></label>
+      <label>Defects weight <b id="v-defects"></b><input type="range" id="w-defects" min="0" max="1" step="0.01" value="0.05"></label>
+      <label>Cost weight <b id="v-cost"></b><input type="range" id="w-cost" min="0" max="1" step="0.01" value="0.1"></label>
+      <div class="banner warn" id="custom-note">Preview only: the sliders move the weights, but only the Python scorer can recompute a result. New answers keep using the Hybrid preview here. In the Streamlit app every change recomputes it.</div>
+      <div class="banner bad" id="custom-err" hidden>Every weight is zero. Set at least one weight above zero before sending a request.</div>
+    </div>
+    <p class="fine" id="prio-note" style="margin:10px 0 0">Hard constraints always apply. The final primary objective is still pending, so these are exploratory presets. Each answer keeps the objective it was produced with.</p>
+    <div class="group"><div class="eyebrow">Where do saved allocations go?</div>
+      <div class="mini" role="group" aria-label="Workspace"><button data-ws="independent" aria-pressed="true">Preview only</button><button data-ws="saved" aria-pressed="false">Saved local plan</button></div>
+      <p class="mode-note" id="ws-note" style="margin-top:6px"></p></div>
+    <div class="actions"><button class="btn main" id="close-settings" style="background:var(--indigo);color:#fff">Done</button></div>
+  </dialog>
+
+  <dialog id="confirmation" aria-labelledby="dialog-title"><div class="eyebrow">Confirm</div><h2 id="dialog-title">Save this allocation?</h2><p id="confirm-summary"></p><p id="confirm-caption"></p><label class="field" id="actor-field" hidden>Confirming dispatcher<input id="actor" maxlength="100" autocomplete="off"></label><div class="actions"><button id="cancel-confirm" class="btn plain">Back</button><button id="demo-confirm" class="btn main" style="background:var(--indigo);color:#fff">Confirm</button></div></dialog>
+  <dialog id="records-dialog" aria-labelledby="rec-title"><div class="eyebrow">Saved local plan</div><h2 id="rec-title">Saved allocations</h2><p class="fine" id="records-empty">Nothing has been saved yet.</p><div class="table-wrap"><table id="records-table" hidden><thead><tr><th>Allocation</th><th>Order</th><th>Workshop</th><th>Confirmed by</th><th>Saved (UTC)</th></tr></thead><tbody id="records-rows"></tbody></table></div><p class="fine" id="records-mode"></p><div class="actions"><button class="btn plain" id="export-records" type="button">Export records</button><button class="btn plain" id="close-records" type="button">Close</button></div></dialog>
+
+  <script id="dispatch-data" type="application/json">__DISPATCH_DATA__</script>
+  <script>
+    const data = JSON.parse(document.getElementById('dispatch-data').textContent);
+    const el = id => document.getElementById(id);
+    const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const S = {draft:'', ws:'independent', preset:'lateness', weights:{lateness:1,defects:0.05,cost:0.1}, msgs:[], records:[], work:null, pending:null, seq:0};
+    const prioNames = {lateness:'Lateness', defects:'Defect', hybrid:'Hybrid', custom:'Custom'};
+    const titles = {RECOMMEND:'Ready to send',CLARIFY:'One question for you',REFUSE_SUGGESTION:'Not allowed: here is an alternative',NEEDS_REVIEW:'Check before sending',NO_FEASIBLE_OPTION:'No workshop can make this date',DECLINE:'Cannot answer from our records',RECORDED_STATUS:'Recorded status'};
+    const cardTone = s => ({RECOMMEND:'', CLARIFY:'ask', REFUSE_SUGGESTION:'warn', NEEDS_REVIEW:'warn', NO_FEASIBLE_OPTION:'bad', DECLINE:'limit', RECORDED_STATUS:'ask'})[s] || 'warn';
+    const dot = s => s === 'RECOMMEND' ? '' : ['REFUSE_SUGGESTION','DECLINE','NO_FEASIBLE_OPTION'].includes(s) ? 'block' : 'review';
+    const stages = ['Understanding the request','Finding the order','Checking eligible workshops','Estimating delivery'];
+    const dataPreset = p => p === 'custom' ? 'hybrid' : p;
+    const customZero = () => S.preset === 'custom' && Object.values(S.weights).every(v => v === 0);
+    const preview = (id, p) => data.previews[id][dataPreset(p)];
+    const reply = (id, p) => data.replies[id][dataPreset(p)];
+    const item = id => data.inbox.find(i => i.request_id === id);
+    const sent = id => S.msgs.some(m => m.type === 'req' && m.id === id);
+    const saved = (m) => m.saved;
+    const row = (cells, cls = '') => '<tr class="' + cls + '">' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+    function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3600); }
+
+    el('as-of').innerHTML = 'Queue snapshot <strong>' + esc(data.as_of) + '</strong>';
+    el('inbox-count').textContent = data.inbox_count;
+
+    // ---------- building blocks ----------
+    const chosenOf = r => r.candidates.find(c => c.estimate.workshop_id === (r.recommendation || r.alternative));
+    function outcomeCard(m) {
+      const r = preview(m.id, m.preset), card = reply(m.id, m.preset), chosen = chosenOf(r);
+      const fixed = r.input.preference !== 'configured', tone = cardTone(r.status), F = Object.fromEntries(card.facts);
+      const prio = fixed ? 'Request asks for: <b>' + esc(r.input.preference.replaceAll('_', ' ')) + '</b>' : 'Objective: <b>' + esc(prioNames[m.preset]) + '</b>';
+      const lead = r.status === 'RECOMMEND' ? 'Recommended workshop' : r.status === 'REFUSE_SUGGESTION' ? 'Allowed alternative' : r.status === 'NEEDS_REVIEW' ? 'Best whole-batch option, for discussion' : 'Best available option';
+      let option = '';
+      if (chosen && r.status !== 'CLARIFY' && r.status !== 'DECLINE') {
+        const tile = (k, v, cls = '') => `<div class="tile ${cls}"><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`;
+        option = `<div class="option"><div class="option-head"><span class="eyebrow">${esc(lead)}</span><strong>${esc(chosen.name)} <small>${esc(chosen.estimate.workshop_id)}</small></strong></div><div class="tiles">`
+          + tile('Estimated delivery', chosen.display.eta) + tile('Turnaround', chosen.display.turnaround)
+          + tile('Deadline', F['Deadline'] || (chosen.meets_deadline ? 'Meets estimate' : 'Late ' + chosen.display.lateness), chosen.meets_deadline ? 'good' : 'late')
+          + tile('Cost', (F['Cost'] || chosen.display.cost)) + tile('Batch defect risk', chosen.display.defects) + `</div></div>`;
+      }
+      const noteHtml = card.notes.length ? `<section class="blk"><h4 class="blk-t">${r.status === 'RECOMMEND' ? 'How it was ranked' : 'What to know'}</h4><ul class="blk-list">${card.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul></section>` : '';
+      const e = r.earliest_option, hasEarliest = card.notes.some(n => /earliest/i.test(n));
+      const earliest = e && r.status !== 'RECOMMEND' && !hasEarliest ? `<p class="callout one">Earliest permitted delivery: <b>${esc(e.name)}</b>, ${esc(e.display.eta)} (${esc(e.display.turnaround)}).</p>` : '';
+      const recorded = r.status === 'RECORDED_STATUS' && r.order ? `<p class="callout one">Recorded status: <b>${esc(r.order.status)}</b>. Last recorded activity: ${esc(r.order.last_activity_date)}.</p>` : '';
+      const choices = card.choices.length ? `<section class="blk"><h4 class="blk-t">Tap an answer</h4><div class="choice-list">${card.choices.map((c, i) => `<button class="choice" data-choice="${i}" type="button"><span>${esc(c.label)}</span><i aria-hidden="true">&rsaquo;</i></button>`).join('')}</div></section>` : '';
+      const canSave = r.status === 'RECOMMEND' && !m.saved;
+      const acts = `<div class="oc-actions">` + (m.saved ? '<span class="saved-pill">Saved to local plan</span>' : canSave ? `<button class="btn main" data-save="${m.uid}" type="button">Review and save</button>` : '')
+        + `<button class="btn plain" data-work="${m.uid}" type="button">Show working</button></div>`;
+      const small = ['CLARIFY','DECLINE','REFUSE_SUGGESTION','NEEDS_REVIEW'].includes(r.status) ? ' small' : '';
+      return `<div class="oc ${tone}"><div class="oc-top"><span class="badge">${esc(m.saved ? 'Saved' : titles[r.status])}</span><span class="prio">${prio}</span></div>`
+        + `<h3 class="${small}">${esc(card.headline)}</h3>${option}${recorded}${earliest}${noteHtml}${choices}${acts}</div>`;
+    }
+    function renderThread() {
+      const t = el('thread');
+      t.classList.toggle('is-empty', !S.msgs.length); el('composer').hidden = !S.msgs.length;
+      if (!S.msgs.length) {
+        const kinds = [
+          ['R07','Feasible Request','Recommends an available workshop with an estimated delivery date.','ok'],
+          ['R30','Unfeasible Deadline','Flags that no workshop can meet the deadline and offers the earliest available date.','bad'],
+          ['R25','Specific Constraints','Applies buyer preferences or restrictions and records who set them.','ok'],
+          ['R01','Ambiguous Request','Detects multiple matching orders and prompts for clarification.','ask'],
+          ['R05','Incomplete Information','Identifies missing details and asks for the required order number or date.','ask'],
+          ['R08','Invalid Workshop Request','Explains why the requested workshop cannot take the order and suggests alternatives.','warn'],
+          ['R02','Missing Historical Data','Clearly states when required information isn\'t in the database without guessing.','limit']];
+        const cards = kinds.filter(k => item(k[0])).map((k, n) => `<button class="path ${k[3] === 'ok' ? '' : k[3]}" data-send="${esc(k[0])}" type="button"><span class="path-no">${n + 1}</span><strong>${esc(k[1])}</strong><span class="path-does">${esc(k[2])}</span><q>&ldquo;${esc(item(k[0]).text)}&rdquo;</q><span class="path-go">Send &rsaquo;</span></button>`).join('');
+        t.innerHTML = `<section class="card empty-state"><div class="eyebrow">Start here</div><h1>Which order needs a workshop today?</h1>`
+          + `<div class="ft ft-big"><label for="ft-start" class="ft-label">Type or paste a message from the group chat</label><textarea id="ft-start" rows="3" placeholder="For example: ORD-063 - 100 cardigans. No special requirements, just make Apr 29.">${esc(S.draft)}</textarea><div class="ft-row"><small>Press Enter to send, Shift+Enter for a new line.</small><button class="btn main" data-ft-send type="button">Send to desk</button></div></div>`
+          + `<h2 class="kinds-h">Try an example scenario</h2><div class="paths">${cards}<a class="path more" href="#examples"><strong>View All Examples</strong><span class="path-does">Browse the full list of test scenarios.</span><span class="path-go">Explore all examples &darr;</span></a></div></section>`;
+        return;
+      }
+      t.innerHTML = S.msgs.map(m => {
+        if (m.type === 'note') return `<div class="sysnote">${esc(m.text)}${m.next ? ` <button class="btn plain" data-send="${esc(m.next)}" type="button" style="padding:4px 12px;font-size:14px">Next: ${esc(m.next)}</button>` : ''}</div>`;
+        const it = item(m.id);
+        const user = `<div class="msg"><div class="avatar">${esc(it.requester.charAt(0))}</div><div><div class="who"><strong>${esc(it.requester)}</strong> ${esc(it.time)} &middot; ${esc(it.request_id)}</div><p class="say">${esc(it.text)}</p></div></div>`;
+        const body = m.stage < stages.length
+          ? `<ul class="progress" aria-label="Progress">${stages.map((s, i) => `<li class="${i < m.stage ? 'ok' : i === m.stage ? 'on' : ''}">${esc(s)}</li>`).join('')}</ul>`
+          : outcomeCard(m);
+        return user + `<div class="msg bot"><div class="avatar">D</div><div><div class="who"><strong>Dispatch desk</strong> checked with Python tools</div>${body}</div></div>`;
+      }).join('');
+      const last = t.lastElementChild; if (last && last.scrollIntoView) last.scrollIntoView({block:'end', behavior:'smooth'});
+    }
+    function renderInbox() {
+      el('inbox').innerHTML = data.inbox.map(i => {
+        const s = data.previews[i.request_id][dataPreset(S.preset)].status;
+        return `<button class="req" type="button" data-send="${esc(i.request_id)}" title="${esc(i.text)}" aria-pressed="${sent(i.request_id)}"><span class="req-top"><span class="dot ${dot(s)}"></span>${esc(i.requester)}${sent(i.request_id) ? '<span class="done-tick" aria-label="sent">&#10003;</span>' : ''} <span class="t">${esc(i.request_id)} / ${esc(i.time)}</span></span></button>`;
+      }).join('');
+    }
+    function workingHtml(m) {
+      const r = preview(m.id, m.preset), card = reply(m.id, m.preset), chosenId = r.recommendation || r.alternative, has = r.candidates.length;
+      const maxDays = Math.max(...r.candidates.map(c => Math.max(c.estimate.expected_turnaround_days, c.estimate.available_days > 0 ? c.estimate.available_days : 0)), 1) * 1.08;
+      const w = r.effective_weights;
+      let h = `<div class="work-head"><div><div class="eyebrow">Show your working</div><h2>${esc(m.id)}: ${esc(item(m.id).requester)}</h2><p class="fine" style="margin:0">${esc(r.assumption)}</p></div><button class="x" data-close-work type="button" aria-label="Close">&times;</button></div>`;
+      h += `<h4>Options compared</h4>`;
+      h += has ? `<div class="lanes">${r.candidates.map(c => {
+        const e = c.estimate, bw = Math.max(e.expected_turnaround_days / maxDays * 100, 1);
+        const mk = e.available_days >= 0 ? `<span class="deadline" style="left:${e.available_days / maxDays * 100}%"></span>` : '';
+        return `<div class="lane ${e.workshop_id === chosenId ? 'chosen' : ''}"><div class="lane-name"><strong>${esc(c.name)}</strong><small>${esc(e.workshop_id)}${e.workshop_id === chosenId ? ' / picked' : ''}</small></div><div class="track"><span class="bar ${c.meets_deadline ? '' : 'late-bar'}" style="width:${bw}%"></span>${mk}</div><div class="lane-val">${esc(c.display.turnaround)}<small class="${c.meets_deadline ? 'ontime' : 'late'}">${c.meets_deadline ? 'Meets estimate' : 'Late ' + esc(c.display.lateness)}</small></div><div class="lane-facts"><span>Queue <b>${esc(c.display.queue)}</b></span><span>Cost <b>${esc(c.display.cost)}</b></span><span>Defect risk <b>${esc(c.display.defects)}</b></span><span>ETA <b>${esc(c.display.eta)}</b></span></div></div>`;
+      }).join('')}</div>` : '<p class="empty" style="padding:8px 0">No permitted candidate evidence for this request.</p>';
+      if (r.split_option) h += `<details class="xp" open><summary>Two-workshop split estimate</summary><div class="xp-body"><div class="table-wrap"><table><thead><tr><th>Workshop</th><th>Pieces</th><th>Expected</th><th>ETA</th><th>Cost</th></tr></thead><tbody>${r.split_option.parts.map(p => row([`<strong>${esc(p.name)}</strong>`, esc(p.pieces), esc(p.display.turnaround), esc(p.display.eta), esc(p.display.cost)])).join('')}</tbody></table></div><p class="fine">The course simulator does not model splits, so this is chat-layer evidence only.</p></div></details>`;
+      if (r.resolution && r.resolution.status === 'AMBIGUOUS' && r.resolution.matches.length) h += `<details class="xp" open><summary>Matching recorded orders</summary><div class="xp-body"><div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Pieces</th><th>Due</th></tr></thead><tbody>${r.resolution.matches.map(x => row([esc(x.order_id), esc(x.customer), esc(x.product), esc(x.pieces), esc(x.due_date)])).join('')}</tbody></table></div></div></details>`;
+      if (r.excluded.length) h += `<details class="xp" open><summary>Why other workshops are not used</summary><div class="xp-body">${r.excluded.map(x => `<div class="row"><strong>${esc(x.name)}</strong><br><span>${esc(x.reasons.join(' '))}</span></div>`).join('')}</div></details>`;
+      if (has) h += `<details class="xp"><summary>How delivery estimates are built</summary><div class="xp-body"><p class="fine">Expected turnaround includes queue, processing, transport and expected rework.</p><div class="table-wrap"><table><thead><tr><th>Workshop</th><th>Queue</th><th>Proc.</th><th>Transport</th><th>Rework</th><th>ETA</th></tr></thead><tbody>${r.candidates.map(c => row([`<strong>${esc(c.name)}</strong>`, ...['queue','processing','transport','expected_rework','eta'].map(k => esc(c.display[k]))])).join('')}</tbody></table></div></div></details>`;
+      if (r.baselines.length) {
+        const ch = chosenOf(r); const rows = [];
+        if (ch) rows.push({label:'This desk', name:ch.name, display:ch.display, meets_deadline:ch.meets_deadline, respects_exclusions:true, sel:true});
+        rows.push(...r.baselines);
+        h += `<details class="xp"><summary>Compared with the reference policies</summary><div class="xp-body"><p class="fine">Same order, same queue snapshot. Reference policies see eligibility only, so they can pick a workshop this desk was told to avoid.</p><div class="table-wrap"><table><thead><tr><th>Policy</th><th>Expected</th><th>Cost</th><th>Defects</th><th>Deadline</th><th>Exclusions</th></tr></thead><tbody>${rows.map(b => row([`<strong>${esc(b.label)}</strong><br><small>${esc(b.name)}</small>`, esc(b.display.turnaround), esc(b.display.cost), esc(b.display.defects), b.meets_deadline ? 'Meets' : 'Late ' + esc(b.display.lateness), b.respects_exclusions ? 'Respected' : 'Ignored'], b.sel ? 'chosen' : '')).join('')}</tbody></table></div></div></details>`;
+      }
+      h += `<details class="xp"><summary>Objective weights and scales</summary><div class="xp-body"><p class="fine">Weights applied: lateness ${esc(w.lateness)}, defects ${esc(w.defects)}, cost ${esc(w.cost)}. They are relative preferences, not probabilities.</p><dl class="scales">${Object.entries(r.scales).map(([k, v]) => `<div><dt>${esc(k.replaceAll('_', ' '))} scale</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div></details>`;
+      h += `<details class="xp"><summary>How this answer was produced</summary><div class="xp-body"><ol class="trace">${card.steps.map(([t, d]) => `<li><strong>${esc(t)}</strong>${esc(d)}</li>`).join('')}</ol><p class="fine">Every value comes from the Python dispatch tools. The model only extracted the request fields.</p></div></details>`;
+      h += `<div class="actions"><button class="btn plain" data-export="${m.uid}" type="button">Export evidence JSON</button></div>`;
+      return h;
+    }
+    function renderWork() {
+      const m = S.msgs.find(x => x.uid === S.work);
+      const open = !!m && m.stage >= stages.length;
+      el('work').hidden = !open; el('shell').classList.toggle('with-work', open);
+      if (open) el('work').innerHTML = workingHtml(m);
+    }
+    function renderRecords() {
+      el('records-empty').hidden = S.records.length > 0; el('records-table').hidden = !S.records.length;
+      el('records-rows').innerHTML = S.records.map(r => row([esc(r.allocation_id), esc(r.order_id), esc(r.workshop_name), esc(r.confirmed_by), esc(r.created_at_utc)])).join('');
+      el('records-mode').textContent = S.ws === 'saved' ? 'Saved local plan is on. Records stay in this page only in the prototype.' : 'Preview-only mode is on. Switch to Saved local plan in Settings to record allocations.';
+    }
+    function renderSettings() {
+      document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === S.preset)));
+      document.querySelectorAll('[data-ws]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ws === S.ws)));
+      el('prio-name').textContent = prioNames[S.preset];
+      el('ws-line').textContent = S.ws === 'saved' ? 'Saved local plan: confirmed allocations are recorded' : 'Preview only: no capacity reserved';
+      el('ws-note').textContent = S.ws === 'saved' ? 'Confirmed allocations are saved and reserve capacity in the local plan (simulated here).' : 'Each request starts from the same snapshot. Nothing is reserved.';
+      el('sliders').hidden = S.preset !== 'custom';
+      for (const k of ['lateness','defects','cost']) { el('v-' + k).textContent = Number(S.weights[k]).toFixed(2); el('w-' + k).value = S.weights[k]; }
+      el('custom-err').hidden = !customZero(); el('custom-note').hidden = customZero();
+      document.querySelectorAll('[data-ft-send]').forEach(b => { b.disabled = customZero(); });
+    }
+    function render() { renderSettings(); renderInbox(); renderThread(); renderWork(); renderRecords(); }
+
+    // ---------- actions ----------
+    function sendRequest(id) {
+      if (customZero()) { toast('Every weight is zero. Open Settings and set at least one weight above zero.'); return; }
+      const m = {type:'req', uid:'m' + (++S.seq), id, preset:S.preset, stage:0, saved:false};
+      S.msgs.push(m); render();
+      const tick = () => { m.stage++; render(); if (m.stage < stages.length) setTimeout(tick, 380); };
+      setTimeout(tick, 380);
+    }
+    const nextUnsent = () => { const i = data.inbox.find(x => !sent(x.request_id)); return i ? i.request_id : null; };
+    document.addEventListener('click', e => {
+      const s = e.target.closest('[data-send]'); if (s) { sendRequest(s.dataset.send); return; }
+      const w = e.target.closest('[data-work]'); if (w) { S.work = w.dataset.work; renderWork(); el('work').scrollTop = 0; return; }
+      if (e.target.closest('[data-close-work]')) { S.work = null; renderWork(); return; }
+      const sv = e.target.closest('[data-save]'); if (sv) { openConfirm(sv.dataset.save); return; }
+      if (e.target.closest('[data-choice]')) { toast('In the Streamlit app this answer is applied directly and the request is re-checked, with no model call.'); return; }
+      const ex = e.target.closest('[data-export]'); if (ex) { const m = S.msgs.find(x => x.uid === ex.dataset.export); download(JSON.stringify({interpretation_source:data.interpretation_source, fixture_sha256:data.fixture_sha256, ...preview(m.id, m.preset)}, null, 2), m.id + '-' + dataPreset(m.preset) + '-preview.json'); }
+    });
+    // free text: this prototype cannot read new wording, so it only recognises the example messages
+    const norm = t => t.toLowerCase().replace(/^\s*r\d+\s*\[[^\]]*\]\s*[^:]*:\s*/, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    function submitText(box) {
+      const text = box.value.trim(); if (!text) { box.focus(); return; }
+      const q = norm(text), hit = data.inbox.find(i => { const n = norm(i.text); return n === q || (q.length > 15 && (n.includes(q) || q.includes(n))); });
+      if (!hit) { toast('This prototype cannot read new wording yet. Paste one of the example messages, or pick one below. The Streamlit app reads free text with the language model.'); return; }
+      S.draft = ''; box.value = ''; sendRequest(hit.request_id);
+    }
+    document.addEventListener('click', e => { const b = e.target.closest('[data-ft-send]'); if (b) submitText(b.closest('.ft').querySelector('textarea')); });
+    document.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && e.target.matches && e.target.matches('.ft textarea')) { e.preventDefault(); submitText(e.target); } });
+    document.addEventListener('input', e => { if (e.target.matches && e.target.matches('.ft textarea')) S.draft = e.target.value; });
+    el('reset').addEventListener('click', () => { S.msgs = []; S.work = null; render(); });
+    el('open-settings').addEventListener('click', () => el('settings').showModal());
+    el('close-settings').addEventListener('click', () => el('settings').close());
+    document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { S.preset = b.dataset.preset; render(); }));
+    document.querySelectorAll('[data-ws]').forEach(b => b.addEventListener('click', () => { S.ws = b.dataset.ws; render(); }));
+    for (const k of ['lateness','defects','cost']) el('w-' + k).addEventListener('input', e => { S.weights[k] = Number(e.target.value); renderSettings(); });
+    el('open-records').addEventListener('click', () => { renderRecords(); el('records-dialog').showModal(); });
+    el('close-records').addEventListener('click', () => el('records-dialog').close());
+    el('export-records').addEventListener('click', () => download(JSON.stringify(S.records, null, 2), 'allocation-records.json'));
+
+    let confirming = null;
+    function openConfirm(uid) {
+      const m = S.msgs.find(x => x.uid === uid), r = preview(m.id, m.preset), c = chosenOf(r); confirming = m;
+      el('confirm-summary').textContent = r.order.order_id + ' to ' + c.name + '. Estimated delivery: ' + c.display.eta + '. Cost: ' + c.display.cost + ' source units.';
+      const sv = S.ws === 'saved';
+      el('confirm-caption').textContent = sv ? 'This saves the allocation and reserves capacity in the local plan. No workshop will be contacted.' : 'Preview only. No allocation is saved, no queue changes, and no workshop is contacted.';
+      el('actor-field').hidden = !sv; el('actor').value = ''; el('demo-confirm').textContent = sv ? 'Confirm and save' : 'Confirm (preview only)'; el('demo-confirm').disabled = sv;
+      el('confirmation').showModal();
+    }
+    el('actor').addEventListener('input', () => { el('demo-confirm').disabled = !el('actor').value.trim(); });
+    el('cancel-confirm').addEventListener('click', () => el('confirmation').close());
+    el('demo-confirm').addEventListener('click', () => {
+      el('confirmation').close(); const m = confirming; if (!m) return;
+      const r = preview(m.id, m.preset), c = chosenOf(r);
+      if (S.ws === 'saved') {
+        m.saved = true;
+        S.records.push({allocation_id:'A-' + String(S.records.length + 1).padStart(4, '0'), order_id:r.order.order_id, workshop_name:c.name, confirmed_by:el('actor').value.trim(), created_at_utc:new Date().toISOString().slice(0, 19).replace('T', ' ')});
+        S.msgs.push({type:'note', text:'Saved ' + r.order.order_id + ' to ' + c.name + ' in the local plan (simulated: nothing persists after reload).', next:nextUnsent()});
+      } else {
+        S.msgs.push({type:'note', text:'Preview confirmed for ' + r.order.order_id + ' to ' + c.name + '. Nothing was saved.', next:nextUnsent()});
+      }
+      render();
+    });
+    function download(text, name) { const blob = new Blob([text], {type:'application/json'}), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+    render();
+  </script>
+</body>
+</html>
