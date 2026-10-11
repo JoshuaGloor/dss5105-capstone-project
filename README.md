@@ -36,12 +36,12 @@ and update local planning queues. Saved records survive restarts and can be expo
 They live in Git-ignored `runtime/dispatch.sqlite3`; no workshop is contacted.
 See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md) for queue semantics,
 duplicate/stale-preview protection, and local-prototype limitations.
-The page opens on **Group-chat request**: paste a message or start from a course
-inbox message, and answer clarification questions using the configured model.
-Each reply is a card built by Python from tool output. Answer buttons for ambiguous
+The page opens on **Start here**: type or paste a group-chat message and answer
+clarification questions using the configured model, or click an example scenario or any
+message in the **Examples** list to run it offline. The page shows one request and its
+answer at a time, a card built by Python from tool output. Answer buttons for ambiguous
 orders and refused workshops apply the choice without another model call.
-Provider calls happen only on send/retry. **Supplied examples** is the offline mode
-with no model and no API key. See [the language guide](docs/NATURAL_LANGUAGE.md).
+Provider calls happen only on send/retry. Examples need no model and no API key. See [the language guide](docs/NATURAL_LANGUAGE.md).
 The launcher keeps caches/temp files in this project and does not open a browser.
 The default port is fixed at 8501. Saved Python, CSS, data and example-input changes
 automatically rerun the open page; no model call or allocation is triggered by a rerun.
