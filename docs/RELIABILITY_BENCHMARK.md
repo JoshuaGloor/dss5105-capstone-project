@@ -22,8 +22,9 @@ Hashes identify the source context; they do not mean annotations are frozen.
 `context.source_sha256` maps each source path to its SHA-256 digest.
 The additive `context.source_hash_modes` map uses exactly the same paths and
 declares how each digest is computed. There is no implicit mode or automatic
-file-extension/binary detection. The reusable evaluation-test helper is
-`tests/benchmark_integrity.py`; it reads bytes, not newline-translated text.
+file-extension/binary detection. The shared offline helper is
+`src/dss5105/benchmark_integrity.py`; `tests/benchmark_integrity.py` preserves the
+existing test imports. It reads bytes, not newline-translated text.
 
 - `normalized_text_sha256`: explicitly declared UTF-8 text only. Validate UTF-8,
   replace CRLF with LF, then remaining lone CR with LF, and hash the resulting
