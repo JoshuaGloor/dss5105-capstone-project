@@ -8,6 +8,7 @@ from dss5105.dispatch import DispatchDesk
 from dss5105.intake import (
     Conversation,
     IntakeError,
+    apply_patch,
     apply_selection,
     interpret_turn,
     parse_date_phrase,
@@ -64,6 +65,171 @@ def test_reference_and_raw_date_reach_allocator_without_model_arithmetic():
     prompt = json.loads(model.calls[0][1].content)
     assert "queues" not in prompt and "cost" not in prompt
     assert prompt["latest_user_message"] == text
+
+
+def test_r14_registered_quantity_does_not_block_ineligible_suggestion_refusal():
+    text = "QuickStitch for the scarves on ORD-103?"
+    state = turn(
+        text,
+        patch(
+            ("order_id", "ORD-103", "ORD-103"),
+            ("product", "scarves", "scarves"),
+            ("suggested_workshop", "QuickStitch", "QuickStitch"),
+            needs=["quantity"],
+        ),
+    )
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert state.request.pieces is None
+    assert state.request.product == "Scarf"
+    assert state.request.suggested_workshop == "W1"
+    assert result["resolution"]["status"] == "RESOLVED"
+    assert len(result["resolution"]["matches"]) == 1
+    assert result["order"]["order_id"] == "ORD-103"
+    assert int(result["order"]["pieces"]) == 2000
+    assert result["status"] == "REFUSE_SUGGESTION", result["message"]
+    assert result["batch"]["pieces"] == 2000
+    refused = next(row for row in result["excluded"] if row["workshop_id"] == "W1")
+    assert "Cannot make ACCESSORIES." in refused["reasons"]
+
+
+def test_quantity_alternatives_with_product_words_remain_unresolved():
+    text = "ORD-103, either 2000 scarves or 2500 scarves"
+    state = turn(text, patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity"]))
+    assert "quantity" in state.needs
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+def test_quantity_alternatives_without_quantity_keywords_remain_unresolved():
+    text = "ORD-103, unsure whether 2000 or 2500 scarves"
+    state = turn(text, patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity"]))
+    assert "quantity" in state.needs
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    ["unsure", "uncertain", "not sure", "unknown", "maybe", "perhaps", "whether 2000", "either 2000 or 2500"],
+)
+def test_uncertainty_language_preserves_quantity_need(phrase):
+    state = turn(f"ORD-103, {phrase} scarves", patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity"]))
+    assert "quantity" in state.needs
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "ORD-103, 2000 scarves",
+        "ORD-103, 2,000 scarves or 2,500 scarves",
+        "ORD-103, 103 scarves",
+        "ORD-103, delivery 2026-04-15",
+        "ORD-103, W1 or W3",
+        "ORD-103 / ORD-1030",
+        "ORD-103 / XORD-103",
+    ],
+)
+def test_numeric_content_beyond_explicit_order_id_preserves_quantity_need(text):
+    state = turn(text, patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity"]))
+    assert "quantity" in state.needs
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+@pytest.mark.parametrize("text", ["ORD-103", "(ord-103)?", "ORD-103 / ord-103"])
+def test_explicit_order_id_digits_alone_do_not_block_quantity_fallback(text):
+    evidence = "ord-103" if text == "(ord-103)?" else "ORD-103"
+    state = turn(text, patch(("order_id", evidence, evidence), needs=["quantity"]))
+    assert "quantity" not in state.needs
+    assert state.request.pieces is None
+
+
+def test_workshop_alternative_does_not_block_registered_quantity_fallback():
+    state = turn(
+        "ORD-103, either QuickStitch or BudgetWorks",
+        patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity"]),
+    )
+    assert "quantity" not in state.needs
+
+
+@pytest.mark.parametrize("quantity", [None, "", "0", "000", "-1", "2000.0", "malformed", "\u00b2", 2000])
+def test_invalid_registered_quantity_preserves_quantity_need(quantity):
+    desk = DispatchDesk()
+    next(row for row in desk.orders if row["order_id"] == "ORD-103")["pieces"] = quantity
+    state = apply_patch(
+        Conversation(), "ORD-103", patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity"]), desk, "Dispatcher"
+    )
+    assert "quantity" in state.needs
+    assert state.request.clarification
+
+
+@pytest.mark.parametrize("duplicate", [False, True])
+def test_unresolved_order_preserves_quantity_need(duplicate):
+    desk = DispatchDesk()
+    order = next(row for row in desk.orders if row["order_id"] == "ORD-103")
+    if duplicate:
+        desk.orders.append(order.copy())
+    else:
+        desk.orders.remove(order)
+    state = apply_patch(
+        Conversation(), "ORD-103", patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity"]), desk, "Dispatcher"
+    )
+    assert "quantity" in state.needs
+    result = preview_conversation(state, desk, ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+def test_registered_quantity_fallback_preserves_other_needs():
+    state = turn("ORD-103", patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity", "deadline"]))
+    assert state.needs == ("deadline",)
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+def test_explicit_quantity_uncertainty_is_not_discharged_by_registered_quantity():
+    state = turn(
+        "QuickStitch for ORD-103, but I'm not sure about the quantity yet.",
+        patch(
+            ("order_id", "ORD-103", "ORD-103"),
+            ("suggested_workshop", "QuickStitch", "QuickStitch"),
+            needs=["quantity"],
+        ),
+    )
+    assert "quantity" in state.needs
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert int(result["order"]["pieces"]) == 2000
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+def test_unresolved_quantity_survives_an_order_only_follow_up():
+    first = turn("usual quantities", patch(("pieces", "usual quantities", "usual quantities")))
+    second = turn("ORD-103", patch(("order_id", "ORD-103", "ORD-103")), first)
+    assert "quantity" in second.needs
+    result = preview_conversation(second, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+def test_explicit_quantity_conflict_is_not_replaced_by_registered_quantity():
+    state = turn(
+        "ORD-103, 2001 scarves",
+        patch(("order_id", "ORD-103", "ORD-103"), ("pieces", "2001", "2001"), needs=["quantity"]),
+    )
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert state.request.pieces == 2001
+    assert int(result["order"]["pieces"]) == 2000
+    assert result["status"] == "CLARIFY"
+    assert "quantity amendment" in result["message"]
+    assert not result["candidates"]
 
 
 def test_clarification_merges_with_exclusions_and_imposer_provenance():

@@ -258,6 +258,31 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         exclusions.setdefault(workshop_id, constraint)
         provenance.append({"field": "exclusion", **constraint, "speaker": speaker, "turn": len(previous.turns)})
     values["exclusions"] = list(exclusions.values())
+    # Only a newly requested, omitted quantity can fall back to the explicit order.
+    if (
+        "quantity" in needs
+        and "quantity" not in previous.needs
+        and "pieces" not in seen
+        and values["pieces"] is None
+        and values["order_id"] is not None
+        # Needs have no evidence field; retain quantity or uncertainty language.
+        and not re.search(
+            r"\b(?:quantity|quantities|qty|pieces|amount|number|count|how\s+many|"
+            r"unsure|uncertain|not\s+sure|unknown|maybe|perhaps|whether)\b",
+            text,
+            re.IGNORECASE,
+        )
+        # Other digits may describe quantities; only the explicit order ID is exempt.
+        and not re.search(
+            r"\d",
+            re.sub(rf"\b{re.escape(values['order_id'])}\b", " ", text, flags=re.IGNORECASE),
+        )
+    ):
+        resolution = desk.resolve_order(DispatchInput(order_id=values["order_id"]))
+        if resolution["status"] == "RESOLVED":
+            quantity = resolution["matches"][0].get("pieces")
+            if isinstance(quantity, str) and re.fullmatch(r"[0-9]+", quantity) and quantity.lstrip("0"):
+                needs.discard("quantity")
     values["clarification"] = " ".join(QUESTIONS[code] for code in QUESTIONS if code in needs) or None
     try:
         request = DispatchInput(**values)
