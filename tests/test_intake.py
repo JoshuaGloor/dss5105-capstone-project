@@ -255,6 +255,21 @@ def test_clarification_merges_with_exclusions_and_imposer_provenance():
     assert second.request.date_uncertain is False
 
 
+def test_ambiguous_order_clarification_is_not_repeated():
+    state = turn(
+        "Can we get the TrendCart order moving? They are chasing.",
+        patch(("customer", "TrendCart", "TrendCart"), needs=["order", "quantity"]),
+    )
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert result["resolution"]["status"] == "AMBIGUOUS"
+    question = "Which order do you mean? Please confirm its order ID."
+    assert result["message"].count(question) == 1, result["message"]
+    assert result["message"] == question + " Please confirm the quantity using digits."
+    assert state.needs == ("order", "quantity")
+    assert not result["candidates"]
+
+
 def test_indirect_reference_never_guesses_an_order():
     first = turn("The TrendCart order please", patch(("customer", "TrendCart", "TrendCart"), needs=["order"]))
     assert preview_conversation(first, DispatchDesk(), ObjectiveWeights())["status"] == "CLARIFY"
