@@ -1,0 +1,726 @@
+{
+  "schema_version": "reliability-case-v1",
+  "artifact_kind": "held_out_authoring_template",
+  "annotation_status": "pending_independent_adjudication",
+  "independent_gold": false,
+  "freeze_status": "not_frozen",
+  "created_on": "2026-10-13",
+  "schema_document": "docs/RELIABILITY_BENCHMARK.md",
+  "context": {
+    "as_of": "2026-04-01",
+    "queue_mode": "independent_workshops_csv_snapshot",
+    "scope": "registered_order_preview",
+    "objective_weights": {
+      "lateness": 1,
+      "defects": 0,
+      "cost": 0,
+      "deadline_buffer_days": 0
+    },
+    "explicit_preferences_override_weights": true,
+    "source_sha256": {
+      "track2/data/dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+      "track2/data/orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+      "track2/data/workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+      "examples/chat_rubric.json": "3d5a17380de57ba5f78c3e627e077213493e13e806ba073f0b8ef7202c71a5d5",
+      "examples/dispatch_inputs.json": "6c0f29f6e6f5b6e8d38f6e22b160d014dbe83445628822db4863f1238801c201",
+      "docs/CHAT_EVALUATION_RESULTS.md": "8ef353e2f8ac3b1d8b6f9f2134da0b04b1238a706b15fa7dd41d97eef2743826",
+      "tests/test_intake.py": "ad7d0f6a90c977d6c29122a71d5360074ddbe391aaf54ad3ec35b190e3d2b9ea",
+      "tests/test_dispatch.py": "abac3594c8bcff84e6080c24275fb2f4e7298fda6d8d2cabab4840f4a3879da7",
+      "tests/test_chat_ui.py": "7a9b887d43603db54bf561d09d833d9aa2692409d113926685720a3ec81dda02"
+    },
+    "source_hash_modes": {
+      "track2/data/dispatch_requests.txt": "raw_bytes_sha256",
+      "track2/data/orders.csv": "raw_bytes_sha256",
+      "track2/data/workshops.csv": "raw_bytes_sha256",
+      "examples/chat_rubric.json": "normalized_text_sha256",
+      "examples/dispatch_inputs.json": "normalized_text_sha256",
+      "docs/CHAT_EVALUATION_RESULTS.md": "normalized_text_sha256",
+      "tests/test_intake.py": "normalized_text_sha256",
+      "tests/test_dispatch.py": "normalized_text_sha256",
+      "tests/test_chat_ui.py": "normalized_text_sha256"
+    }
+  },
+  "limitations": [
+    "No independent gold labels or frozen held-out queries exist in this artifact.",
+    "No scoring logic or model evaluation has been run to create these data.",
+    "Source hashes identify the provisional context; they do not certify a frozen benchmark."
+  ],
+  "cases": [
+    {
+      "id": "H01",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "valid-relative-deadline",
+      "categories": [
+        "complete_request",
+        "temporal_expression"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Choose a registered order and supported relative delivery phrase whose normalized deadline is feasible under the source snapshot.",
+          "Do not invent a year or conflate dispatch and delivery."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H02",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "ambiguous-reference-id-only-follow-up",
+      "categories": [
+        "ambiguous_order",
+        "retrieval",
+        "multi_turn"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Author an ambiguous customer or product reference, then an ID-only follow-up identifying an existing order.",
+          "Assert one order question and discharge only omitted retrievable secondary needs."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H03",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "explicit-alternative-quantities",
+      "categories": [
+        "quantity_uncertainty"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Use an identified registered order with two explicit alternative quantities.",
+          "Require quantity clarification despite a valid registered quantity; no candidates."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H04",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "revised-deadline-retained-exclusion",
+      "categories": [
+        "deadline_uncertainty",
+        "exclusion_constraint",
+        "provenance",
+        "multi_turn"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Combine an unknown revised deadline with an attributed hard exclusion.",
+          "Follow up with an explicit deadline; exclusion and imposer must persist. Adjudicate subsequent status from the selected snapshot."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H05",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "shipping-delivery-distinction",
+      "categories": [
+        "shipping_delivery_semantics",
+        "multi_turn"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Use a ship date differing from the recorded deadline.",
+          "Follow up confirming dispatch or delivery meaning; independently adjudicate resulting date and status."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H06",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "ineligible-workshop-omitted-quantity",
+      "categories": [
+        "ineligible_workshop_suggestion",
+        "retrieval"
+      ],
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Choose a registered order and ineligible suggested workshop while omitting quantity.",
+          "Retrieve quantity, refuse with the correct reason, and offer a permitted alternative if available."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H07",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "cheapest-on-time-exclusions-infeasible",
+      "categories": [
+        "recommendation_preference",
+        "exclusion_constraint",
+        "impossible_deadline"
+      ],
+      "expected_status": "NO_FEASIBLE_OPTION",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Choose a cheapest-on-time request whose explicit exclusions leave no on-time candidate.",
+          "Do not relax deadline or exclusions; retain earliest permitted evidence where available."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H08",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "disguised-past-deadline",
+      "categories": [
+        "past_deadline",
+        "temporal_expression",
+        "paraphrase"
+      ],
+      "expected_status": "NEEDS_REVIEW",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Express a past delivery deadline indirectly with urgent context.",
+          "Adjudicate normalized date, past-deadline flag, and earliest permitted finish."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H09",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "incomplete-new-order-reservation-invented-eta",
+      "categories": [
+        "new_order_request",
+        "incomplete_request",
+        "adversarial",
+        "scope_limitation"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Describe an incomplete new order demanding immediate reservation and an unsupported ETA.",
+          "No reservation or invented estimate. Independently adjudicate scope clarification and required details."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    },
+    {
+      "id": "H10",
+      "raw_text": null,
+      "speaker": null,
+      "split": "held_out_template",
+      "scenario_family": "known-order-status-historical-context",
+      "categories": [
+        "status_query",
+        "temporal_expression"
+      ],
+      "expected_status": "RECORDED_STATUS",
+      "expected_fields": {},
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {},
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {},
+      "turns": [],
+      "gold_annotation": {
+        "status": "authoring_template_pending_independent_authoring_and_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "scenario_specification_only_no_final_wording",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": []
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": false
+      },
+      "notes": [
+        "Scenario specification only; not an authored query, gold case, or frozen held-out benchmark.",
+        "Keep final wording and labels separate from tuning material; initial status is a provisional authoring target."
+      ],
+      "freeze_status": "not_frozen",
+      "authoring_specification": {
+        "requirements": [
+          "Ask for a known registered order status with incidental historical context.",
+          "Return recorded status with live-movement limitation; historical time must not become a delivery deadline."
+        ],
+        "final_wording_location": null,
+        "follow_up_wording_finalized": false
+      }
+    }
+  ]
+}
