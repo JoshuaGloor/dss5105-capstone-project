@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 from streamlit.testing.v1 import AppTest
 
@@ -153,6 +155,30 @@ def test_inbox_mode_sends_raw_request_not_fixture(ui):
     assert fake.calls == 1
     assert app.session_state["conversation"].turns[0]["speaker"] == "Mei"
     assert app.session_state["preview"]["input"]["exclusions"] == []  # Not backfilled from a fixture.
+
+
+def test_ui_reply_rebuild_and_clicked_selection_preserve_deferred_needs(ui):
+    app, fake = ui
+    fake.outputs = [patch(("customer", "TrendCart"), needs=["order", "quantity"])]
+    app.chat_input(key="dispatch_chat").set_value("Can we get the TrendCart order moving?").run()
+    original = app.session_state["conversation"]
+    # Remove the stored reply so remember_tool_reply must rebuild the conversation.
+    turns = tuple({key: value for key, value in turn.items() if key != "reply"} for turn in original.turns)
+    app.session_state["conversation"] = replace(original, turns=turns, deferred_needs=("quantity",))
+    app.run()
+    assert not app.exception
+    rebuilt = app.session_state["conversation"]
+    assert rebuilt.turns[-1]["reply"]
+    assert rebuilt.deferred_needs == ("quantity",)
+    assert app.session_state["preview"]["conversation"]["deferred_needs"] == ("quantity",)
+    choices = app.session_state["chat_replies"][0]["choices"]
+    index = [choice["value"] for choice in choices].index("ORD-017")
+    app.button(key=f"choice_{index}").click().run()
+    assert not app.exception
+    assert fake.calls == 1
+    assert app.session_state["conversation"].deferred_needs == ()
+    assert app.session_state["conversation"].needs == ()
+    assert app.session_state["preview"]["status"] == "RECOMMEND"
 
 
 def test_clicking_a_matching_order_resolves_without_a_model_call(ui):

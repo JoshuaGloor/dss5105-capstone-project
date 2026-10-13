@@ -1,6 +1,7 @@
 """Natural-language controls. Provider calls happen only on explicit send/retry."""
 
 import html
+from dataclasses import replace
 
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
@@ -168,10 +169,4 @@ def remember_tool_reply(conversation: intake.Conversation, result: dict, slot: D
     if conversation.turns[-1].get("reply"):
         return
     turns = (*conversation.turns[:-1], {**conversation.turns[-1], "reply": result["message"]})
-    st.session_state["conversation"] = intake.Conversation(
-        conversation.request,
-        turns,
-        conversation.needs,
-        conversation.provenance,
-        conversation.traces,
-    )
+    st.session_state["conversation"] = replace(conversation, turns=turns)

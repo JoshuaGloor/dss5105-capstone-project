@@ -4,7 +4,7 @@ import hashlib
 import json
 import os
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -110,6 +110,13 @@ class Conversation:
     needs: tuple[str, ...] = ()
     provenance: tuple[dict, ...] = ()
     traces: tuple[dict, ...] = ()
+    # Internal retrieval classification only; unclassified needs remain blocking.
+    deferred_needs: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        if any(code not in ("quantity", "deadline") or code not in self.needs for code in self.deferred_needs):
+            raise ValueError("deferred_needs must contain only pending quantity or deadline needs")
+        object.__setattr__(self, "deferred_needs", tuple(code for code in QUESTIONS if code in self.deferred_needs))
 
 
 def parse_date_phrase(value: str, as_of: date) -> date | None:
@@ -185,6 +192,46 @@ def _product(value: str, desk: DispatchDesk) -> str:
     return aliases.get(value.casefold(), value)
 
 
+def _secondary_evidence(text: str, order_id: str | None, code: str) -> bool:
+    """Absence of these conservative guards permits retrieval, not a user amendment."""
+    uncertainty = r"unsure|uncertain|not\s+sure|unknown|maybe|perhaps|whether"
+    language = (
+        r"quantity|quantities|qty|pieces|amount|number|count|how\s+many"
+        if code == "quantity"
+        else r"deadline|deadlines|due|date|dates|delivery|shipping|ship|revised|revision|"
+        r"today|tomorrow|yesterday|week|month|year|next|earlier|later|"
+        r"monday|tuesday|wednesday|thursday|friday|saturday|sunday|"
+        r"jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|"
+        r"aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|"
+        r"tbd|tbc|to\s+follow|will\s+confirm"
+    )
+    if re.search(rf"\b(?:{language}|{uncertainty})\b", text, re.IGNORECASE):
+        return True
+    # Only the explicit order identifier is exempt from numeric ambiguity.
+    remainder = re.sub(rf"\b{re.escape(order_id)}\b", " ", text, flags=re.IGNORECASE) if order_id else text
+    return bool(re.search(r"\d", remainder))
+
+
+def _registered_need_available(code: str, order: dict) -> bool:
+    value = order.get("pieces" if code == "quantity" else "due_date")
+    if not isinstance(value, str):
+        return False
+    if code == "quantity":
+        if not re.fullmatch(r"[0-9]+", value):
+            return False
+        try:
+            return int(value) > 0
+        except ValueError:
+            return False
+    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
 def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDesk, speaker: str) -> Conversation:
     """Validate before advancing the conversation; omission cannot remove a constraint."""
     if not isinstance(patch, dict) or set(patch) != {"updates", "exclusions", "needs"}:
@@ -258,32 +305,33 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         exclusions.setdefault(workshop_id, constraint)
         provenance.append({"field": "exclusion", **constraint, "speaker": speaker, "turn": len(previous.turns)})
     values["exclusions"] = list(exclusions.values())
-    # Only a newly requested, omitted quantity can fall back to the explicit order.
-    if (
-        "quantity" in needs
-        and "quantity" not in previous.needs
-        and "pieces" not in seen
-        and values["pieces"] is None
-        and values["order_id"] is not None
-        # Needs have no evidence field; retain quantity or uncertainty language.
-        and not re.search(
-            r"\b(?:quantity|quantities|qty|pieces|amount|number|count|how\s+many|"
-            r"unsure|uncertain|not\s+sure|unknown|maybe|perhaps|whether)\b",
-            text,
-            re.IGNORECASE,
+    deferred = set(previous.deferred_needs) & needs
+    for code, name in (("quantity", "pieces"), ("deadline", "due_date")):
+        if code not in needs:
+            continue
+        explicit = (
+            name in seen
+            or values[name] is not None
+            or (code == "deadline" and values["date_uncertain"])
+            or _secondary_evidence(text, values["order_id"], code)
         )
-        # Other digits may describe quantities; only the explicit order ID is exempt.
-        and not re.search(
-            r"\d",
-            re.sub(rf"\b{re.escape(values['order_id'])}\b", " ", text, flags=re.IGNORECASE),
+        if explicit:
+            deferred.discard(code)
+        elif code not in previous.needs:
+            # Legacy/unclassified pending needs are never retroactively weakened.
+            deferred.add(code)
+    if deferred:
+        resolution = desk.resolve_order(
+            DispatchInput(order_id=values["order_id"], customer=values["customer"], product=values["product"])
         )
-    ):
-        resolution = desk.resolve_order(DispatchInput(order_id=values["order_id"]))
         if resolution["status"] == "RESOLVED":
-            quantity = resolution["matches"][0].get("pieces")
-            if isinstance(quantity, str) and re.fullmatch(r"[0-9]+", quantity) and quantity.lstrip("0"):
-                needs.discard("quantity")
-    values["clarification"] = " ".join(QUESTIONS[code] for code in QUESTIONS if code in needs) or None
+            order = resolution["matches"][0]
+            for code in deferred:
+                if _registered_need_available(code, order):
+                    needs.discard(code)
+            # Unavailable registered fields must become visible blockers.
+            deferred.clear()
+    values["clarification"] = " ".join(QUESTIONS[code] for code in QUESTIONS if code in needs - deferred) or None
     try:
         request = DispatchInput(**values)
     except (ValueError, TypeError) as error:
@@ -294,6 +342,7 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         needs=tuple(code for code in QUESTIONS if code in needs),
         provenance=tuple(provenance),
         traces=previous.traces,
+        deferred_needs=tuple(code for code in QUESTIONS if code in deferred),
     )
 
 
@@ -338,7 +387,7 @@ def interpret_turn(
         "prompt_sha256": hashlib.sha256((SYSTEM_PROMPT + prompt).encode()).hexdigest(),
         "patch": json.loads(json.dumps(patch)),
     }
-    return Conversation(result.request, result.turns, result.needs, result.provenance, result.traces + (trace,))
+    return replace(result, traces=result.traces + (trace,))
 
 
 def apply_selection(
@@ -350,7 +399,7 @@ def apply_selection(
     patch = {"updates": [{"field": field, "value": value, "evidence": value}], "exclusions": [], "needs": []}
     result = apply_patch(previous, text, patch, desk, speaker)
     trace = {"version": VERSION, "model": "dispatcher selection; no model call", "patch": patch}
-    return Conversation(result.request, result.turns, result.needs, result.provenance, result.traces + (trace,))
+    return replace(result, traces=result.traces + (trace,))
 
 
 def preview_conversation(conversation: Conversation, desk: DispatchDesk, weights: ObjectiveWeights) -> dict:
@@ -367,6 +416,7 @@ def preview_conversation(conversation: Conversation, desk: DispatchDesk, weights
     result["conversation"] = {
         "turns": conversation.turns,
         "needs": conversation.needs,
+        "deferred_needs": conversation.deferred_needs,
         "provenance": conversation.provenance,
         "traces": conversation.traces,
     }

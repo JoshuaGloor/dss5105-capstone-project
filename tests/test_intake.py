@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 from datetime import date
 
 import pytest
@@ -43,6 +44,268 @@ def patch(*updates, exclusions=None, needs=None):
 
 def turn(text, output, previous=None):
     return interpret_turn(previous or Conversation(), text, DispatchDesk(), model=Extractor(output))
+
+
+def test_legacy_conversation_defaults_to_no_deferred_needs():
+    legacy = Conversation(Conversation().request, (), ("quantity",), (), ())
+    assert legacy.needs == ("quantity",)
+    assert legacy.deferred_needs == ()
+
+
+def test_deferred_needs_are_normalized_in_question_order():
+    state = Conversation(needs=("order", "quantity", "deadline"), deferred_needs=("deadline", "quantity", "deadline"))
+    assert state.deferred_needs == ("quantity", "deadline")
+
+
+@pytest.mark.parametrize(
+    "needs,deferred",
+    [
+        ((), ("quantity",)),
+        (("quantity",), ("deadline",)),
+        (("scope",), ("scope",)),
+        (("constraint_change",), ("constraint_change",)),
+        (("order",), ("order",)),
+        (("quantity",), ("unknown",)),
+    ],
+)
+def test_deferred_needs_reject_nonpending_or_independent_codes(needs, deferred):
+    with pytest.raises(ValueError, match="deferred_needs"):
+        Conversation(needs=needs, deferred_needs=deferred)
+
+
+@pytest.mark.parametrize("clicked", [False, True])
+def test_order_follow_up_discharges_retrievable_deferred_needs(clicked):
+    first = turn("TrendCart", patch(("customer", "TrendCart", "TrendCart"), needs=["order", "quantity", "deadline"]))
+    assert first.deferred_needs == ("quantity", "deadline")
+    if clicked:
+        second = apply_selection(first, "order_id", "ORD-017", "ORD-017", DispatchDesk())
+    else:
+        second = turn("ORD-017", patch(("order_id", "ORD-017", "ORD-017")), first)
+    assert second.needs == ()
+    assert second.deferred_needs == ()
+    assert second.request.pieces is None
+    assert second.request.due_date is None
+    result = preview_conversation(second, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "RECOMMEND"
+    assert result["batch"]["pieces"] == 800
+    assert result["batch"]["due_date"] == "2026-04-10"
+    assert result["conversation"]["deferred_needs"] == second.deferred_needs
+
+
+def test_explicit_answers_remove_only_resolved_deferred_markers():
+    first = turn("TrendCart", patch(("customer", "TrendCart", "TrendCart"), needs=["order", "quantity", "deadline"]))
+    first = replace(first, deferred_needs=("quantity", "deadline"))
+    second = turn("999 pieces", patch(("pieces", "999", "999")), first)
+    assert second.request.pieces == 999
+    assert second.needs == ("order", "deadline")
+    # Unrelated digits conservatively promote an ambiguous deadline need to blocking.
+    assert second.deferred_needs == ()
+    third = turn("delivery Apr 15", patch(("due_date", "Apr 15", "Apr 15")), second)
+    assert third.needs == ("order",)
+    assert third.deferred_needs == ()
+
+
+@pytest.mark.parametrize("secondary", ["quantity", "deadline"])
+def test_omitted_secondary_need_is_deferred_until_order_identification(secondary):
+    state = turn(
+        "Can we get the TrendCart order moving? They are chasing.",
+        patch(("customer", "TrendCart", "TrendCart"), needs=["order", secondary]),
+    )
+    assert state.deferred_needs == (secondary,)
+    assert "order" in state.needs
+    result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
+    assert result["message"] == "Which order do you mean? Please confirm its order ID."
+
+
+@pytest.mark.parametrize(
+    "text,output",
+    [
+        ("I'm not sure about the quantity", patch(needs=["quantity"])),
+        ("usual quantities", patch(("pieces", "usual quantities", "usual quantities"))),
+        ("either 2000 scarves or 2500 scarves", patch(needs=["quantity"])),
+        ("999 pieces", patch(("pieces", "999", "999"), needs=["quantity"])),
+        ("The revised date is unknown", patch(("date_uncertain", "true", "date is unknown"), needs=["deadline"])),
+        ("The revised date is unknown", patch(needs=["deadline"])),
+    ],
+)
+def test_explicit_secondary_information_is_not_automatically_deferred(text, output):
+    state = turn(text, output)
+    assert state.deferred_needs == ()
+    if text == "999 pieces":
+        assert state.request.pieces == 999
+    else:
+        assert state.needs
+
+
+def test_independent_needs_and_exclusions_are_not_deferred():
+    state = turn(
+        "No BudgetWorks; start a new request",
+        patch(
+            needs=["scope", "constraint_change"],
+            exclusions=[{"workshop": "BudgetWorks", "imposed_by": "", "evidence": "No BudgetWorks"}],
+        ),
+    )
+    assert state.needs == ("scope", "constraint_change")
+    assert state.deferred_needs == ()
+    assert state.request.exclusions[0]["workshop_id"] == "W3"
+
+
+@pytest.mark.parametrize(
+    "text,updates,code",
+    [
+        ("usual quantities", (("pieces", "usual quantities", "usual quantities"),), "quantity"),
+        ("I'm not sure about the quantity", (), "quantity"),
+        ("either 2000 scarves or 2500 scarves", (), "quantity"),
+        ("The revised date is unknown", (("date_uncertain", "true", "date is unknown"),), "deadline"),
+        ("The revised date is unknown", (), "deadline"),
+        ("Revised deadline next Friday", (("due_date", "next Friday", "next Friday"),), "deadline"),
+    ],
+)
+def test_later_uncertainty_revokes_deferral_and_survives_selection(text, updates, code):
+    first = turn("TrendCart", patch(("customer", "TrendCart", "TrendCart"), needs=["order", code]))
+    assert first.deferred_needs == (code,)
+    # No new need code is required: existing pending state must react to raw evidence.
+    second = turn(text, patch(*updates), first)
+    assert code in second.needs
+    assert code not in second.deferred_needs
+    selected = apply_selection(second, "order_id", "ORD-017", "ORD-017", DispatchDesk())
+    assert selected.needs == (code,)
+    assert selected.deferred_needs == ()
+    result = preview_conversation(selected, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+@pytest.mark.parametrize(
+    "code,field,value",
+    [
+        ("quantity", "pieces", None),
+        ("quantity", "pieces", "0"),
+        ("quantity", "pieces", "broken"),
+        ("quantity", "pieces", "\u00b2"),
+        ("quantity", "pieces", "9" * 5000),
+        ("deadline", "due_date", None),
+        ("deadline", "due_date", ""),
+        ("deadline", "due_date", "2026-02-30"),
+        ("deadline", "due_date", "20260410"),
+        ("deadline", "due_date", "tomorrow"),
+        ("deadline", "due_date", 20260410),
+    ],
+    ids=[
+        "none-pieces",
+        "zero-pieces",
+        "bad-pieces",
+        "unicode-pieces",
+        "oversized-pieces",
+        "none-date",
+        "empty-date",
+        "invalid-date",
+        "noncanonical-date",
+        "relative-date",
+        "nonstring-date",
+    ],
+)
+def test_invalid_registered_field_promotes_deferred_need_to_blocking(code, field, value):
+    desk = DispatchDesk()
+    first = apply_patch(
+        Conversation(),
+        "TrendCart",
+        patch(("customer", "TrendCart", "TrendCart"), needs=["order", code]),
+        desk,
+        "Dispatcher",
+    )
+    assert not first.traces
+    assert first.deferred_needs == (code,)
+    order = next(row for row in desk.orders if row["order_id"] == "ORD-017")
+    order[field] = value
+    selected = apply_selection(first, "order_id", "ORD-017", "ORD-017", desk)
+    assert selected.needs == (code,)
+    assert selected.deferred_needs == ()
+    result = preview_conversation(selected, desk, ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert not result["candidates"]
+
+
+@pytest.mark.parametrize("duplicate", [False, True])
+def test_missing_or_duplicate_order_does_not_discharge_deferred_needs(duplicate):
+    desk = DispatchDesk()
+    first = apply_patch(
+        Conversation(),
+        "TrendCart",
+        patch(("customer", "TrendCart", "TrendCart"), needs=["order", "quantity", "deadline"]),
+        desk,
+        "Dispatcher",
+    )
+    order = next(row for row in desk.orders if row["order_id"] == "ORD-017")
+    if duplicate:
+        desk.orders.append(order.copy())
+    else:
+        desk.orders.remove(order)
+    selected = apply_selection(first, "order_id", "ORD-017", "ORD-017", desk)
+    assert selected.needs == ("quantity", "deadline")
+    assert selected.deferred_needs == selected.needs
+    result = preview_conversation(selected, desk, ObjectiveWeights())
+    assert result["resolution"]["status"] == ("AMBIGUOUS" if duplicate else "NOT_FOUND")
+    assert result["status"] == "CLARIFY"
+    assert result["input"]["clarification"] is None
+    assert "quantity" not in result["message"]
+    assert not result["candidates"]
+
+
+def test_mixed_deferred_and_independent_needs_preserve_exclusions():
+    first = turn(
+        "TrendCart, no BudgetWorks",
+        patch(
+            ("customer", "TrendCart", "TrendCart"),
+            needs=["order", "quantity", "deadline", "scope", "constraint_change"],
+            exclusions=[{"workshop": "BudgetWorks", "imposed_by": "", "evidence": "no BudgetWorks"}],
+        ),
+    )
+    assert first.deferred_needs == ("quantity", "deadline")
+    before = preview_conversation(first, DispatchDesk(), ObjectiveWeights())
+    assert "quantity using digits" not in before["message"]
+    assert "delivery deadline" not in before["message"]
+    assert "new, fully specified order request" in before["message"]
+    assert "Existing exclusions cannot be relaxed" in before["message"]
+    selected = apply_selection(first, "order_id", "ORD-017", "ORD-017", DispatchDesk())
+    assert selected.needs == ("scope", "constraint_change")
+    assert selected.deferred_needs == ()
+    assert selected.request.exclusions == first.request.exclusions
+    assert preview_conversation(selected, DispatchDesk(), ObjectiveWeights())["status"] == "CLARIFY"
+
+
+def test_explicit_pieces_before_order_selection_preserves_amendment_check():
+    first = turn(
+        "TrendCart, 999 pieces",
+        patch(("customer", "TrendCart", "TrendCart"), ("pieces", "999", "999"), needs=["order", "quantity"]),
+    )
+    assert first.request.pieces == 999
+    assert first.deferred_needs == ()
+    selected = apply_selection(first, "order_id", "ORD-017", "ORD-017", DispatchDesk())
+    result = preview_conversation(selected, DispatchDesk(), ObjectiveWeights())
+    assert selected.request.pieces == 999
+    assert result["status"] == "CLARIFY"
+    assert "quantity amendment" in result["message"]
+
+
+def test_legacy_unclassified_needs_remain_blocking_after_selection():
+    previous = Conversation(turns=({"speaker": "Dispatcher", "text": "TrendCart"},), needs=("quantity", "deadline"))
+    selected = apply_selection(previous, "order_id", "ORD-017", "ORD-017", DispatchDesk())
+    assert selected.needs == previous.needs
+    assert selected.deferred_needs == ()
+    assert preview_conversation(selected, DispatchDesk(), ObjectiveWeights())["status"] == "CLARIFY"
+
+
+def test_quantity_blocker_and_deferred_deadline_have_separate_lifecycles():
+    first = turn("TrendCart", patch(("customer", "TrendCart", "TrendCart"), needs=["order", "quantity", "deadline"]))
+    second = turn("usual quantities", patch(("pieces", "usual quantities", "usual quantities")), first)
+    assert second.deferred_needs == ("deadline",)
+    before = preview_conversation(second, DispatchDesk(), ObjectiveWeights())
+    assert "quantity using digits" in before["message"]
+    assert "delivery deadline" not in before["message"]
+    selected = apply_selection(second, "order_id", "ORD-017", "ORD-017", DispatchDesk())
+    assert selected.needs == ("quantity",)
+    assert selected.deferred_needs == ()
 
 
 def test_reference_and_raw_date_reach_allocator_without_model_arithmetic():
@@ -187,7 +450,14 @@ def test_unresolved_order_preserves_quantity_need(duplicate):
 
 
 def test_registered_quantity_fallback_preserves_other_needs():
-    state = turn("ORD-103", patch(("order_id", "ORD-103", "ORD-103"), needs=["quantity", "deadline"]))
+    state = turn(
+        "ORD-103 revised deadline",
+        patch(
+            ("order_id", "ORD-103", "ORD-103"),
+            ("date_uncertain", "true", "revised deadline"),
+            needs=["quantity", "deadline"],
+        ),
+    )
     assert state.needs == ("deadline",)
     result = preview_conversation(state, DispatchDesk(), ObjectiveWeights())
     assert result["status"] == "CLARIFY"
@@ -265,8 +535,9 @@ def test_ambiguous_order_clarification_is_not_repeated():
     assert result["resolution"]["status"] == "AMBIGUOUS"
     question = "Which order do you mean? Please confirm its order ID."
     assert result["message"].count(question) == 1, result["message"]
-    assert result["message"] == question + " Please confirm the quantity using digits."
+    assert result["message"] == question
     assert state.needs == ("order", "quantity")
+    assert state.deferred_needs == ("quantity",)
     assert not result["candidates"]
 
 
