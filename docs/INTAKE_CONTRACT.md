@@ -79,9 +79,9 @@ Retain the failed user message separately. Require Retry or New request before a
 different follow-up so a failed constraint-bearing message is not silently skipped.
 Retries are explicit; there is no background model-call loop.
 
-Group-chat request is the default mode; offline supplied examples remain one click
-away. Sending a
-message in that mode calls the configured provider and may incur its normal usage
+Typing a message is the primary input; offline supplied examples remain one click
+away. Sending a typed
+message calls the configured provider and may incur its normal usage
 charges. Read-only previews cannot create allocations. Saved-plan mode wraps the
 same validated input in a separate human-confirmed persistence workflow; the model
 never supplies commit authority or a confirming dispatcher identity.

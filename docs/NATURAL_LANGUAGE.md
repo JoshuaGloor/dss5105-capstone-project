@@ -2,9 +2,9 @@
 
 The Streamlit page has two input modes:
 
-- **Group-chat request (default):** submitted messages are interpreted by the
-  configured model, validated in Python, then passed to the same dispatch tools.
-- **Supplied examples (offline, no model):** the original development fixtures.
+- **Typed message (Start here box and the box under the answer):** submitted messages are
+  interpreted by the configured model, validated in Python, then passed to the same dispatch tools.
+- **Examples (scenario cards and the Examples list, offline, no model):** the original development fixtures.
 
 The first real-provider development run is documented in
 [CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md), including a blocking
@@ -116,7 +116,8 @@ The [intake contract](INTAKE_CONTRACT.md) specifies the schema and state rules.
 `src/dss5105/intake.py` accepts evidence-backed patches, preserves prior fields and
 exclusions, converts supported date/quantity phrases, and validates the request.
 `src/dss5105/chat_ui.py` manages explicit submissions, answer buttons, retry, reset,
-and session history. `src/dss5105/replies.py` builds the reply cards. `web_app.py` still renders the same deterministic candidate evidence.
+and the single answer view with its session history. `src/dss5105/replies.py` builds the reply cards, and
+`src/dss5105/cards.py` renders the same deterministic candidate evidence.
 
 The model extracts intent and fields using LangChain's structured-output interface.
 It cannot output numerical estimates, score weights, workshop allocations, or a
