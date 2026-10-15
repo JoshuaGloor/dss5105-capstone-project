@@ -55,7 +55,8 @@ render them identically.
 
 - The 30/30 inbox result is fixture replay on hand-written inputs. It tests the tools, not
   language understanding.
-- Simulator results are not factory results. Costs are source cost units, not dollars.
+- Simulator results are not factory results. Slide 5 shows costs in $ for readability; the
+  data gives cost per piece with no currency, so say so if asked.
 - Slide 9's AI-native items are a team proposal in [AI_NATIVE_PLAN.md](AI_NATIVE_PLAN.md),
   not built yet. Say "we plan", never "the desk does".
 - The deployment on slide 6 is the AWS pipeline merged to main (infra/, deploy.yaml,

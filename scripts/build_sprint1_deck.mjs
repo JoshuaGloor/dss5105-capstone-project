@@ -68,7 +68,7 @@ const TESTS = process.env.DECK_TEST_COUNT || '300'; // `uv run pytest` on 2026-1
 
 const pct = (x, d = 1) => x.toFixed(d) + '%';
 const num = (x) => Math.round(x).toLocaleString('en-US');
-const kilo = (x) => (x / 1000).toFixed(1) + 'k';
+const kilo = (x) => '$' + (x / 1000).toFixed(1) + 'k';
 const late = (row) => pct(row['% late']);
 const relChange = (a, b) => Math.round((Math.abs(a - b) / b) * 100);
 const lateBatches = (row) => Math.round((row['% late'] / 100) * BATCHES);
@@ -342,7 +342,7 @@ function source(slide, text) {
     ['Operational efficiency & risk reduction', 'No bounced batches: the course\u2019s own eligibility rule runs before anything is recommended.'],
     ['Transparency & auditability', 'A full record of the request, every option, the estimates, who set each constraint and who approved.'],
     ['Proactive exception management', 'An impossible date gets the earliest achievable date and the options: split, accept late, escalate.'],
-    ['Transparent cost-speed trade-offs', `${kilo(normal.lateness.cost)} cost units per run, against ${kilo(normal.cheapest.cost)} for always-cheapest (late on ${Math.round(normal.cheapest['% late'])}% of batches) and ${kilo(normal.random.cost)} for random.`],
+    ['Transparent cost-speed trade-offs', `${kilo(normal.lateness.cost)} per run, against ${kilo(normal.cheapest.cost)} for always-cheapest (late on ${Math.round(normal.cheapest['% late'])}% of batches) and ${kilo(normal.random.cost)} for random.`],
   ];
   items.forEach(([h, b], i) => {
     const y = 1.45 + i * 0.83;
@@ -350,7 +350,7 @@ function source(slide, text) {
     T(s, h, { x: 4.85, y, w: 4.55, h: 0.28, fontFace: HEAD, fontSize: 14 });
     T(s, b, { x: 4.85, y: y + 0.29, w: 4.55, h: 0.48, fontSize: 10.5, color: C.inkSoft });
   });
-  s.addNotes(notesFor(5, [`Q&A: cost per replay ${num(normal.lateness.cost)} for our desk, ${num(normal.random.cost)} for random, ${num(normal.cheapest.cost)} for cheapest; ratio to cheapest ${costRatio.toFixed(2)} (source cost units, not dollars).`]));
+  s.addNotes(notesFor(5, [`Q&A: cost per replay ${num(normal.lateness.cost)} for our desk, ${num(normal.random.cost)} for random, ${num(normal.cheapest.cost)} for cheapest; ratio to cheapest ${costRatio.toFixed(2)} (shown as $; the data gives cost per piece with no currency, so say so if asked).`]));
 }
 
 // ---- 6. Progress: evidence and deployment ------------------------------------------------
