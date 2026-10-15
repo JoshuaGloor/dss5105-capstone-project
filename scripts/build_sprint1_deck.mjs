@@ -140,7 +140,7 @@ function source(slide, text) {
   // Alphabetical by name, in the attendance format the course asks for.
   const members = [
     ['Chen Zepeng', 'A0156784N'], ['Duong Thanh Nhan', 'A0296326W'], ['Joshua Wesley Gloor', 'A0296944J'],
-    ['Niyanthri Rajeswari Sridhar', 'A0351151U'], ['Sundara Rajan Saadhvika', 'A0352594W'], ['Tang Zheling', 'A0352177B'],
+    ['Sridhar Niyanthri Rajeswari', 'A0351151U'], ['Sundara Rajan Saadhvika', 'A0352594W'], ['Tang Zheling', 'A0352177B'],
   ];
   members.forEach(([name, id], i) => T(s, `${name} (${id}) \u2014 Present (in person)`,
     { x: i < 3 ? 0.6 : 4.85, y: 4.47 + (i % 3) * 0.19, w: 4.2, h: 0.18, fontSize: 8.5, color: C.onInk }));
