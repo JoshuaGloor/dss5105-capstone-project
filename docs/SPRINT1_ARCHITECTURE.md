@@ -1,86 +1,97 @@
 # Sprint 1 architecture and walkthrough
 
-Use [the SVG](sprint1-architecture.svg) on a presentation slide. It is a standalone
-vector image with a widescreen canvas; it can also be opened directly in a browser.
-The diagram distinguishes implemented tools, the product prototype, and planned
-language/state features. It is a target architecture with current status labels.
-The language path is now implemented and tested with fake models; real-provider
-the revised live evaluation is pending. Local durable confirmation is implemented;
-held-out chat evaluation and full explanation review remain planned.
-The Streamlit web interface now runs live Python previews with native controls.
-The standalone HTML remains the design prototype and opens directly in Chrome.
+The [reviewed deck](slides/reviewed/Presentation_Group11_Sprint1.pptx) contains an
+editable architecture diagram at module level: components, data flows, data stores and
+the trust boundary. The [standalone SVG](sprint1-architecture.svg) shows the same system
+at a higher level. The diagram describes the implemented local prototype. Language
+accuracy, held-out evaluation and dispatcher usability remain unverified.
 
 ```mermaid
 flowchart LR
-    U[Streamlit web UI: implemented preview] --> L[Language extraction + clarification: offline-tested]
-    U --> V
-    L --> V[Validate structured request: implemented]
-    F[Draft inputs: offline development only] --> V
-    D[Course orders + workshop register] --> V
-    V --> R[Resolve order + hard constraints]
-    R --> A[Existing Python estimates + weighted scorer]
-    A --> E[Candidate evidence + exception states]
-    E --> U
-    U --> C[Explicit confirmation in saved-plan mode]
-    C --> S[Versioned queues + SQLite audit: implemented]
-    S --> V
-    A --> H[Shared simulator: policy evaluation]
-    L -.-> Q[Chat behavior + faithfulness evaluation: planned]
-    E -.-> Q
+    CHAT[Group chat] --> DESK[Streamlit desk: web_app.py, chat_ui.py, replies.py]
+    DESK -->|message| IN[intake.py]
+    IN -->|message, earlier turns, draft, names| LLM[LLM provider: outside the machine]
+    LLM -->|typed patch| IN
+    IN -->|DispatchInput| CORE[dispatch.py + allocator.py]
+    CORE -->|preview for review| DESK
+    DESK -->|Confirm, name, retry key| REC[records.py]
+    REC -. saved queues, recompute .-> CORE
+    CORE --> HAR[harness.py: course simulate.py, unmodified]
+    CORE --> DATA[track2/data: orders.csv, workshops.csv]
+    REC -->|BEGIN IMMEDIATE| DB[runtime/ SQLite: records, queues, revision]
+    EVAL[evaluate.py: offline, no model] --> HAR
 ```
 
-## What to say about the design
+The model call in `intake.py` is the app's only outbound call. Locally the app binds to
+127.0.0.1; on AWS it runs in a container behind Caddy with a password (see
+`docs/DEPLOYMENT.md` on main). Streamlit telemetry is off in both. The model never
+receives prices, queues or defect rates.
 
-The browser displays the Streamlit application. Streamlit calls the Python tools
-directly; a separate frontend framework or REST service is not required for the
-first version. The group-chat mode (the default) uses model-extracted, validated
-patches and answer buttons; offline examples use fixtures. Keep conversational session state separate from durable allocations.
+## Technical explanation for Q&A
 
-The language layer interprets what the dispatcher means and asks questions when
-necessary. It does not calculate dates, costs, probabilities, or allocation scores.
-Structured inputs cross a validation boundary into Python tools. Eligibility and
-explicit exclusions are hard constraints; objective weights affect ranking only
-inside the permitted set. The same scorer serves both the application and the
-shared policy evaluation, while chat behavior has its own evaluation path.
+This is one assistant workflow with deterministic Python orchestration. The LLM
+extracts quoted request fields through LangChain structured output. It does not
+choose tool calls autonomously, negotiate with other agents, or calculate estimates.
+Python validates fields, resolves orders, preserves restrictions, asks clarification
+questions and produces the displayed answer. `get_model()` reads the configured
+`LLM_MODEL`; no model name is fixed in the architecture.
 
-Comparisons are previews on the same snapshot. Saved-plan mode commits only after
-human confirmation and a current-state check, using SQLite transactions. Independent
-previews and the HTML reference retain the demo-only confirmation interaction.
+Session memory means Streamlit server-side session state: conversation turns,
+draft fields, unresolved questions, provenance and extraction traces. It is ephemeral
+and limited to the active conversation. We have no vector database, retrieval system,
+long-term model memory or LangGraph graph in this implementation. Those components
+should appear only if a future feature needs them.
 
-One well-tooled dispatcher agent is the starting design. No DeepAgents or multi-agent
-architecture is required for this boundary. Add orchestration complexity only if
-we can demonstrate its benefit on concrete cases.
+In agent terms, this is a workflow agent: the track's "single well-tooled dispatcher".
+The LLM and the tools run on a fixed code path, so the model never chooses a tool. We
+chose this over a ReAct loop because every request needs the same checks in the same
+order, and over a multi-agent design because the track says a plain dispatcher with
+excellent tools beats a multi-agent conversation. The deck calls session state
+short-term memory and the SQLite store long-term memory: the model keeps nothing between
+turns, but Python resends the conversation each turn, and later previews read the saved
+planning queues. Sprint 2 adds tool selection for read-only capacity questions only.
 
-## Proposed Sprint 1 story
+Confirmed decisions are a separate kind of state. SQLite stores reviewed evidence,
+the dispatcher identity, state revision and updated planning queues. A transaction
+rechecks the preview against current state. Unique order IDs and idempotency keys
+protect against duplicate saves. The identity is self-declared, not authenticated.
+The local plan does not book a real workshop or drain queues with wall-clock time.
 
-The course format is five minutes plus two minutes of questions; this timing split
-is our proposal, not an additional course rule.
+The simulator calls the same allocator directly, without any LLM. It measures
+allocation policy performance. Separate chat evaluation must measure extraction,
+clarification, refusal and explanation accuracy. Fixture replay and offline tests
+do not establish real language accuracy.
 
-| Time | Content |
-|---|---|
-| Opening minute | Factory chat problem, invalid workshop / missed-date risks, business value |
-| Next minute | Declare primary and success criteria; show other/hybrid tradeoffs with retained evidence |
-| Next minute | Architecture: language understands, tools calculate, dispatcher confirms |
-| Next minute | Brief prototype walkthrough; identify implemented vs planned parts explicitly |
-| Final minute | Evaluation plan, assumptions, risks, ownership and Sprint 2 roadmap |
+The new workshop-capacity workspace calls `query_register` and `probe_load` directly.
+It estimates delivery for a hypothetical batch and shows the effect of more work
+ahead of it. Those tools never reserve capacity. Natural-language routing for these
+questions remains planned.
 
-The objective slide cannot be finalized until the team decides. Do not substitute
-the prototype's default for a justified objective declaration.
+## Speaking scope
 
-## Rehearsable prototype path
+CHEN ZEPENG presents the opening, problem and architecture. Target speaking time
+is 1 minute 45 seconds, leaving a buffer inside the allocated 2 minutes. The
+[plain-language script](slides/reviewed/Opening_Script_Group11.txt) also appears in
+the deck's first three speaker-note pages. The remaining slides cover the objective,
+business value, progress, risks and roadmap within the course's total presentation time.
 
-1. Start on R25: the instruction excludes BudgetWorks. Switch lateness / defects /
-   hybrid and inspect the tradeoff on identical queues. Show the exclusion evidence.
-2. Select R08: FreshStart cannot accept the batch. Show the refusal reason and
-   alternative without pretending it was automatically allocated.
-3. Select R03 or R05: ambiguity or an unknown revised date blocks a recommendation.
-4. Select R21: the request explicitly asks for cheapest while meeting the date.
-   The request preference overrides global presets and filters infeasible candidates.
-5. In Streamlit, switch to Saved local plan, review an on-time recommendation, enter
-   the dispatcher name and confirm. Show the saved record and changed queue evidence.
-   Independent mode and the standalone HTML still demonstrate confirmation only.
+The team has agreed on minimise lateness as the primary objective. The reviewed deck
+declares "Primary objective: minimise lateness", measured by late fraction and mean
+late days.
 
-Use one or two cases if time is tight. R20 demonstrates an infeasible delivery date;
-R13 demonstrates unavailable quote data. These are development fixtures, not a live
-language-agent performance demonstration. All displayed numerical estimates are
-generated by the same Python service used by the CLI.
+## Offline demonstration
+
+Start with `sh scripts/run_app.sh`, then open the displayed local address in Chrome.
+Choose **Supplied examples (offline, no model)** and **Independent previews**.
+
+1. R25: a workshop exclusion remains in force when priorities change.
+2. R08: the suggested workshop is refused with a reason and an alternative.
+3. R03 or R05: missing details block a decision and prompt clarification.
+4. R20: an impossible date shows estimates and options, with confirmation disabled.
+5. **Workshop register (offline)**: check a batch against an explicit date,
+   then compare delivery before and after extra work. The queues remain unchanged.
+6. **Saved local plan**: review an on-time in-progress order, enter the dispatcher
+   name and confirm. Show the saved record and changed planning queue.
+
+Capacity updates only after dispatcher confirmation. Independent-mode confirmation
+is a session demonstration and never saves an allocation.

@@ -1,0 +1,72 @@
+Speaker script, Group 11, Sprint 1 (16 Oct 2026)
+Hard stop at 5:00. About 670 words: 4:26 at 150 words a minute, 4:49 at 138.
+scripts/build_sprint1_deck.mjs copies each section into that slide's speaker notes.
+Numbers come from docs/evidence/*.json; if the evidence changes, update both.
+
+SLIDE 1 - Opening (CHEN ZEPENG, 0:25)
+Good evening, we're Group 11. SweaterCo is a knitwear factory that lives on quick
+reorders. When the factory is full, the next batch has to go to one of these eight
+workshops within the hour. We built the desk that makes that call, shows its working and
+keeps the record. Our primary objective is to minimise lateness.
+
+SLIDE 2 - Problem (CHEN ZEPENG, 0:40)
+Today, that decision is one line in a group chat: send it to QuickStitch. Behind it,
+someone is answering three questions from memory. Can they make it? Half of them can't
+make a scarf. Can they take it now? QuickStitch, the fastest, is booked solid for four
+days. Are they allowed to? OldMill is suspended, and FreshStart is on trial, capped at 300
+pieces. And only 7 of this morning's 30 messages are straightforward. Get one wrong and
+the batch bounces back a day later, which in a ten-day cycle wipes out the margin.
+
+SLIDE 3 - Solution and architecture (CHEN ZEPENG, 0:40)
+So instead of one person juggling all that, we built one dispatcher agent, run as a fixed
+workflow. On the left, the model reads the message through LangChain. It's the only thing
+beyond this dashed line, and it never sees a price or a queue. Every value must quote the
+message's exact words, or Python rejects it, and anything missing becomes a question, not
+a guess. In the middle, Python tools work out who is eligible and when each workshop would
+deliver. On the right, a person approves. The session remembers the conversation; the
+database remembers every decision.
+
+SLIDE 4 - Primary objective (0:35)
+We declare one objective: minimise lateness. In quick response, speed is the product: a
+defect can be reworked, a missed reorder date loses the sale. We count late batches and
+late days. Here is the scoreboard, wins and losses. Lateness: we beat all three baselines.
+Defects: biggest-capacity still beats us. A surprise closure moves us a quarter of a
+point; random moves four. Fairness: random spreads work more evenly, but it is late a
+third of the time.
+
+SLIDE 5 - Business value (0:30)
+What does that buy? Out of 120 batches, 2 arrive late instead of 41: ninety-five percent
+fewer than random. That's the course simulator, not a factory. And no batch goes where it
+can't be made, every decision is on record, and an impossible date is flagged on day one,
+with options. The price: about a third more than the cheapest rule, which is late nine
+times in ten.
+
+SLIDE 6 - Progress (0:35)
+The shipped baselines run a third to nine-tenths late; we're under two percent. The
+honest part: a ten-second earliest-finish rule ties us, because two batches of 2,000
+pieces simply can't be made in their window. So what we add isn't a better formula, it's
+configuration. The same code, re-weighted, buys 7.7 percent lower cost and 23 percent
+fewer late days for one more late batch per ten runs. And it's deployed: every merge
+builds an image to ECR, and one workflow deploys it to AWS.
+
+SLIDE 7 - The desk today (0:25)
+This is the desk on request R25: five hundred vests, keep it away from BudgetWorks. The
+exclusion is recorded against Mei, who asked. Under the pick, the desk says why, in lines
+Python writes, not the model. All thirty inbox requests reach the right outcome from
+hand-checked inputs; testing the live model on them is our first Sprint 2 task.
+
+SLIDE 8 - Risks and assumptions (0:30)
+The worst failure in this track is an invented delivery estimate; our design prevents it
+and we check it automatically. The likeliest is a misread request: in our first live run,
+a needless question blocked a refusal. And no message can talk past the rules: eligibility
+is Python, not the model. Our key assumption: a person confirms every allocation.
+
+SLIDE 9 - Sprint 2 roadmap (0:25)
+Sprint 2 makes the desk AI-native, while tools keep every number. The evaluation set comes
+first, with injection and hallucination bait. Then the model takes on three jobs: choosing
+a read-only tool for questions, explaining decisions, and drafting replies, with Python
+filling in every number. Our bar: the right behaviour on at least twenty-seven of thirty,
+with no untraceable number, while still beating every baseline. Thank you.
+
+SLIDE 10 - Questions
+Q&A crib notes are in this slide's speaker notes.
