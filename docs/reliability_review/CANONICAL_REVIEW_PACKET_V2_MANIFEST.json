@@ -1,0 +1,209 @@
+{
+  "packet_version": 2,
+  "created_at": "2026-10-15T05:38:18.542871+00:00",
+  "canonical_source_artifact_paths": {
+    "after": "D:\\DESKTOP\\dss5105\\Capstone_Project\\dss5105-capstone-project\\results\\chat-current-reliability-first",
+    "before": "D:\\DESKTOP\\dss5105\\Capstone_Project\\dss5105-baseline-bea5028\\results\\chat-baseline-bea5028-first"
+  },
+  "canonical_source_selection": "AFTER request envelope; BEFORE exact identity and both recorded human-message latest_user_message values verified. No reviewer document supplies request wording.",
+  "before_after_identity": {
+    "identical": true,
+    "count": 30,
+    "fields": [
+      "request_id",
+      "time",
+      "requester",
+      "text"
+    ],
+    "comparison": "Exact string equality; no normalization",
+    "recorded_human_message_text_identity": true
+  },
+  "request_hash_method": "SHA-256 of exact UTF-8 request text only; no BOM, appended newline or normalization.",
+  "request_set_serialization": "UTF-8 bytes of a JSON array of the 30 exact request strings in R01 through R30 order, generated with json.dumps(texts, ensure_ascii=False, separators=(\",\", \":\")); no BOM, no trailing newline, no whitespace or Unicode normalization. IDs, senders and timestamps are not included in this set digest.",
+  "request_set_sha256": "d54a71a8d7c2ef1a53fdcd2ea81f076310fa3d5fef74d85b973febede7f20826",
+  "per_case_request_hashes": {
+    "R01": "ddc040e3a9230808fd7e5462af36f1f14ea70723e711f5541e2396f35acb7e29",
+    "R02": "b9dc655a61da624620cc7767b2614e629a4613778bfcaee70110afb68fde66e2",
+    "R03": "6048f29da6e157bd2c79e0db180373e3c81ad280be4f8cc7f6fe2ef7a4b68094",
+    "R04": "114f8a102862e0ba5e2b20fe9587a99b88700c031307c4bd74e90f2d7d3c4447",
+    "R05": "f358cd77f5d4ecd41b4b01d2b4d2a001c361be8c067627497274de161fd8cb61",
+    "R06": "710f0061ebc15ac46166ea8be18314fa171506528404e3dea51057a6acdef76d",
+    "R07": "19c22922484cd7934338cab776473ec507694a253ea2a0b0cbc6a2f69df929cd",
+    "R08": "666e117c272ff21604a89bd9f71b412ce86bb815fafed0469010552ffa54c738",
+    "R09": "206219e0024b58db7ecad9e76fe657d0a647a7bc64ab436d04ca095191a88fd0",
+    "R10": "c09e04efb77f9ecc1acb54558056296c659c774288a29ab46d2e64b2f293a513",
+    "R11": "02ea2fab61318cb7c91d759bcb85d7d3da0e4aa5014c5f239e645a6dc45c76a8",
+    "R12": "4ca35445d1e4be415b7938a597aa2f4891c62e0a92fb8002fedd4fb1dc301dcc",
+    "R13": "2f1fc89a24f1332d91ed638cc5e21f189de0c1e5d2dc9e0cceb2fc14a06a9cdc",
+    "R14": "1c734070be0d8ee9297edffcad56ac4e319120ab2ae7afe5d8c0e3a2d8962112",
+    "R15": "b999dfebf7a1151f322a5659cbb2ae91785e90b79299675cc08fd7930caaf5cf",
+    "R16": "9e7c3ae8df8e9cafe6802cc78f8f0605d15a24c26f97370959b051ca8dd5d2b2",
+    "R17": "f79064caa3ae9779603710613077ed6087ce3df8fa38d89b8a3534f532feb82f",
+    "R18": "947f23ef009e7ac4a0ce575395f8b2dea852d148800501d8d282bcdaa1abe735",
+    "R19": "ab4cba80b8a585684569d94dbfa2dc5f1d8cecc99650dd6dc72225922f903d8c",
+    "R20": "08f8db112a10dd463ee417604939e6a573636a681232140e72892422c5252145",
+    "R21": "b2909c3004ad3ffd91f404da890a6b82ae4402f2f010805a997e60394393bc90",
+    "R22": "3c9d51df4b90fc4a2ce4f13b4c27231ea91c8f488cc873a8eb58facff66353e6",
+    "R23": "380044b8bad4e7ddd16eb8dbc2cd054eff6be2d47dc245902bb9f031a6c9f8d0",
+    "R24": "a784d5e1fd3e3e3b3165950b25b5c36a3ae03ea00efea6b7d9279726b73c8db2",
+    "R25": "546b35a166ebefc93ca7c45a0fe1b0718764c3ec3d717a23c12a4dc9c1272aed",
+    "R26": "ca1534dab3aef252f9fa99694e61b1b9bb900f1e2fd75b3cb554646f5e2d631d",
+    "R27": "bdcb4bdaeef412588e46fb97547f3f71f610225c0345bc74346e334ed0ae25d7",
+    "R28": "0115f66dcabd2b94733678a71bc33413db5d17021941183dd37860da35b1db96",
+    "R29": "6e96bc9ae75fdd8fff1064f600b300f21b6bf47e63c9442eb702b9893f664c16",
+    "R30": "7ee4ececebfea06ca0b219d6c86ffbdf17aa956f007443bb356591ff5992ca7a"
+  },
+  "workshop_source_sha256": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+  "orders_source_sha256": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+  "task_rule_source_hashes": {
+    "docs/DATA_FINDINGS.md": "52631c0b446277504376d28c027af0e241370464ef37d4878b3c67ea1c24b517",
+    "docs/PROJECT_BRIEF.md": "f215e2f8e2cff73ba7f2dab9230aef9c510e462209307169b4fe070513f88b86",
+    "docs/TOOL_SPEC.md": "ed8a2fc81158de8a6e9f14292f38e196a1f065579d7b8efe1924c5c2aa0ad3f1",
+    "src/dss5105/evaluate_chat.py": "33e5b1425829964aef1f23b2c2c4d0dd5d0c9fa07df43f41d9588baab403d1fd",
+    "track2/data/data_dictionary.md": "10940ea58568be8b853946e5894eccd31f652d3844f27139a8b37f9600b4c3e1",
+    "track2/data/orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+    "track2/data/workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+    "track2/harness/simulate.py": "b845804ad1229f593627b6ef1a6482258331178dbc4ec535274103fc3244593b"
+  },
+  "source_hash_mode": "raw bytes SHA-256",
+  "task_rule_provenance": {
+    "G01": [
+      "track2/data/data_dictionary.md"
+    ],
+    "G02": [
+      "track2/harness/simulate.py",
+      "track2/data/data_dictionary.md"
+    ],
+    "G03": [
+      "track2/harness/simulate.py",
+      "docs/DATA_FINDINGS.md"
+    ],
+    "G04": [
+      "docs/DATA_FINDINGS.md",
+      "track2/data/data_dictionary.md"
+    ],
+    "G05": [
+      "docs/DATA_FINDINGS.md",
+      "track2/data/workshops.csv"
+    ],
+    "G06": [
+      "docs/PROJECT_BRIEF.md",
+      "docs/TOOL_SPEC.md"
+    ],
+    "G07": [
+      "track2/harness/simulate.py",
+      "docs/TOOL_SPEC.md"
+    ],
+    "G08": [
+      "track2/data/data_dictionary.md",
+      "docs/DATA_FINDINGS.md",
+      "docs/TOOL_SPEC.md"
+    ],
+    "G09": [
+      "docs/PROJECT_BRIEF.md",
+      "docs/TOOL_SPEC.md"
+    ],
+    "G10": [
+      "src/dss5105/evaluate_chat.py"
+    ],
+    "G11": [
+      "track2/data/data_dictionary.md"
+    ],
+    "G12": [
+      "docs/TOOL_SPEC.md"
+    ]
+  },
+  "task_rule_scope_note": "CSV and simulator hashes match both frozen manifests. Documentation hashes identify the locally inspected rule sources; they are not claimed to be archived documentation snapshots from the live runs. Only general task rules were transcribed, not case labels or historical results.",
+  "input_artifact_file_hashes": {
+    "before": {
+      "manifest.json": "5be209b51537d38ec635b2cf428c06c285e484ddefbffd09fbab13363947347d",
+      "R01.json": "3d500286c9d21ba367907d4734238ad1e32f708d2df3b1af14290d5a2230970d",
+      "R02.json": "8afec1b6f94522562acb73e2efd7af2000a7d5e4a864453dc5ad8bf33897c856",
+      "R03.json": "ce856256c253dae583519fe89618c70b24469d0a276ee7eb8a10f793b091d7a5",
+      "R04.json": "c21784623fcdf609b18fe3d28eaa7d228ccde594babbf20b563b2a8e63119a39",
+      "R05.json": "d4be489c248ac996f714664de07796ce430183e61d346b5b40fe9ae0a6efebf1",
+      "R06.json": "5ea68a87b6dca223b9d9ef5d3e523532f7a360b9b2f2230ee69f7960c4e2bad5",
+      "R07.json": "5370edc369b032675c0fff5d85785dfe2975ee4777479ea822bcc2ee469847ea",
+      "R08.json": "5810192923e39df51bc292b3c550e41d952f8de5b3e42cb7f4cf20a76f281da3",
+      "R09.json": "b8bee32840733b5fe78d38e0866e379f6747badf3a5af91acd400eab626ca897",
+      "R10.json": "37a3487f6401549eeccdc2f0a9a26e5c37c52a0587e51470d34427682c6b10e3",
+      "R11.json": "143a484998ce77388be810a9e6ab5fe14989efdab04fde42a2f6e560be9586f5",
+      "R12.json": "5c36fc289eb91a554c99065a5805f7db58790d5fc36198e01abb8d95b3e8335f",
+      "R13.json": "d21c0b4ccc12c1e3eb335fc6c73330413434c334c20f46e37e5ac542e981f7c5",
+      "R14.json": "1183c90b99baa9385442c420305f67665c84957cb9def852b412a0087f0e202e",
+      "R15.json": "ff26e3ced7e8d3e10fce4c3f5fb8957f56ba6d1925fe8aa58f5767497f55c854",
+      "R16.json": "326d5a67fbb35b56525c5ca9f7fd6a7d255d6bebae4e451eac085d54a1deb912",
+      "R17.json": "655fd5ea802cac5926ae6f77a82aea58a13602608f008e1983a0e34c10c77431",
+      "R18.json": "8e16f449d4a359b63abec7e48aba111ac706c5323bd1b9f051cfded15dc8f8b7",
+      "R19.json": "96ca463969af36cbd14eef4b0184248db3c3ff1fcbb531bf177933b8fb66ce10",
+      "R20.json": "e10d9025a26bc6e846174d8492c5df2c14736c8e0c69e5bf84d720f7a86ec265",
+      "R21.json": "53eca95ad4b56cf75c39abe62f2ad1d19d9a8700487b2e866702c7f82b3c9062",
+      "R22.json": "11f5b90bb460b1f438de0ef9f49f9d0f8a062b59fcb20cfb67e729f9277569e7",
+      "R23.json": "1c8093cccb550134716e1022fbaa325a0d8ddd34612a9e41cd9bc5331167a72a",
+      "R24.json": "f3905ff547a3ef82e41f93a90dad36f53f61af32a55962c722af7cfb94fda222",
+      "R25.json": "3310dbfb7fafd08b8db3ec0232e708d0909a66851835a85732ca7b7d479877ed",
+      "R26.json": "3ecec5b0abe0768d89d9d8bd7162dc2e36481bf08f0b4dde281e207e4d0d59c6",
+      "R27.json": "2ef73a8be27235e6e7a505f9a603840fade0b5e4e966c93663fc7ac3d2c5a702",
+      "R28.json": "f1e57540ceb3f389dc0c8bdbb7b9cb5c4a32298789c9ad4eda5983e40524e736",
+      "R29.json": "018049ad23b836c28a4ceb4ea5144012054f20fc6f07f14463232dade800ae7a",
+      "R30.json": "c9a7c40061bd50720b97f1c2c2b93ae4d00d822f3a709cd4f4fd747416646634",
+      "source_snapshot.json": "a2d67dd99fdf61d9251b82a8776514c1f06aa431dc4de050ab8727a6770a7ecd",
+      "summary.json": "94e1b0606ccdc53f3225caaac8bb52baf41dba4d15f8203ae26ad3d9201e5e29"
+    },
+    "after": {
+      "manifest.json": "192a16bcbb47a9f894c861f65a3d5e1f84d0f0c00dec9725095d5daa29a366ba",
+      "R01.json": "22629a2caeaf0505b50746d8c6d84d8cdda39688a65781404520f4435aa3e07f",
+      "R02.json": "f6ac07a71a76afb1ccb46786ee5a80396df8e81e96af6315bfb2c2343025a431",
+      "R03.json": "8271c7b0b6273283c0181dff9da37983daf7357ce90652517001a6cc09a0525a",
+      "R04.json": "34bc5f0c5e9ca8a8bb796689d8f19fe809af0cde671b3e1164f125a452090ef6",
+      "R05.json": "24103262cf7b72b5b489914d151d20a321349695b256f42dfcfd2391e7170d7f",
+      "R06.json": "4a90a98fee48e768ed2b460451a2d7c45b7b831cb223ff462fd078032b08f769",
+      "R07.json": "91d050742b929a9c579dd4887cfab2eaa1dfd101724bcfbf14834eae62b72088",
+      "R08.json": "eeb1914fd05d7b4236e99db79b9f5a8a8c3e7cbf6098a9b0f173e054a5fa89d7",
+      "R09.json": "c582b0316c8bb582e060970a7a72d664a81d8325de27d777ee48301371e85dcf",
+      "R10.json": "74713c6d158a76bd4e1b06eb4932db1d46d061189634ccb0dd0236f2f09844ce",
+      "R11.json": "a8893a5b03a11b2781574bb2d84cab578078121c64eec441337db69578f3bdfc",
+      "R12.json": "888c13d927fea06f944ec8086cc150c57d20e1240fb7d61acf921b690407f312",
+      "R13.json": "befc84b7f6c5c3c0a80a4ece6b2895c903e14f33d7240f9513102a1151aea0e2",
+      "R14.json": "f036df729ce84d7f3277fe1090e2b3fcdda9efefee52c29f54bccf320bb50245",
+      "R15.json": "675750ff49bffd116212de8271b471febe7b1144a55cc3999bce67763e2d8027",
+      "R16.json": "dd9537038d922a4e85cfca8039c3dab634a843a3021225e8c0b15d5d59d69ed5",
+      "R17.json": "c3f3611e082b3338045bae23565fbba821ffeac0292c25abbcfa2091d5445891",
+      "R18.json": "cb86727ec0cf43715770ac51b1904ed0f99573b66a16e22c5ac0d4c178f34d12",
+      "R19.json": "5883e8568ace660eb0c236394dc9eac720969fb6ce9ba09f9519a261e103887d",
+      "R20.json": "d837a454ce592ca2a5646cc26c963a94cda63b995fa32e54ffdafe0f0afcc56b",
+      "R21.json": "f5fd4a1947d4937e18c27177d6f916a8e05b3e2f928d2d46ae6428e5a5736b50",
+      "R22.json": "e7dc30acf4a3f039d25917e4a579315d8c42b347477d8435572c2ef8103ceba5",
+      "R23.json": "927e28f98e045f5af15c1fc36723445c2102600cdf04fa5ff51bcb6114d01b1d",
+      "R24.json": "6e171d66808906f92288693ad02edf4549140c78513b6916c3b1675c8bd3a72e",
+      "R25.json": "91dbc4d159f24d9196196dcecc898a67ef19a32b714149c33e13abf08fca255c",
+      "R26.json": "37ef22b60de88d3839742290496d6434f660d5629e1a6ce8cfa794926f7b9b37",
+      "R27.json": "5128d4196bc0cdb3b70f1654d920fb466c90f45d586af31a67daa4c9d35f83d5",
+      "R28.json": "7c440baf1d3ff70b69e0af7c8e9eca2e602efabf7e11324c4c41266ec778ad57",
+      "R29.json": "82faec9561fb6e9594fba2c72b9efea5e21053ef0c40a4668369ad9bf869010e",
+      "R30.json": "46991a0e08938d90444542956adb2894fc796ab98815b61258efd36dbc175c42",
+      "source_snapshot.json": "c79e7b87e0d88ae9e471d9de1b8e1424fef0d8df1ce5446b778941af86027b4a",
+      "summary.json": "4264acc62e03a3ce50c3e33bfbe436d31da86696f7a575825f1364911e89b9f2"
+    }
+  },
+  "generated_packet_file_hashes": {
+    "docs/reliability_review/CANONICAL_AI_REVIEW_PACKET_V2.md": "2439634cf7397f9fa6b612a0e083e72a3d8a3b03eedda4e00b04decba3b586d7",
+    "examples/canonical_ai_review_packet_v2.json": "c00c49cd8509b6c6e67641a44cc172daba98b85a7f9c6c44a2e242f319d01171",
+    "docs/reliability_review/AI_REVIEW_RESPONSE_TEMPLATE_V2.md": "db00b7b579950607eeb73c55f940661f5da2298f617e504131214996003e55d2"
+  },
+  "manifest_hash_note": "Manifest excluded from its own hash map to avoid self-reference. All three reviewer payload files are hashed.",
+  "validation": {
+    "case_ids_unique_and_ordered": true,
+    "exact_before_after_match_count": 30,
+    "per_case_hashes_recomputed": true,
+    "request_set_hash_recomputed": true,
+    "markdown_request_blocks_match_json": true,
+    "review_fields_blank": true,
+    "no_expected_answers_or_prior_votes_copied": true,
+    "no_model_outputs_or_run_results_copied": true,
+    "no_live_calls": true,
+    "no_scorer_execution": true,
+    "protected_existing_files_count": 103,
+    "protected_existing_files_unchanged": true
+  }
+}

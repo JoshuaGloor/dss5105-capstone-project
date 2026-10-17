@@ -1,0 +1,4032 @@
+{
+  "schema_version": "reliability-case-v1",
+  "artifact_kind": "canonical_ai_consensus_benchmark_v2",
+  "annotation_status": "ai_consensus_pending_human_adjudication",
+  "independent_gold": false,
+  "freeze_status": "pending_human_adjudication",
+  "canonical_request_set_sha256": "d54a71a8d7c2ef1a53fdcd2ea81f076310fa3d5fef74d85b973febede7f20826",
+  "context": {
+    "as_of": "2026-04-01",
+    "queue_mode": "independent_workshops_csv_snapshot",
+    "scope": "registered_order_preview",
+    "objective_weights": {
+      "lateness": 1,
+      "defects": 0,
+      "cost": 0,
+      "deadline_buffer_days": 0
+    },
+    "explicit_preferences_override_weights": true,
+    "source_sha256": {
+      "track2/data/dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+      "track2/data/orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+      "track2/data/workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+      "examples/chat_rubric.json": "3d5a17380de57ba5f78c3e627e077213493e13e806ba073f0b8ef7202c71a5d5",
+      "examples/dispatch_inputs.json": "6c0f29f6e6f5b6e8d38f6e22b160d014dbe83445628822db4863f1238801c201",
+      "docs/CHAT_EVALUATION_RESULTS.md": "8ef353e2f8ac3b1d8b6f9f2134da0b04b1238a706b15fa7dd41d97eef2743826",
+      "tests/test_intake.py": "ad7d0f6a90c977d6c29122a71d5360074ddbe391aaf54ad3ec35b190e3d2b9ea",
+      "tests/test_dispatch.py": "abac3594c8bcff84e6080c24275fb2f4e7298fda6d8d2cabab4840f4a3879da7",
+      "tests/test_chat_ui.py": "7a9b887d43603db54bf561d09d833d9aa2692409d113926685720a3ec81dda02"
+    },
+    "source_hash_modes": {
+      "track2/data/dispatch_requests.txt": "raw_bytes_sha256",
+      "track2/data/orders.csv": "raw_bytes_sha256",
+      "track2/data/workshops.csv": "raw_bytes_sha256",
+      "examples/chat_rubric.json": "normalized_text_sha256",
+      "examples/dispatch_inputs.json": "normalized_text_sha256",
+      "docs/CHAT_EVALUATION_RESULTS.md": "normalized_text_sha256",
+      "tests/test_intake.py": "normalized_text_sha256",
+      "tests/test_dispatch.py": "normalized_text_sha256",
+      "tests/test_chat_ui.py": "normalized_text_sha256"
+    }
+  },
+  "cases": [
+    {
+      "id": "R01",
+      "raw_text": "Need scarves for Harbor Knits sent out today, usual quantities.",
+      "speaker": "Chen",
+      "source_time": "07:53",
+      "request_sha256": "ddc040e3a9230808fd7e5462af36f1f14ea70723e711f5541e2396f35acb7e29",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "customer": "Harbor Knits",
+        "order_id": null,
+        "product": "Scarf",
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [
+        "order",
+        "quantity"
+      ],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.order",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "required_needs.order"
+        },
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.quantity",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "required_needs.quantity"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.date_semantics_ambiguity",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.identity_ambiguity",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Harbor Knits",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Scarf",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R02",
+      "raw_text": "Which workshop did we use for the Harbor Knits batch last October?",
+      "speaker": "Ravi",
+      "source_time": "07:59",
+      "request_sha256": "b9dc655a61da624620cc7767b2614e629a4613778bfcaee70110afb68fde66e2",
+      "split": "development",
+      "expected_status": "DECLINE",
+      "expected_fields": {
+        "customer": "Harbor Knits",
+        "order_id": null,
+        "product": null,
+        "pieces": null,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "deferred_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_deferred_needs"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.missing_history",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "historical_query_behavior",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "no_fabricated_history",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "DECLINE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Harbor Knits",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R03",
+      "raw_text": "Can we get the TrendCart order moving? They are chasing.",
+      "speaker": "Priya",
+      "source_time": "08:03",
+      "request_sha256": "6048f29da6e157bd2c79e0db180373e3c81ad280be4f8cc7f6fe2ef7a4b68094",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "customer": "TrendCart",
+        "order_id": null,
+        "product": null,
+        "pieces": null,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.order",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "required_needs.order"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.identity_ambiguity",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "TrendCart",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R04",
+      "raw_text": "ORD-041 needs a home today. 600 beanies, back by Apr 21.",
+      "speaker": "Boss",
+      "source_time": "08:08",
+      "request_sha256": "114f8a102862e0ba5e2b20fe9587a99b88700c031307c4bd74e90f2d7d3c4447",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "due_date": "2026-04-21",
+        "order_id": "ORD-041",
+        "product": "Beanie",
+        "pieces": 600,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {
+        "order.customer": "Harbor Knits"
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-21",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-041",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Beanie",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 600,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "Harbor Knits",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R05",
+      "raw_text": "ORD-066 due date just moved up — will confirm the new date after the call, but line something up.",
+      "speaker": "Mei",
+      "source_time": "08:14",
+      "request_sha256": "f358cd77f5d4ecd41b4b01d2b4d2a001c361be8c067627497274de161fd8cb61",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": "ORD-066",
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {
+        "order.customer": "Northwind Apparel",
+        "order.product": "Polo shirt",
+        "order.pieces": 1000
+      },
+      "forbidden_fields": [],
+      "required_needs": [
+        "deadline"
+      ],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.deadline",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "required_needs.deadline"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.deadline_change_unconfirmed",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "MAJORITY",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-066",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "Northwind Apparel",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.product",
+          "consensus_value": "Polo shirt",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.quantity",
+          "consensus_value": 1000,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R06",
+      "raw_text": "Farm out ORD-096 please — 1000 beanies for TrendCart, ship date Apr 17.",
+      "speaker": "Chen",
+      "source_time": "08:18",
+      "request_sha256": "710f0061ebc15ac46166ea8be18314fa171506528404e3dea51057a6acdef76d",
+      "split": "development",
+      "expected_status": null,
+      "expected_fields": {
+        "customer": "TrendCart",
+        "order_id": "ORD-096",
+        "product": "Beanie",
+        "pieces": 1000,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W2",
+            "W4",
+            "W6"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "TrendCart",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-096",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Beanie",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 1000,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R07",
+      "raw_text": "ORD-063 — 100 cardigans. No special requirements, just make Apr 29.",
+      "speaker": "Ravi",
+      "source_time": "08:23",
+      "request_sha256": "19c22922484cd7934338cab776473ec507694a253ea2a0b0cbc6a2f69df929cd",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-063",
+        "product": "Cardigan",
+        "pieces": 100,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {
+        "order.customer": "Loom & Leaf"
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W1",
+            "W2",
+            "W3",
+            "W5",
+            "W6",
+            "W8"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-063",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Cardigan",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 100,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "Loom & Leaf",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R08",
+      "raw_text": "Send ORD-073 (400 hoodies) to FreshStart, their quote was good.",
+      "speaker": "Priya",
+      "source_time": "08:29",
+      "request_sha256": "666e117c272ff21604a89bd9f71b412ce86bb815fafed0469010552ffa54c738",
+      "split": "development",
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "due_date": null,
+        "order_id": "ORD-073",
+        "product": "Hoodie",
+        "pieces": 400,
+        "suggested_workshop": "W8"
+      },
+      "expected_resolved_fields": {
+        "order.customer": "Loom & Leaf"
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "deferred_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_deferred_needs"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.batch_cap_violation",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.missing_quote",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "named_workshop_refusal_reason_code",
+          "consensus_value": "batch_cap",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "REFUSE_SUGGESTION",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-073",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Hoodie",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 400,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "Loom & Leaf",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": "W8",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R09",
+      "raw_text": "ORD-045 — 150 vests for Cotton Club, due Apr 09. It's urgent. Cost doesn't matter, just the fastest turnaround.",
+      "speaker": "Boss",
+      "source_time": "08:33",
+      "request_sha256": "206219e0024b58db7ecad9e76fe657d0a647a7bc64ab436d04ca095191a88fd0",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Cotton Club",
+        "due_date": "2026-04-09",
+        "order_id": "ORD-045",
+        "preference": "fastest",
+        "product": "Vest",
+        "pieces": 150,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W1",
+            "W2",
+            "W3",
+            "W5",
+            "W6",
+            "W8"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Cotton Club",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-09",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-045",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": "fastest",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.preference"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Vest",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 150,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R10",
+      "raw_text": "New rush coming in from Loom & Leaf — details to follow, but book capacity somewhere good.",
+      "speaker": "Mei",
+      "source_time": "08:38",
+      "request_sha256": "c09e04efb77f9ecc1acb54558056296c659c774288a29ab46d2e64b2f293a513",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "customer": "Loom & Leaf",
+        "due_date": null,
+        "order_id": null,
+        "product": null,
+        "pieces": null,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [
+        "deadline",
+        "order",
+        "quantity"
+      ],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.deadline",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "required_needs.deadline"
+        },
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.order",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "required_needs.order"
+        },
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.quantity",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "required_needs.quantity"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.deadline_change_unconfirmed",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Loom & Leaf",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R11",
+      "raw_text": "OldMill is free right now — give them ORD-008.",
+      "speaker": "Chen",
+      "source_time": "08:44",
+      "request_sha256": "02ea2fab61318cb7c91d759bcb85d7d3da0e4aa5014c5f239e645a6dc45c76a8",
+      "split": "development",
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "order_id": "ORD-008",
+        "suggested_workshop": "W7"
+      },
+      "expected_resolved_fields": {
+        "order.customer": "Loom & Leaf",
+        "order.product": "Polo shirt",
+        "order.pieces": 600
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "deferred_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_deferred_needs"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.suspended_workshop",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "named_workshop_refusal_reason_code",
+          "consensus_value": "suspended",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "REFUSE_SUGGESTION",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-008",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "Loom & Leaf",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.product",
+          "consensus_value": "Polo shirt",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.quantity",
+          "consensus_value": 600,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": "W7",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R12",
+      "raw_text": "ORD-053 — 800 polo shirts for UrbanThread, due Apr 10. Boss says nothing new to QuickStitch this week, they're swamped.",
+      "speaker": "Ravi",
+      "source_time": "08:48",
+      "request_sha256": "4ca35445d1e4be415b7938a597aa2f4891c62e0a92fb8002fedd4fb1dc301dcc",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "UrbanThread",
+        "due_date": "2026-04-10",
+        "order_id": "ORD-053",
+        "product": "Polo shirt",
+        "pieces": 800
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [
+          {
+            "workshop_id": "W1"
+          }
+        ]
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs_detail",
+          "consensus_value": "none",
+          "consensus_level": "MAJORITY",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "explicit_exclusion_workshop_ids",
+          "consensus_value": [
+            "W1"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "UrbanThread",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-10",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [
+            "W1"
+          ],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-053",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Polo shirt",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 800,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R13",
+      "raw_text": "Finance asks: what price did we quote TrendCart on ORD-120?",
+      "speaker": "Priya",
+      "source_time": "08:53",
+      "request_sha256": "2f1fc89a24f1332d91ed638cc5e21f189de0c1e5d2dc9e0cceb2fc14a06a9cdc",
+      "split": "development",
+      "expected_status": "DECLINE",
+      "expected_fields": {
+        "customer": "TrendCart",
+        "order_id": "ORD-120",
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {
+        "order.product": "Vest"
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "deferred_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_deferred_needs"
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "DECLINE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "TrendCart",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-120",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.product",
+          "consensus_value": "Vest",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R14",
+      "raw_text": "QuickStitch for the scarves on ORD-103?",
+      "speaker": "Boss",
+      "source_time": "08:59",
+      "request_sha256": "1c734070be0d8ee9297edffcad56ac4e319120ab2ae7afe5d8c0e3a2d8962112",
+      "split": "development",
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "order_id": "ORD-103",
+        "product": "Scarf",
+        "suggested_workshop": "W1"
+      },
+      "expected_resolved_fields": {
+        "order.customer": "Bright Basics",
+        "order.pieces": 2000
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "deferred_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_deferred_needs"
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "REFUSE_SUGGESTION",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-103",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Scarf",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "Bright Basics",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.quantity",
+          "consensus_value": 2000,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": "W1",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R15",
+      "raw_text": "Boss wants the Loom & Leaf stuff outside asap.",
+      "speaker": "Mei",
+      "source_time": "09:03",
+      "request_sha256": "b999dfebf7a1151f322a5659cbb2ae91785e90b79299675cc08fd7930caaf5cf",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "customer": "Loom & Leaf",
+        "order_id": null,
+        "product": null,
+        "pieces": null,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.order",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "required_needs.order"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.identity_ambiguity",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Loom & Leaf",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R16",
+      "raw_text": "Loom & Leaf confirmed the reorder: ORD-024, 300 vests. Needs to ship Apr 15, so it has to go out today.",
+      "speaker": "Chen",
+      "source_time": "09:08",
+      "request_sha256": "9e7c3ae8df8e9cafe6802cc78f8f0605d15a24c26f97370959b051ca8dd5d2b2",
+      "split": "development",
+      "expected_status": null,
+      "expected_fields": {
+        "customer": "Loom & Leaf",
+        "order_id": "ORD-024",
+        "product": "Vest",
+        "pieces": 300,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W1",
+            "W2",
+            "W3",
+            "W5",
+            "W6",
+            "W8"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Loom & Leaf",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-024",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Vest",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 300,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R17",
+      "raw_text": "ORD-017 — 800 cardigans for TrendCart. Factory is full, this one goes outside. Back by Apr 10 please.",
+      "speaker": "Ravi",
+      "source_time": "09:14",
+      "request_sha256": "f79064caa3ae9779603710613077ed6087ce3df8fa38d89b8a3534f532feb82f",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "TrendCart",
+        "due_date": "2026-04-10",
+        "order_id": "ORD-017",
+        "product": "Cardigan",
+        "pieces": 800,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "TrendCart",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-10",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-017",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Cardigan",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 800,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R18",
+      "raw_text": "Any movement on ORD-999? Customer is chasing.",
+      "speaker": "Priya",
+      "source_time": "09:18",
+      "request_sha256": "947f23ef009e7ac4a0ce575395f8b2dea852d148800501d8d282bcdaa1abe735",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "customer": null,
+        "due_date": null,
+        "order_id": "ORD-999",
+        "product": null,
+        "pieces": null,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.unknown_order",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "unknown_order_behavior",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "MAJORITY",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-999",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R19",
+      "raw_text": "That big reorder from last week — send it to whoever is quickest.",
+      "speaker": "Boss",
+      "source_time": "09:23",
+      "request_sha256": "ab4cba80b8a585684569d94dbfa2dc5f1d8cecc99650dd6dc72225922f903d8c",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "customer": null,
+        "order_id": null,
+        "preference": "fastest",
+        "product": null,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.order",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "required_needs.order"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.identity_ambiguity",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": "fastest",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.preference"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R20",
+      "raw_text": "New one for the network: ORD-103, 2000 scarves for Bright Basics, due Apr 04.",
+      "speaker": "Mei",
+      "source_time": "09:29",
+      "request_sha256": "08f8db112a10dd463ee417604939e6a573636a681232140e72892422c5252145",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Bright Basics",
+        "due_date": "2026-04-04",
+        "order_id": "ORD-103",
+        "product": "Scarf",
+        "pieces": 2000,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W2",
+            "W4",
+            "W6"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Bright Basics",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-04",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-103",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Scarf",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 2000,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R21",
+      "raw_text": "ORD-081 — 1500 crewneck sweaters for Harbor Knits, due Apr 13. Margin is thin on this one — cheapest shop that can still make Apr 13.",
+      "speaker": "Chen",
+      "source_time": "09:33",
+      "request_sha256": "b2909c3004ad3ffd91f404da890a6b82ae4402f2f010805a997e60394393bc90",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Harbor Knits",
+        "due_date": "2026-04-13",
+        "order_id": "ORD-081",
+        "preference": "cheapest_on_time",
+        "product": "Crewneck sweater",
+        "pieces": 1500,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Harbor Knits",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-13",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-081",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": "cheapest_on_time",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.preference"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Crewneck sweater",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 1500,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R22",
+      "raw_text": "ORD-040 ready to dispatch. 1200 hoodies for Loom & Leaf, back by Apr 21.",
+      "speaker": "Ravi",
+      "source_time": "09:38",
+      "request_sha256": "3c9d51df4b90fc4a2ce4f13b4c27231ea91c8f488cc873a8eb58facff66353e6",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Loom & Leaf",
+        "due_date": "2026-04-21",
+        "order_id": "ORD-040",
+        "product": "Hoodie",
+        "pieces": 1200,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Loom & Leaf",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-21",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-040",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Hoodie",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 1200,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R23",
+      "raw_text": "ORD-005 — 500 scarves for TrendCart, due Apr 20. Split it across two shops if that gets it back faster.",
+      "speaker": "Priya",
+      "source_time": "09:44",
+      "request_sha256": "380044b8bad4e7ddd16eb8dbc2cd054eff6be2d47dc245902bb9f031a6c9f8d0",
+      "split": "development",
+      "expected_status": "NEEDS_REVIEW",
+      "expected_fields": {
+        "customer": "TrendCart",
+        "due_date": "2026-04-20",
+        "order_id": "ORD-005",
+        "product": "Scarf",
+        "pieces": 500,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "split_extension_review_path",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "split_simulator_single_workshop",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W2",
+            "W4",
+            "W6"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "NEEDS_REVIEW_ESCALATE",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "TrendCart",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-20",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-005",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Scarf",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 500,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R24",
+      "raw_text": "Little Loom does lovely work — ORD-015 to them?",
+      "speaker": "Boss",
+      "source_time": "09:48",
+      "request_sha256": "a784d5e1fd3e3e3b3165950b25b5c36a3ae03ea00efea6b7d9279726b73c8db2",
+      "split": "development",
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "order_id": "ORD-015",
+        "suggested_workshop": "W4"
+      },
+      "expected_resolved_fields": {
+        "order.customer": "UrbanThread",
+        "order.product": "Vest",
+        "order.pieces": 300
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "deferred_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_deferred_needs"
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "REFUSE_SUGGESTION",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-015",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "UrbanThread",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.product",
+          "consensus_value": "Vest",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.quantity",
+          "consensus_value": 300,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": "W4",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R25",
+      "raw_text": "ORD-109 — 500 vests for Harbor Knits, due Apr 13. …and keep it away from BudgetWorks, the last batch came back rough.",
+      "speaker": "Mei",
+      "source_time": "09:53",
+      "request_sha256": "546b35a166ebefc93ca7c45a0fe1b0718764c3ec3d717a23c12a4dc9c1272aed",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Harbor Knits",
+        "due_date": "2026-04-13",
+        "order_id": "ORD-109",
+        "product": "Vest",
+        "pieces": 500
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [
+          {
+            "workshop_id": "W3"
+          }
+        ]
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs_detail",
+          "consensus_value": "none",
+          "consensus_level": "MAJORITY",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs_exact",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "explicit_exclusion_workshop_ids",
+          "consensus_value": [
+            "W3"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Harbor Knits",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-13",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [
+            "W3"
+          ],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-109",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Vest",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 500,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R26",
+      "raw_text": "Can someone place ORD-010? 1000 cardigans, Cotton Club, due Apr 25.",
+      "speaker": "Chen",
+      "source_time": "09:59",
+      "request_sha256": "ca1534dab3aef252f9fa99694e61b1b9bb900f1e2fd75b3cb554646f5e2d631d",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Cotton Club",
+        "due_date": "2026-04-25",
+        "order_id": "ORD-010",
+        "product": "Cardigan",
+        "pieces": 1000,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W1",
+            "W2",
+            "W3",
+            "W5",
+            "W6"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Cotton Club",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-25",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-010",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Cardigan",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 1000,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R27",
+      "raw_text": "ORD-095 — 800 hoodies for Bright Basics, due Apr 26. Bright Basics rejected a batch last month, so lowest defect rate you can get.",
+      "speaker": "Ravi",
+      "source_time": "10:03",
+      "request_sha256": "bdcb4bdaeef412588e46fb97547f3f71f610225c0345bc74346e334ed0ae25d7",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Bright Basics",
+        "due_date": "2026-04-26",
+        "order_id": "ORD-095",
+        "preference": "lowest_defects",
+        "product": "Hoodie",
+        "pieces": 800,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": false,
+      "human_review_recommended": false,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Bright Basics",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-04-26",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-095",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": "lowest_defects",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.preference"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Hoodie",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 800,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R28",
+      "raw_text": "Sending ORD-002 outside — 1000 crewneck sweaters. Who has room this week? Due Mar 29.",
+      "speaker": "Priya",
+      "source_time": "10:08",
+      "request_sha256": "0115f66dcabd2b94733678a71bc33413db5d17021941183dd37860da35b1db96",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "due_date": "2026-03-29",
+        "order_id": "ORD-002",
+        "product": "Crewneck sweater",
+        "pieces": 1000,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {
+        "order.customer": "Cotton Club"
+      },
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.past_deadline",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "infeasibility_disclosure",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "past_deadline_disclosure",
+          "consensus_value": true,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W1",
+            "W2",
+            "W3",
+            "W5",
+            "W6"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "MAJORITY",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "due_date",
+          "consensus_value": "2026-03-29",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.due_date"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-002",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Crewneck sweater",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 1000,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 4,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "retrieved.customer",
+          "consensus_value": "Cotton Club",
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_resolved_fields.order.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R29",
+      "raw_text": "The vests need to go out this week — who takes them?",
+      "speaker": "Boss",
+      "source_time": "10:14",
+      "request_sha256": "6e96bc9ae75fdd8fff1064f600b300f21b6bf47e63c9442eb702b9893f664c16",
+      "split": "development",
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "customer": null,
+        "order_id": null,
+        "product": "Vest",
+        "pieces": null,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "clarification",
+          "assertion_key": "required_needs.order",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "required_needs.order"
+        },
+        {
+          "assertion_family": "flags",
+          "assertion_key": "required_flags_concept.identity_ambiguity",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "CLARIFY",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Vest",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "questions": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": false,
+        "case_suppression_reasons": [
+          "Current scorer hardcodes this ID in UNRESOLVED"
+        ],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    },
+    {
+      "id": "R30",
+      "raw_text": "Please allocate ORD-099: 1500 polo shirts, Northwind Apparel. Deadline Apr 05.",
+      "speaker": "Mei",
+      "source_time": "10:18",
+      "request_sha256": "7ee4ececebfea06ca0b219d6c86ffbdf17aa956f007443bb356591ff5992ca7a",
+      "split": "development",
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "customer": "Northwind Apparel",
+        "order_id": "ORD-099",
+        "product": "Polo shirt",
+        "pieces": 1500,
+        "suggested_workshop": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": []
+      },
+      "gold_annotation": {
+        "status": "ai_consensus_pending_human_adjudication",
+        "independent_gold": false
+      },
+      "policy_sensitive": true,
+      "human_review_recommended": true,
+      "consensus_assertions": [
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "ranking_requires_tool",
+          "consensus_value": true,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "operational_predicates",
+          "assertion_key": "workshop_hard_eligibility_ids",
+          "consensus_value": [
+            "W1",
+            "W2",
+            "W3",
+            "W5",
+            "W6"
+          ],
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "primary_status",
+          "assertion_key": "status",
+          "consensus_value": "RECOMMEND_ALLOCATE",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_status"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "customer",
+          "consensus_value": "Northwind Apparel",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.customer"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "exclusions",
+          "consensus_value": [],
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_constraints.exclusions"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "order_id",
+          "consensus_value": "ORD-099",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.order_id"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "preference",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": null
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "product",
+          "consensus_value": "Polo shirt",
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.product"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "quantity",
+          "consensus_value": 1500,
+          "consensus_level": "HIGH_CONSENSUS",
+          "valid_reviewer_count": 3,
+          "scorer_mapping": "expected_fields.pieces"
+        },
+        {
+          "assertion_family": "supported_fields",
+          "assertion_key": "suggested_workshop",
+          "consensus_value": null,
+          "consensus_level": "LIMITED_CONSENSUS",
+          "valid_reviewer_count": 2,
+          "scorer_mapping": "expected_fields.suggested_workshop"
+        }
+      ],
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "questions": [],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null
+      },
+      "scoring_scope": {
+        "semantic_scoring_enabled": true,
+        "case_suppression_reasons": [],
+        "unsupported_assertions_are_metadata_only": true,
+        "empty_exclusions_placeholder_is_not_approved": false,
+        "ready_for_gold_state_is_legacy_scorer_gate_not_gold_claim": true
+      }
+    }
+  ],
+  "limitations": [
+    "AI consensus is not human-adjudicated gold",
+    "Only explicitly extracted assertions vote; original provisional expectations are not copied",
+    "Legacy exact-current reviews are included alongside new canonical-v2 reviews",
+    "Unsupported predicates and prose remain consensus metadata, not executable scorer checks",
+    "Existing scorer case gates and unconditional exact exclusions constrain partial coverage"
+  ]
+}
