@@ -12,14 +12,15 @@ Each assertion has one annotation basis: `adjudicated`, `provisional`, or
 adjudicated track only when `gold_annotation.status=independently_adjudicated`,
 `independent_gold=true`, nonempty named annotators, adjudicator and adjudication
 date, and no pending adjudication items are recorded. Partial or contradictory
-gold metadata is rejected, not promoted. An unresolved review overrides either
-semantic track; no subfield approvals are inferred.
+gold metadata is rejected, not promoted. In legacy benchmark mode, an unresolved
+review overrides either semantic track; no subfield approvals are inferred.
 
-R01, R03, R06, R10, R15, R16, R19, R23 and R29 currently suppress all
+Without `consensus_assertions`, R01, R03, R06, R10, R15, R16, R19, R23 and R29 suppress all
 benchmark-dependent assertions as UNRESOLVED_POLICY. Explicit integrity-only
 checks (execution completion, observable repeated standard questions, and the
-source-compatible tool audit) remain available. No partial approval ledger is
-implemented. Held-out authoring templates are rejected as evaluable benchmarks.
+source-compatible tool audit) remain available. Benchmarks containing
+`consensus_assertions` instead use the explicit assertion-level approval adapter
+described below. Held-out authoring templates are rejected as evaluable benchmarks.
 
 ## Outcomes and counting
 
@@ -192,7 +193,41 @@ observed, reason_code and evidence_paths; observed_missing distinguishes absent
 evidence from observed null. CSV/JSON reasons are stable machine-readable codes.
 JSON is the canonical scoring output. No Markdown review prose is parsed.
 
-## Deferred scope
+## Opt-in consensus assertion approvals
+
+A case containing `consensus_assertions` uses assertion-level approval. Cases
+without that key retain the original policy gates and output format exactly.
+Only rows with HIGH_CONSENSUS, MAJORITY, or LIMITED_CONSENSUS and a valid reviewer
+count are enabled; optional `score_assertion: false` disables a row. UNRESOLVED
+rows are NOT_SCORABLE. An empty list enables no benchmark assertions. Integrity
+audits remain independent. Approval never overrides artifact compatibility.
+
+The adapter derives native mappings from assertion family/key and rejects
+conflicting supplied mappings. It does not inherit unapproved case expectations.
+Consequently policy-sensitive cases can score approved fields without approving
+their status, needs, flags, or exclusions. Exact exclusion sets, required members,
+and forbidden members are separate approvals; membership never implies exactness.
+
+JSON checks and CSV rows include `assertion_id` as `family.key`, scoped by case ID,
+matching provenance. Integrity IDs use `integrity.` followed by the legacy check
+ID. The manifest also hashes the assertion adapter. Structured predicates use
+the `consensus_assertion` metric; native assertions retain their original metrics.
+
+Supported structured evidence includes exact clarification needs, candidate
+workshop IDs, excluded workshop application, exact dispatch reason-array values
+verified against workshop data, split review flags/status/commit permission, and
+recorded rankings with matching allocator/dispatch hashes and a passing tool audit.
+Candidate eligibility compares the recorded candidate set to the approved set;
+it is not a new eligibility oracle. Ranking checks establish audited recorded
+tool evidence, not which internal reasoning produced an answer.
+
+Absent or incomplete evidence remains NOT_SCORABLE. No complete structured
+ETA/quote/history claim ledger exists, so clean fields or a refusal status cannot
+prove absence of fabricated prose. Historical/unknown-order behavior, disclosures,
+semantic flag concepts, and executed split behavior remain unsupported where no
+deterministic evidence contract exists. No free-form keyword heuristics are used.
+
+## Deferred scope (all benchmark modes)
 
 No workshop-policy winner grading beyond the existing integrity audit, full
 clarification precision, semantic duplicate detection, numerical prose claims,

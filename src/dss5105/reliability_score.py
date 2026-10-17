@@ -151,6 +151,10 @@ def validate_benchmark(benchmark):
         raise ValueError("Benchmark must contain cases")
     ids = []
     for case in cases:
+        if "consensus_assertions" in case:
+            from dss5105.reliability_assertions import validate_approvals
+
+            validate_approvals(case["consensus_assertions"])
         if case.get("split") not in ("development", "held_out") or not isinstance(case.get("raw_text"), str):
             raise ValueError("Templates or un-authored cases cannot be scored")
         ids.append(case["id"])
@@ -510,9 +514,17 @@ def tool_audit(preview, compatibility, source_root):
 
 
 def score_case(case, record, compatibility, *, source_root=ROOT, audit_tools=True):
+    if "consensus_assertions" in case:
+        from dss5105.reliability_assertions import score_approved_case
+
+        return score_approved_case(case, record, compatibility, source_root=source_root, audit_tools=audit_tools)
+    return _score_legacy_case(case, record, compatibility, source_root=source_root, audit_tools=audit_tools)
+
+
+def _score_legacy_case(case, record, compatibility, *, source_root=ROOT, audit_tools=True, assertion_mode=False):
     basis = annotation_basis(case)
     review = case["adjudication_review"]
-    unresolved = (
+    unresolved = not assertion_mode and (
         case["id"] in UNRESOLVED or review.get("unresolved") is not False or review.get("state") != "READY_FOR_GOLD"
     )
     preview = record.get("preview", {}) if record else {}
@@ -886,7 +898,7 @@ def score_case(case, record, compatibility, *, source_root=ROOT, audit_tools=Tru
 
 def aggregate(cases):
     metrics = []
-    for metric in sorted(METRICS):
+    for metric in sorted(set(METRICS) | {check["metric"] for case in cases for check in case["checks"]}):
         for basis in BASES:
             counts = Counter(
                 check["outcome"]
@@ -1011,6 +1023,8 @@ def serialize_outputs(report, manifest):
         "reason_code",
         "evidence_paths",
     ]
+    if any("assertion_id" in check for case in report["cases"] for check in case["checks"]):
+        columns.append("assertion_id")
     writer = csv.DictWriter(checks_buffer, fieldnames=columns, lineterminator="\n")
     writer.writeheader()
     for case in report["cases"]:
@@ -1099,6 +1113,11 @@ def main(argv=None):
                 key: run_manifest[key] for key in ("model", "intake_version", "file_hashes") if key in run_manifest
             },
         }
+        if any("consensus_assertions" in case for case in benchmark["cases"]):
+            manifest["scorer_configuration"]["unresolved_policy"] = "explicit_assertion_approval"
+            manifest["assertion_adapter_content_hash"] = hashlib.sha256(
+                Path(__file__).with_name("reliability_assertions.py").read_bytes()
+            ).hexdigest()
         outputs = serialize_outputs(report, manifest)
         output.mkdir(parents=True, exist_ok=False)
         for name, content in outputs.items():

@@ -162,3 +162,20 @@ only `adjudication_review`. It is a review-integrity marker, not a freeze hash.
 Any later semantic refinement requires a new review rather than silently changing
 the values covered by the marker. Held-out templates have no development review
 object and remain un-authored/not frozen.
+
+## Alternate assertion-consensus benchmarks
+
+The scorer accepts optional per-case `consensus_assertions` without changing the
+original provisional benchmark. Each row contains `assertion_family`,
+`assertion_key`, `consensus_value`, `consensus_level`, and `valid_reviewer_count`.
+Accepted levels are HIGH_CONSENSUS or MAJORITY with at least three valid reviewers,
+and LIMITED_CONSENSUS with exactly two. UNRESOLVED is disabled. Optional
+`score_assertion: false` disables an accepted row; a supplied `scorer_mapping`
+must match the mapping derived from its identity. Duplicate identities are invalid.
+
+Approval is specific to the assertion; it does not approve other expectations in
+the case or make this independently adjudicated gold. Policy-sensitive metadata
+is retained. Rows absent from the approval list are not synthesized from legacy
+expectations. Unresolved assertions retained only in provenance remain outside
+scoring denominators. Unsupported approved rows are reported NOT_SCORABLE.
+See RELIABILITY_SCORER.md for deterministic evidence requirements and output IDs.
