@@ -264,7 +264,12 @@ class DispatchDesk:
                 else "Which order do you mean? Please confirm its order ID."
             )
             if request.clarification:
-                message += " " + request.clarification
+                # Intake puts the order question first; do not prepend it again.
+                message = (
+                    request.clarification
+                    if request.clarification.startswith(message)
+                    else message + " " + request.clarification
+                )
             return finish("CLARIFY", message)
         order = resolution["matches"][0]
         result["order"] = order

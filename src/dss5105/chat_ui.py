@@ -8,7 +8,7 @@ of the next run, so the page always renders from the stored result. Earlier answ
 
 import html
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from uuid import uuid4
 
 import streamlit as st
@@ -177,9 +177,7 @@ def remember_reply(conversation: intake.Conversation, result: dict) -> intake.Co
     if conversation.turns[-1].get("reply"):
         return conversation
     turns = (*conversation.turns[:-1], {**conversation.turns[-1], "reply": result["message"]})
-    return intake.Conversation(
-        conversation.request, turns, conversation.needs, conversation.provenance, conversation.traces
-    )
+    return replace(conversation, turns=turns)
 
 
 def answer_conversation(ctx: DeskContext, conversation: intake.Conversation, speaker: str, text: str):

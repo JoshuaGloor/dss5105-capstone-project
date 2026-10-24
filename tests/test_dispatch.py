@@ -48,6 +48,32 @@ def test_ambiguous_reference_is_not_guessed(desk):
 
 
 @pytest.mark.parametrize(
+    "clarification",
+    [None, "Please confirm the quantity using digits. Please confirm the delivery deadline using an explicit date."],
+)
+def test_ambiguous_order_keeps_resolver_question_and_other_clarifications(desk, clarification):
+    result = desk.preview(
+        envelope(), DispatchInput(customer="TrendCart", clarification=clarification), ObjectiveWeights()
+    )
+    question = "Which order do you mean? Please confirm its order ID."
+    assert result["status"] == "CLARIFY"
+    assert result["resolution"]["status"] == "AMBIGUOUS"
+    assert result["message"] == question + (" " + clarification if clarification else "")
+    assert not result["candidates"]
+
+
+def test_unknown_order_keeps_missing_record_message_and_pending_order_question(desk):
+    clarification = "Which order do you mean? Please confirm its order ID."
+    result = desk.preview(
+        envelope(), DispatchInput(order_id="ORD-999", clarification=clarification), ObjectiveWeights()
+    )
+    assert result["status"] == "CLARIFY"
+    assert result["resolution"]["status"] == "NOT_FOUND"
+    assert result["message"] == "No matching order is recorded. Please check the order reference. " + clarification
+    assert not result["candidates"]
+
+
+@pytest.mark.parametrize(
     "fields",
     [
         {"pieces": 501},

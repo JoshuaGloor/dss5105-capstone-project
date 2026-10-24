@@ -1,7 +1,9 @@
+from dataclasses import replace
+
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from dss5105 import llm
+from dss5105 import chat_ui, llm
 from dss5105.dispatch import ROOT
 from dss5105.replies import build_reply
 
@@ -140,6 +142,30 @@ def test_examples_do_not_call_the_model_and_do_not_need_a_new_request(ui):
     assert fake.calls == 0
     assert requests(app)[-1]["kind"] == "example"
     assert "conversation" not in app.session_state
+
+
+def test_ui_reply_rebuild_and_clicked_selection_preserve_deferred_needs(ui):
+    app, fake = ui
+    fake.outputs = [patch(("customer", "TrendCart"), needs=["order", "quantity"])]
+    app.chat_input(key="dispatch_chat").set_value("Can we get the TrendCart order moving?").run()
+    original = app.session_state["conversation"]
+    # Rebuild a reply using the current UI helper without dropping pending state.
+    turns = tuple({key: value for key, value in turn.items() if key != "reply"} for turn in original.turns)
+    pending = replace(original, turns=turns, deferred_needs=("quantity",))
+    rebuilt = chat_ui.remember_reply(pending, requests(app)[-1]["result"])
+    app.session_state["conversation"] = rebuilt
+    assert rebuilt.turns[-1]["reply"]
+    assert rebuilt.deferred_needs == ("quantity",)
+    assert original.deferred_needs == ("quantity",)
+    assert requests(app)[-1]["result"]["conversation"]["deferred_needs"] == ("quantity",)
+    choices = build_reply(requests(app)[-1]["result"])["choices"]
+    index = [choice["value"] for choice in choices].index("ORD-017")
+    app.button(key=f"choice_{index}").click().run()
+    assert not app.exception
+    assert fake.calls == 1
+    assert app.session_state["conversation"].deferred_needs == ()
+    assert app.session_state["conversation"].needs == ()
+    assert requests(app)[-1]["result"]["status"] == "RECOMMEND"
 
 
 def test_clicking_a_matching_order_resolves_without_a_model_call(ui):

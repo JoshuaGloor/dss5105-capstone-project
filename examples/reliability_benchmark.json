@@ -1,0 +1,4300 @@
+{
+  "schema_version": "reliability-case-v1",
+  "artifact_kind": "provisional_development_benchmark",
+  "annotation_status": "pending_independent_adjudication",
+  "independent_gold": false,
+  "freeze_status": "not_frozen",
+  "created_on": "2026-10-13",
+  "schema_document": "docs/RELIABILITY_BENCHMARK.md",
+  "context": {
+    "as_of": "2026-04-01",
+    "queue_mode": "independent_workshops_csv_snapshot",
+    "scope": "registered_order_preview",
+    "objective_weights": {
+      "lateness": 1,
+      "defects": 0,
+      "cost": 0,
+      "deadline_buffer_days": 0
+    },
+    "explicit_preferences_override_weights": true,
+    "source_sha256": {
+      "track2/data/dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+      "track2/data/orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+      "track2/data/workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+      "examples/chat_rubric.json": "3d5a17380de57ba5f78c3e627e077213493e13e806ba073f0b8ef7202c71a5d5",
+      "examples/dispatch_inputs.json": "6c0f29f6e6f5b6e8d38f6e22b160d014dbe83445628822db4863f1238801c201",
+      "docs/CHAT_EVALUATION_RESULTS.md": "8ef353e2f8ac3b1d8b6f9f2134da0b04b1238a706b15fa7dd41d97eef2743826",
+      "tests/test_intake.py": "ad7d0f6a90c977d6c29122a71d5360074ddbe391aaf54ad3ec35b190e3d2b9ea",
+      "tests/test_dispatch.py": "abac3594c8bcff84e6080c24275fb2f4e7298fda6d8d2cabab4840f4a3879da7",
+      "tests/test_chat_ui.py": "26c6af7c7c4e1b0e096ae1e6d5a7362602094626158fada67690559fcf78537f"
+    },
+    "source_hash_modes": {
+      "track2/data/dispatch_requests.txt": "raw_bytes_sha256",
+      "track2/data/orders.csv": "raw_bytes_sha256",
+      "track2/data/workshops.csv": "raw_bytes_sha256",
+      "examples/chat_rubric.json": "normalized_text_sha256",
+      "examples/dispatch_inputs.json": "normalized_text_sha256",
+      "docs/CHAT_EVALUATION_RESULTS.md": "normalized_text_sha256",
+      "tests/test_intake.py": "normalized_text_sha256",
+      "tests/test_dispatch.py": "normalized_text_sha256",
+      "tests/test_chat_ui.py": "normalized_text_sha256"
+    }
+  },
+  "limitations": [
+    "No independent gold labels or frozen held-out queries exist in this artifact.",
+    "No scoring logic or model evaluation has been run to create these data.",
+    "Source hashes identify the provisional context; they do not certify a frozen benchmark."
+  ],
+  "cases": [
+    {
+      "id": "R01",
+      "raw_text": "Need scarves for Harbor Knits sent out today, usual quantities.",
+      "speaker": "Chen",
+      "split": "development",
+      "scenario_family": "ambiguous-order-explicit-quantity-uncertainty",
+      "categories": [
+        "incomplete_request",
+        "ambiguous_order",
+        "quantity_uncertainty",
+        "temporal_expression",
+        "shipping_delivery_semantics"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": null,
+        "customer": "Harbor Knits",
+        "product": "Scarf",
+        "pieces": null,
+        "date_kind": "shipping"
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [
+        "order",
+        "quantity"
+      ],
+      "forbidden_needs": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "targeted_clarification",
+          "no_ranking_before_resolution"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R01",
+          "examples/chat_rubric.json:cases.R01",
+          "examples/dispatch_inputs.json:R01"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Usual quantities is explicit uncertainty, not an omitted retrievable quantity.",
+        "Today describes sending; no delivery deadline is inferred. Shipping interpretation and question ordering need adjudication.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "07:53",
+      "course_kind": "missing_number_or_date",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "confidence": "medium",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Does sent out today express dispatch only, or should it set date_kind=shipping and/or due_date=2026-04-01?",
+          "Should explicit usual quantities be asked alongside order identification, and must it remain blocking after identification?",
+          "Should an omitted delivery deadline be absent from needs or optionally deferred while order is unresolved?"
+        ],
+        "recommended_decision": "Recommend interpreting today as dispatch context only, with no inferred delivery deadline. Keep CLARIFY and explicit quantity uncertainty blocking; ask order and quantity once. Decide the normalized date_kind and deadline-need representation explicitly before gold.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R01",
+          "examples/chat_rubric.json:cases.R01",
+          "examples/dispatch_inputs.json:R01",
+          "docs/INTAKE_CONTRACT.md:Normalization and clarification",
+          "tests/test_intake.py:test_quantity_blocker_and_deferred_deadline_have_separate_lifecycles"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "d2fc468382e9644fcc6bb29ec854b275bc27b453b5a46162bcfe3802fa24aa35"
+      }
+    },
+    {
+      "id": "R02",
+      "raw_text": "Which workshop did we use for the Harbor Knits batch last October?",
+      "speaker": "Ravi",
+      "split": "development",
+      "scenario_family": "historical-allocation-unavailable",
+      "categories": [
+        "unanswerable_request",
+        "temporal_expression"
+      ],
+      "expected_status": "DECLINE",
+      "expected_fields": {
+        "order_id": null,
+        "intent": "history",
+        "customer": "Harbor Knits",
+        "due_date": null,
+        "date_uncertain": false
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days",
+        "due_date"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "missing_records_limitation",
+          "no_invented_answer"
+        ],
+        "forbidden_question_topics": [
+          "allocation_quantity",
+          "allocation_deadline"
+        ],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R02",
+          "examples/chat_rubric.json:cases.R02",
+          "examples/dispatch_inputs.json:R02"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Historical last October must not become a delivery deadline or irrelevant allocation questions.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "07:59",
+      "course_kind": "unanswerable",
+      "historical_observation": {
+        "status": "DECLINE",
+        "workshop_id": null,
+        "draft_checks": "pass; manual extraction issue above",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain DECLINE/history with missing historical-allocation explanation. Last October is query context, never due_date or deadline uncertainty; forbid irrelevant allocation needs.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R02",
+          "examples/chat_rubric.json:cases.R02",
+          "examples/dispatch_inputs.json:R02",
+          "docs/DATA_FINDINGS.md:missing historical allocations",
+          "docs/CHAT_EVALUATION_RESULTS.md:R02 historical time interpreted as deadline",
+          "tests/test_dispatch.py:test_missing_data_is_declined_without_inventing_answer"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "948266ee71e87a1f7e9d86bd32118b6ed0168defd3a65e808ce562c8635988f6"
+      }
+    },
+    {
+      "id": "R03",
+      "raw_text": "Can we get the TrendCart order moving? They are chasing.",
+      "speaker": "Priya",
+      "split": "development",
+      "scenario_family": "ambiguous-customer-order",
+      "categories": [
+        "ambiguous_order"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": null,
+        "customer": "TrendCart"
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "targeted_clarification",
+          "no_ranking_before_resolution"
+        ],
+        "forbidden_question_topics": [
+          "omitted_retrievable_quantity",
+          "omitted_retrievable_deadline"
+        ],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R03",
+          "examples/chat_rubric.json:cases.R03",
+          "examples/dispatch_inputs.json:R03"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Order question must appear once. Optional omitted quantity/deadline needs may be deferred, not asked prematurely.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:03",
+      "course_kind": "ambiguous",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_WORDING/EXPECTATION_REFINEMENT",
+        "unresolved": true,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Is needs=[order] equivalent to order plus quantity/deadline when all omitted secondary needs are deferred?",
+          "Which explicit predicate forbids non-deferred secondary needs while expected_deferred_needs is null?"
+        ],
+        "recommended_decision": "Recommend accepting absent secondary needs or pending secondary needs only when marked deferred; require one order question and no premature quantity/deadline question. Record that allowed-state relation explicitly in a later expectation refinement.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R03",
+          "examples/chat_rubric.json:cases.R03",
+          "examples/dispatch_inputs.json:R03",
+          "tests/test_intake.py:test_ambiguous_order_clarification_is_not_repeated",
+          "tests/test_intake.py:test_order_follow_up_discharges_retrievable_deferred_needs"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "c423ca99af9ce2d4a3482b2b17905ce5e3c57f48982fa4031d0a9ed2f00b54bc"
+      }
+    },
+    {
+      "id": "R04",
+      "raw_text": "ORD-041 needs a home today. 600 beanies, back by Apr 21.",
+      "speaker": "Boss",
+      "split": "development",
+      "scenario_family": "complete-registered-order",
+      "categories": [
+        "complete_request"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-041",
+        "pieces": 600,
+        "product": "Beanie",
+        "due_date": "2026-04-21",
+        "intent": "allocate"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-041",
+        "batch.order_id": "ORD-041",
+        "batch.category": "ACCESSORIES",
+        "batch.pieces": 600,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-21"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R04",
+          "examples/chat_rubric.json:cases.R04",
+          "examples/dispatch_inputs.json:R04",
+          "track2/data/orders.csv:ORD-041"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:08",
+      "course_kind": "complete_meetable",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W2",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND for ORD-041, 600 beanies, delivery Apr 21. Today describes immediate dispatch; select by configured policy, not the historical W2 result.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R04",
+          "examples/chat_rubric.json:cases.R04",
+          "examples/dispatch_inputs.json:R04",
+          "track2/data/orders.csv:ORD-041",
+          "track2/data/orders.csv:ORD-041",
+          "tests/test_dispatch.py:test_revised_v3_cases_and_queue_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "321d9e847fa5de54b2c2c713b1e3954803966aac38e1ab7fa54f07640b97bba5"
+      }
+    },
+    {
+      "id": "R05",
+      "raw_text": "ORD-066 due date just moved up \u2014 will confirm the new date after the call, but line something up.",
+      "speaker": "Mei",
+      "split": "development",
+      "scenario_family": "unknown-revised-deadline",
+      "categories": [
+        "incomplete_request",
+        "deadline_uncertainty"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": "ORD-066",
+        "date_uncertain": true,
+        "due_date": null
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-066"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [
+        "deadline"
+      ],
+      "forbidden_needs": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "targeted_clarification",
+          "no_ranking_before_resolution"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R05",
+          "examples/chat_rubric.json:cases.R05",
+          "examples/dispatch_inputs.json:R05",
+          "track2/data/orders.csv:ORD-066"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Unknown revised deadline must block ranking; do not reuse the registered due date.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:14",
+      "course_kind": "missing_number_or_date",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain CLARIFY with blocking deadline need and unknown revised date. Do not reuse the registered Apr 26 due date; no ranking or reservation before clarification.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R05",
+          "examples/chat_rubric.json:cases.R05",
+          "examples/dispatch_inputs.json:R05",
+          "track2/data/orders.csv:ORD-066",
+          "track2/data/orders.csv:ORD-066",
+          "tests/test_intake.py:test_later_uncertainty_revokes_deferral_and_survives_selection",
+          "docs/DISPATCH_CONTRACT.md:unknown revised dates"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "994aba9853e1866d6aa33983762108b870099e43cca98be6c3b26c0267858099"
+      }
+    },
+    {
+      "id": "R06",
+      "raw_text": "Farm out ORD-096 please \u2014 1000 beanies for TrendCart, ship date Apr 17.",
+      "speaker": "Chen",
+      "split": "development",
+      "scenario_family": "shipping-date-matches-record",
+      "categories": [
+        "complete_request",
+        "shipping_delivery_semantics"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-096",
+        "pieces": 1000,
+        "product": "Beanie",
+        "customer": "TrendCart",
+        "due_date": "2026-04-17",
+        "date_kind": "shipping"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-096",
+        "batch.order_id": "ORD-096",
+        "batch.category": "ACCESSORIES",
+        "batch.pieces": 1000,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-17"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee",
+          "ship_date_matches_recorded_due_date"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R06",
+          "examples/chat_rubric.json:cases.R06",
+          "examples/dispatch_inputs.json:R06",
+          "track2/data/orders.csv:ORD-096"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Shipping date matches the recorded due date. RECOMMEND follows the current tool convention; this policy still needs independent adjudication.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:18",
+      "course_kind": "complete_meetable",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "confidence": "medium",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Does a ship date matching the registered due date authorize treating it as delivery without clarification, or should shipping semantics always be clarified?"
+        ],
+        "recommended_decision": "Recommend retaining the documented matching-record convention for this registered-order preview: RECOMMEND with a deadline note, shipping extraction preserved, and no date-kind question. Human ratification is required; equality alone is not independent proof of delivery meaning.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R06",
+          "examples/chat_rubric.json:cases.R06",
+          "examples/dispatch_inputs.json:R06",
+          "track2/data/orders.csv:ORD-096",
+          "track2/data/orders.csv:ORD-096",
+          "docs/DISPATCH_CONTRACT.md:DispatchInput.date_kind and preview step 3",
+          "tests/test_dispatch.py:test_ship_date_matching_the_recorded_due_date_needs_no_question"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "d65f8ce8a8cbf436e71f651fc9ed2b3291a6bcc73517866583aeb28f3129b324"
+      }
+    },
+    {
+      "id": "R07",
+      "raw_text": "ORD-063 \u2014 100 cardigans. No special requirements, just make Apr 29.",
+      "speaker": "Ravi",
+      "split": "development",
+      "scenario_family": "complete-registered-order",
+      "categories": [
+        "complete_request"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-063",
+        "pieces": 100,
+        "product": "Cardigan",
+        "due_date": "2026-04-29"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-063",
+        "batch.order_id": "ORD-063",
+        "batch.category": "TOPS",
+        "batch.pieces": 100,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-29"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R07",
+          "examples/chat_rubric.json:cases.R07",
+          "examples/dispatch_inputs.json:R07",
+          "track2/data/orders.csv:ORD-063"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:23",
+      "course_kind": "complete_meetable",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W1",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND for ORD-063, 100 cardigans, Apr 29 under configured policy; no invented preference or special constraint.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R07",
+          "examples/chat_rubric.json:cases.R07",
+          "examples/dispatch_inputs.json:R07",
+          "track2/data/orders.csv:ORD-063",
+          "track2/data/orders.csv:ORD-063",
+          "tests/test_dispatch.py:test_revised_v3_cases_and_queue_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "62c4f3650e2ad63f06059c97e5079a83b918470cbff59df5792049bc713e84fd"
+      }
+    },
+    {
+      "id": "R08",
+      "raw_text": "Send ORD-073 (400 hoodies) to FreshStart, their quote was good.",
+      "speaker": "Priya",
+      "split": "development",
+      "scenario_family": "suggestion-exceeds-batch-limit",
+      "categories": [
+        "ineligible_workshop_suggestion"
+      ],
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "order_id": "ORD-073",
+        "pieces": 400,
+        "product": "Hoodie",
+        "suggested_workshop": "W8",
+        "intent": "allocate"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-073",
+        "batch.order_id": "ORD-073",
+        "batch.category": "TOPS",
+        "batch.pieces": 400,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-20"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": "W8",
+        "refusal_reason": "batch_size_exceeds_300_piece_cap",
+        "alternative_predicate": "eligible_permitted_candidate_selected_by_effective_policy",
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "SUGGESTION_REFUSED"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "refusal_reason",
+          "eligible_alternative_if_available",
+          "disclose_alternative_lateness"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R08",
+          "examples/chat_rubric.json:cases.R08",
+          "examples/dispatch_inputs.json:R08",
+          "track2/data/orders.csv:ORD-073"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "The quote comment is not a request for a customer quote or authority to invent a price.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:29",
+      "course_kind": "ineligible_suggestion",
+      "historical_observation": {
+        "status": "REFUSE_SUGGESTION",
+        "workshop_id": "W6",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain REFUSE_SUGGESTION for W8: 400 exceeds the 300-piece cap. Retrieve deadline, offer an eligible permitted policy-selected alternative; quote praise does not make this a quote lookup.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R08",
+          "examples/chat_rubric.json:cases.R08",
+          "examples/dispatch_inputs.json:R08",
+          "track2/data/orders.csv:ORD-073",
+          "track2/data/orders.csv:ORD-073",
+          "track2/data/workshops.csv:W8",
+          "tests/test_dispatch.py:test_invalid_suggestion_is_refused_with_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "a6edf4f7e28f091797f5fc5802e416816589546e1b77143ecc8137b341f7ce14"
+      }
+    },
+    {
+      "id": "R09",
+      "raw_text": "ORD-045 \u2014 150 vests for Cotton Club, due Apr 09. It's urgent. Cost doesn't matter, just the fastest turnaround.",
+      "speaker": "Boss",
+      "split": "development",
+      "scenario_family": "fastest-preference",
+      "categories": [
+        "complete_request",
+        "recommendation_preference"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-045",
+        "pieces": 150,
+        "product": "Vest",
+        "customer": "Cotton Club",
+        "due_date": "2026-04-09",
+        "preference": "fastest"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-045",
+        "batch.order_id": "ORD-045",
+        "batch.category": "TOPS",
+        "batch.pieces": 150,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-09"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_expected_turnaround_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R09",
+          "examples/chat_rubric.json:cases.R09",
+          "examples/dispatch_inputs.json:R09",
+          "track2/data/orders.csv:ORD-045"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:33",
+      "course_kind": "constraint",
+      "historical_observation": {
+        "status": "RECOMMEND",
+        "workshop_id": "W6",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain fastest preference and RECOMMEND; minimum continuous expected turnaround among permitted candidates. Costs do not become a hardcoded workshop winner.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R09",
+          "examples/chat_rubric.json:cases.R09",
+          "examples/dispatch_inputs.json:R09",
+          "track2/data/orders.csv:ORD-045",
+          "track2/data/orders.csv:ORD-045",
+          "docs/DISPATCH_CONTRACT.md:preference mappings",
+          "src/dss5105/allocator.py:rank_candidates"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "e189c75331208d48ca9c5103580edb5d1c401466a3d17d7aed745a00791a9bd7"
+      }
+    },
+    {
+      "id": "R10",
+      "raw_text": "New rush coming in from Loom & Leaf \u2014 details to follow, but book capacity somewhere good.",
+      "speaker": "Mei",
+      "split": "development",
+      "scenario_family": "incomplete-new-order",
+      "categories": [
+        "incomplete_request",
+        "new_order_request",
+        "scope_limitation"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": null,
+        "customer": "Loom & Leaf",
+        "pieces": null,
+        "due_date": null
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "targeted_clarification",
+          "no_ranking_before_resolution",
+          "new_order_and_booking_scope_limitation"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R10",
+          "examples/chat_rubric.json:cases.R10",
+          "examples/dispatch_inputs.json:R10"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "New-order creation and capacity booking are unsupported. Keep provisional CLARIFY; exact scope/order/detail needs are not fixed pending adjudication.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:38",
+      "course_kind": "missing_number_or_date",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass; new-order workflow gap",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "confidence": "medium",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Should an incomplete new-order booking request CLARIFY for details, DECLINE unsupported creation/booking, or require a new scoped request?",
+          "Which order/product/quantity/deadline/scope needs are legitimate, and should an existing-order ID question be forbidden?",
+          "Should expected_deferred_needs=[] be replaced by unasserted or scope-specific needs once the workflow is chosen?"
+        ],
+        "recommended_decision": "Recommend CLARIFY with an explicit creation/booking limitation and a request for new-order details; never reserve capacity or invent a registered ID. Do not treat an existing-order-ID question as the complete workflow. Ratify status, need codes, and deferral before gold.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R10",
+          "examples/chat_rubric.json:cases.R10",
+          "examples/dispatch_inputs.json:R10",
+          "docs/CHAT_EVALUATION_RESULTS.md:R10 safe blocking, incomplete new-order workflow",
+          "docs/INTAKE_CONTRACT.md:scope code",
+          "docs/PROJECT_BRIEF.md:registered-order preview and booking limitations"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "4f708274a34ae2fe17b9f800b85bda596481d3a462ee5165e4fbe1b9e331500f"
+      }
+    },
+    {
+      "id": "R11",
+      "raw_text": "OldMill is free right now \u2014 give them ORD-008.",
+      "speaker": "Chen",
+      "split": "development",
+      "scenario_family": "suspended-workshop-suggestion",
+      "categories": [
+        "ineligible_workshop_suggestion",
+        "retrieval"
+      ],
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "order_id": "ORD-008",
+        "suggested_workshop": "W7",
+        "pieces": null,
+        "due_date": null
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-008",
+        "batch.order_id": "ORD-008",
+        "batch.category": "TOPS",
+        "batch.pieces": 600,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-09"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": "W7",
+        "refusal_reason": "workshop_suspended",
+        "alternative_predicate": "eligible_permitted_candidate_selected_by_effective_policy",
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "SUGGESTION_REFUSED"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "refusal_reason",
+          "eligible_alternative_if_available",
+          "disclose_alternative_lateness"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R11",
+          "examples/chat_rubric.json:cases.R11",
+          "examples/dispatch_inputs.json:R11",
+          "track2/data/orders.csv:ORD-008"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:44",
+      "course_kind": "ineligible_suggestion",
+      "historical_observation": {
+        "status": "REFUSE_SUGGESTION",
+        "workshop_id": "W6",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain REFUSE_SUGGESTION for suspended W7. Request pieces/date remain null; retrieve 600 and Apr 09. Claimed availability cannot override suspension.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R11",
+          "examples/chat_rubric.json:cases.R11",
+          "examples/dispatch_inputs.json:R11",
+          "track2/data/orders.csv:ORD-008",
+          "track2/data/orders.csv:ORD-008",
+          "track2/data/workshops.csv:W7",
+          "tests/test_dispatch.py:test_invalid_suggestion_is_refused_with_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "c068c75f9bc3541460aa02fe6059838db494dab2371cb82c55a41a238af87758"
+      }
+    },
+    {
+      "id": "R12",
+      "raw_text": "ORD-053 \u2014 800 polo shirts for UrbanThread, due Apr 10. Boss says nothing new to QuickStitch this week, they're swamped.",
+      "speaker": "Ravi",
+      "split": "development",
+      "scenario_family": "third-party-hard-exclusion",
+      "categories": [
+        "complete_request",
+        "exclusion_constraint",
+        "provenance",
+        "temporal_expression"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-053",
+        "pieces": 800,
+        "product": "Polo shirt",
+        "customer": "UrbanThread",
+        "due_date": "2026-04-10"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-053",
+        "batch.order_id": "ORD-053",
+        "batch.category": "TOPS",
+        "batch.pieces": 800,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-10"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [
+          {
+            "workshop_id": "W1",
+            "imposed_by": "Boss",
+            "reported_by": "Ravi",
+            "evidence": "Boss says nothing new to QuickStitch this week"
+          }
+        ],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R12",
+          "examples/chat_rubric.json:cases.R12",
+          "examples/dispatch_inputs.json:R12",
+          "track2/data/orders.csv:ORD-053"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Boss is the imposer; Ravi is the reporting speaker. Fixture wording Boss (reported by Ravi) is normalized to separate attribution fields.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:48",
+      "course_kind": "constraint",
+      "historical_observation": {
+        "status": "RECOMMEND",
+        "workshop_id": "W6",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND with W1 hard-excluded, Boss as imposer and Ravi as reporter. This week scopes the current exclusion, not due_date or a global cross-case ban.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R12",
+          "examples/chat_rubric.json:cases.R12",
+          "examples/dispatch_inputs.json:R12",
+          "track2/data/orders.csv:ORD-053",
+          "track2/data/orders.csv:ORD-053",
+          "tests/test_dispatch.py:test_exclusion_is_hard_constraint_with_provenance",
+          "docs/INTAKE_CONTRACT.md:Persistent constraints and evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "2dc5368be5e9dd6adb7b619dd37006daa6eec24fca2699025c4a765837f5ebf5"
+      }
+    },
+    {
+      "id": "R13",
+      "raw_text": "Finance asks: what price did we quote TrendCart on ORD-120?",
+      "speaker": "Priya",
+      "split": "development",
+      "scenario_family": "customer-quote-unavailable",
+      "categories": [
+        "unanswerable_request"
+      ],
+      "expected_status": "DECLINE",
+      "expected_fields": {
+        "order_id": "ORD-120",
+        "customer": "TrendCart",
+        "intent": "quote"
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "missing_records_limitation",
+          "no_invented_answer"
+        ],
+        "forbidden_question_topics": [
+          "allocation_quantity",
+          "allocation_deadline"
+        ],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R13",
+          "examples/chat_rubric.json:cases.R13",
+          "examples/dispatch_inputs.json:R13"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:53",
+      "course_kind": "unanswerable",
+      "historical_observation": {
+        "status": "DECLINE",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain DECLINE/quote; customer selling quotes are absent. Never substitute workshop processing cost, and do not ask allocation quantity/deadline questions.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R13",
+          "examples/chat_rubric.json:cases.R13",
+          "examples/dispatch_inputs.json:R13",
+          "track2/data/orders.csv:ORD-120",
+          "docs/DATA_FINDINGS.md:customer quotes unavailable",
+          "tests/test_replies.py:test_decline_and_status_cards_state_the_limit"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "a263e36ef4d1416e3e171b28a1c0d39fa698f3550883071804f7abfb421309ea"
+      }
+    },
+    {
+      "id": "R14",
+      "raw_text": "QuickStitch for the scarves on ORD-103?",
+      "speaker": "Boss",
+      "split": "development",
+      "scenario_family": "resolved-order-ineligible-suggestion",
+      "categories": [
+        "ineligible_workshop_suggestion",
+        "retrieval"
+      ],
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "order_id": "ORD-103",
+        "product": "Scarf",
+        "suggested_workshop": "W1",
+        "pieces": null,
+        "due_date": null
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-103",
+        "batch.order_id": "ORD-103",
+        "batch.category": "ACCESSORIES",
+        "batch.pieces": 2000,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-04"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": "W1",
+        "refusal_reason": "unsupported_ACCESSORIES_category",
+        "alternative_predicate": "eligible_permitted_candidate_selected_by_effective_policy",
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "SUGGESTION_REFUSED",
+        "NO_ON_TIME_OPTION"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "refusal_reason",
+          "eligible_alternative_if_available",
+          "disclose_alternative_lateness"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R14",
+          "examples/chat_rubric.json:cases.R14",
+          "examples/dispatch_inputs.json:R14",
+          "track2/data/orders.csv:ORD-103"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Registered quantity is 2000. Omitted request quantity stays null; redundant quantity clarification must not prevent refusal. Alternative may be late.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "08:59",
+      "course_kind": "ineligible_suggestion",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "FAIL",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain REFUSE_SUGGESTION for W1 unsupported ACCESSORIES, with NO_ON_TIME_OPTION. Keep extracted pieces=null versus resolved batch.pieces=2000; forbid redundant quantity need and disclose lateness of any alternative.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R14",
+          "examples/chat_rubric.json:cases.R14",
+          "examples/dispatch_inputs.json:R14",
+          "track2/data/orders.csv:ORD-103",
+          "track2/data/orders.csv:ORD-103",
+          "track2/data/workshops.csv:W1",
+          "tests/test_intake.py:test_r14_registered_quantity_does_not_block_ineligible_suggestion_refusal",
+          "docs/V3_EVALUATION.md:R14"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "f47661ba6b73b9af3fc8c147d11d4b9e45136deb11189fc974513b32530d5e08"
+      }
+    },
+    {
+      "id": "R15",
+      "raw_text": "Boss wants the Loom & Leaf stuff outside asap.",
+      "speaker": "Mei",
+      "split": "development",
+      "scenario_family": "ambiguous-customer-order",
+      "categories": [
+        "ambiguous_order",
+        "temporal_expression"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": null,
+        "customer": "Loom & Leaf",
+        "due_date": null,
+        "date_uncertain": false
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days",
+        "due_date"
+      ],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "targeted_clarification",
+          "no_ranking_before_resolution"
+        ],
+        "forbidden_question_topics": [
+          "omitted_retrievable_quantity",
+          "omitted_retrievable_deadline"
+        ],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R15",
+          "examples/chat_rubric.json:cases.R15",
+          "examples/dispatch_inputs.json:R15"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Asap does not establish a precise delivery date. Identify the order before asking for retrievable details.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:03",
+      "course_kind": "ambiguous",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_WORDING/EXPECTATION_REFINEMENT",
+        "unresolved": true,
+        "confidence": "medium",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Should absent and correctly deferred omitted secondary needs be accepted as equivalent?",
+          "Does asap imply preference=fastest, or is it non-specific urgency that remains unasserted?",
+          "How will the final expectation prohibit converting asap into a delivery date while targeting order identification?"
+        ],
+        "recommended_decision": "Recommend CLARIFY for the order once, due_date=null, and no guessed deadline. Accept absent or correctly deferred secondary needs. Leave preference unasserted unless reviewers agree asap requires fastest; the benchmark currently does not assert it.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R15",
+          "examples/chat_rubric.json:cases.R15",
+          "examples/dispatch_inputs.json:R15",
+          "tests/test_intake.py:test_omitted_secondary_need_is_deferred_until_order_identification",
+          "docs/INTAKE_CONTRACT.md:unsupported relative date phrases",
+          "docs/CHAT_EVALUATION_RESULTS.md:premature questions"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "678bb786705dedd9e96c92afcf4cd785f7dd591af25bce58b55e88ca5ef5066e"
+      }
+    },
+    {
+      "id": "R16",
+      "raw_text": "Loom & Leaf confirmed the reorder: ORD-024, 300 vests. Needs to ship Apr 15, so it has to go out today.",
+      "speaker": "Chen",
+      "split": "development",
+      "scenario_family": "shipping-date-matches-record",
+      "categories": [
+        "complete_request",
+        "shipping_delivery_semantics",
+        "temporal_expression"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-024",
+        "pieces": 300,
+        "product": "Vest",
+        "customer": "Loom & Leaf",
+        "due_date": "2026-04-15",
+        "date_kind": "shipping"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-024",
+        "batch.order_id": "ORD-024",
+        "batch.category": "TOPS",
+        "batch.pieces": 300,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-15"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee",
+          "ship_date_matches_recorded_due_date"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R16",
+          "examples/chat_rubric.json:cases.R16",
+          "examples/dispatch_inputs.json:R16",
+          "track2/data/orders.csv:ORD-024"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Shipping date matches the recorded due date; today describes dispatch. Current policy differs from historical shipping clarification.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:08",
+      "course_kind": "complete_meetable",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "confidence": "medium",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Ratify the same matching-record ship-date convention as R06.",
+          "Does go out today describe dispatch context only, leaving Apr 15 as the sole deadline under that convention?"
+        ],
+        "recommended_decision": "Recommend retaining RECOMMEND with the matching-record deadline note and preserving date_kind=shipping. Treat today as dispatch context, not a second deadline. Ratify together with R06 rather than using their historical CLARIFY results as gold.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R16",
+          "examples/chat_rubric.json:cases.R16",
+          "examples/dispatch_inputs.json:R16",
+          "track2/data/orders.csv:ORD-024",
+          "track2/data/orders.csv:ORD-024",
+          "docs/DISPATCH_CONTRACT.md:DispatchInput.date_kind and preview step 3",
+          "docs/CHAT_EVALUATION_RESULTS.md:R06/R16 shipping questions"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "9f60e4a109ffe4196428a0c8e7d60a252c2ee77f74ef63f87ebe443a43bfb7b2"
+      }
+    },
+    {
+      "id": "R17",
+      "raw_text": "ORD-017 \u2014 800 cardigans for TrendCart. Factory is full, this one goes outside. Back by Apr 10 please.",
+      "speaker": "Ravi",
+      "split": "development",
+      "scenario_family": "complete-registered-order",
+      "categories": [
+        "complete_request"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-017",
+        "pieces": 800,
+        "product": "Cardigan",
+        "customer": "TrendCart",
+        "due_date": "2026-04-10"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-017",
+        "batch.order_id": "ORD-017",
+        "batch.category": "TOPS",
+        "batch.pieces": 800,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-10"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R17",
+          "examples/chat_rubric.json:cases.R17",
+          "examples/dispatch_inputs.json:R17",
+          "track2/data/orders.csv:ORD-017"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:14",
+      "course_kind": "complete_meetable",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W1",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND for ORD-017, 800 cardigans, Apr 10. Explicit ID/customer/product agree with source; no clarification or unrequested preference.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R17",
+          "examples/chat_rubric.json:cases.R17",
+          "examples/dispatch_inputs.json:R17",
+          "track2/data/orders.csv:ORD-017",
+          "track2/data/orders.csv:ORD-017",
+          "tests/test_dispatch.py:test_revised_v3_cases_and_queue_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "f8157d10c8d2eda31464820113ea621e0f37869c60cb7b2c6115ded85798ee54"
+      }
+    },
+    {
+      "id": "R18",
+      "raw_text": "Any movement on ORD-999? Customer is chasing.",
+      "speaker": "Priya",
+      "split": "development",
+      "scenario_family": "unknown-order-status",
+      "categories": [
+        "unanswerable_request",
+        "unknown_order"
+      ],
+      "expected_status": "DECLINE",
+      "expected_fields": {
+        "order_id": "ORD-999",
+        "intent": "status"
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "missing_records_limitation",
+          "no_invented_answer"
+        ],
+        "forbidden_question_topics": [
+          "allocation_quantity",
+          "allocation_deadline"
+        ],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R18",
+          "examples/chat_rubric.json:cases.R18",
+          "examples/dispatch_inputs.json:R18"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Unknown-order status declines; an allocation request for the same unknown ID would clarify.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:18",
+      "course_kind": "unanswerable",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain DECLINE/status and missing-order explanation. ORD-999 is absent; do not fall back to a customer, invent movement, or turn status lookup into allocation intake. A separate request for allocation would CLARIFY.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R18",
+          "examples/chat_rubric.json:cases.R18",
+          "examples/dispatch_inputs.json:R18",
+          "track2/data/orders.csv:ORD-999 absent",
+          "docs/DISPATCH_CONTRACT.md:preview steps 1-2",
+          "tests/test_dispatch.py:test_status_of_unknown_order_is_declined_but_allocation_asks",
+          "tests/test_evaluate_chat.py:test_recorded_model_preserves_actual_model_label_and_usage"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "3d37716af91f4c4e89b19caf6ad044050ad6bc706ebd7360508a4d0756552532"
+      }
+    },
+    {
+      "id": "R19",
+      "raw_text": "That big reorder from last week \u2014 send it to whoever is quickest.",
+      "speaker": "Boss",
+      "split": "development",
+      "scenario_family": "ambiguous-reorder-fastest",
+      "categories": [
+        "ambiguous_order",
+        "recommendation_preference",
+        "temporal_expression"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": null,
+        "preference": "fastest",
+        "due_date": null,
+        "date_uncertain": false
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days",
+        "due_date"
+      ],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "targeted_clarification",
+          "no_ranking_before_resolution"
+        ],
+        "forbidden_question_topics": [
+          "omitted_retrievable_quantity",
+          "omitted_retrievable_deadline"
+        ],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R19",
+          "examples/chat_rubric.json:cases.R19",
+          "examples/dispatch_inputs.json:R19"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Last week describes the reorder, not the due date. Fixture asks premature secondary details; dependency-aware regression behavior supersedes that question wording.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:23",
+      "course_kind": "ambiguous",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_WORDING/EXPECTATION_REFINEMENT",
+        "unresolved": true,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Should absent and correctly deferred omitted secondary needs be accepted as equivalent?",
+          "How should the final allowed-state expectation reject blocking secondary needs despite expected_deferred_needs=null?",
+          "Should last week be recorded only as reference context rather than deadline uncertainty?"
+        ],
+        "recommended_decision": "Recommend CLARIFY once for the reorder, retain fastest preference, and leave due_date=null/date_uncertain=false. Accept only absent or deferred omitted quantity/deadline needs; refine the allowed-state relation explicitly. Do not reuse the fixture premature detail question.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R19",
+          "examples/chat_rubric.json:cases.R19",
+          "examples/dispatch_inputs.json:R19",
+          "tests/test_intake.py:test_order_follow_up_discharges_retrievable_deferred_needs",
+          "docs/CHAT_EVALUATION_RESULTS.md:premature requests for details",
+          "examples/dispatch_inputs.json:R19"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "a60254cc505c03057988ba73466c2da63c3e1b06233118819697dee168989ea5"
+      }
+    },
+    {
+      "id": "R20",
+      "raw_text": "New one for the network: ORD-103, 2000 scarves for Bright Basics, due Apr 04.",
+      "speaker": "Mei",
+      "split": "development",
+      "scenario_family": "impossible-delivery-deadline",
+      "categories": [
+        "impossible_deadline"
+      ],
+      "expected_status": "NEEDS_REVIEW",
+      "expected_fields": {
+        "order_id": "ORD-103",
+        "pieces": 2000,
+        "product": "Scarf",
+        "customer": "Bright Basics",
+        "due_date": "2026-04-04"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-103",
+        "batch.order_id": "ORD-103",
+        "batch.category": "ACCESSORIES",
+        "batch.pieces": 2000,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-04"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "NO_ON_TIME_OPTION",
+        "SELECTED_OPTION_LATE"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "review_required",
+          "tool_supported_options",
+          "no_guaranteed_on_time_promise"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R20",
+          "examples/chat_rubric.json:cases.R20",
+          "examples/dispatch_inputs.json:R20",
+          "track2/data/orders.csv:ORD-103"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:29",
+      "course_kind": "complete_impossible",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W2",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain NEEDS_REVIEW with NO_ON_TIME_OPTION and SELECTED_OPTION_LATE; expose earliest permitted finish/options and never auto-allocate. New one for the network names existing ORD-103, not an unregistered order.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R20",
+          "examples/chat_rubric.json:cases.R20",
+          "examples/dispatch_inputs.json:R20",
+          "track2/data/orders.csv:ORD-103",
+          "track2/data/orders.csv:ORD-103",
+          "track2/CHANGELOG.md:deliberately impossible R20",
+          "tests/test_dispatch.py:test_declared_impossible_requests_expose_earliest_delivery_and_options"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "6cb740b0f18e6901ed26143a426fb61ec002bebc2dd03e0c7899b7d934d2cce6"
+      }
+    },
+    {
+      "id": "R21",
+      "raw_text": "ORD-081 \u2014 1500 crewneck sweaters for Harbor Knits, due Apr 13. Margin is thin on this one \u2014 cheapest shop that can still make Apr 13.",
+      "speaker": "Chen",
+      "split": "development",
+      "scenario_family": "cheapest-on-time-preference",
+      "categories": [
+        "complete_request",
+        "recommendation_preference",
+        "deadline_constraint"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-081",
+        "pieces": 1500,
+        "product": "Crewneck sweater",
+        "customer": "Harbor Knits",
+        "due_date": "2026-04-13",
+        "preference": "cheapest_on_time"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-081",
+        "batch.order_id": "ORD-081",
+        "batch.category": "TOPS",
+        "batch.pieces": 1500,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-13"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_cost_among_permitted_on_time_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R21",
+          "examples/chat_rubric.json:cases.R21",
+          "examples/dispatch_inputs.json:R21",
+          "track2/data/orders.csv:ORD-081"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:33",
+      "course_kind": "constraint",
+      "historical_observation": {
+        "status": "RECOMMEND",
+        "workshop_id": "W5",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND with cheapest_on_time. Filter eligible permitted candidates by continuous deadline feasibility before minimizing batch cost; retain tie rule. Historical W5 is evidence only, not a required winner.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R21",
+          "examples/chat_rubric.json:cases.R21",
+          "examples/dispatch_inputs.json:R21",
+          "track2/data/orders.csv:ORD-081",
+          "track2/data/orders.csv:ORD-081",
+          "tests/test_dispatch.py:test_cheapest_on_time_enforces_deadline_before_cost",
+          "tests/test_intake.py:test_lowest_cost_with_deadline_maps_to_tool_constraint"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "012cb77eaae60ccaeef125791fcf5541ef32cf8d9afa1fbcb29af01bd7fa5454"
+      }
+    },
+    {
+      "id": "R22",
+      "raw_text": "ORD-040 ready to dispatch. 1200 hoodies for Loom & Leaf, back by Apr 21.",
+      "speaker": "Ravi",
+      "split": "development",
+      "scenario_family": "complete-registered-order",
+      "categories": [
+        "complete_request"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-040",
+        "pieces": 1200,
+        "product": "Hoodie",
+        "customer": "Loom & Leaf",
+        "due_date": "2026-04-21"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-040",
+        "batch.order_id": "ORD-040",
+        "batch.category": "TOPS",
+        "batch.pieces": 1200,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-21"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R22",
+          "examples/chat_rubric.json:cases.R22",
+          "examples/dispatch_inputs.json:R22",
+          "track2/data/orders.csv:ORD-040"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:38",
+      "course_kind": "complete_meetable",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W1",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND for ORD-040, 1200 hoodies, Apr 21 under configured policy; source agrees.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R22",
+          "examples/chat_rubric.json:cases.R22",
+          "examples/dispatch_inputs.json:R22",
+          "track2/data/orders.csv:ORD-040",
+          "track2/data/orders.csv:ORD-040",
+          "tests/test_dispatch.py:test_revised_v3_cases_and_queue_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "27abca483a5f7f6ee1b71b3c6deb8c07ec56b31e2c13de5048c89cdb0181bafb"
+      }
+    },
+    {
+      "id": "R23",
+      "raw_text": "ORD-005 \u2014 500 scarves for TrendCart, due Apr 20. Split it across two shops if that gets it back faster.",
+      "speaker": "Priya",
+      "split": "development",
+      "scenario_family": "conditional-two-workshop-split",
+      "categories": [
+        "split_request",
+        "split_constraint"
+      ],
+      "expected_status": "NEEDS_REVIEW",
+      "expected_fields": {
+        "order_id": "ORD-005",
+        "pieces": 500,
+        "product": "Scarf",
+        "customer": "TrendCart",
+        "due_date": "2026-04-20",
+        "split_requested": true
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-005",
+        "batch.order_id": "ORD-005",
+        "batch.category": "ACCESSORIES",
+        "batch.pieces": 500,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-20"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": true
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "SPLIT_REVIEW"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "review_required",
+          "tool_supported_options",
+          "no_guaranteed_on_time_promise",
+          "conditional_split_benefit_comparison",
+          "split_cannot_be_saved"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R23",
+          "examples/chat_rubric.json:cases.R23",
+          "examples/dispatch_inputs.json:R23",
+          "track2/data/orders.csv:ORD-005"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "If faster is conditional: split_requested records intent but does not authorize a split. Split estimates exist now; split plans cannot be saved.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:44",
+      "course_kind": "constraint",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W6",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_POLICY_DECISION",
+        "unresolved": true,
+        "confidence": "medium",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Does if faster require NEEDS_REVIEW for every split inquiry, or permit RECOMMEND when the split offers no improvement?",
+          "What defines faster: continuous whole-batch expected turnaround, display-rounded ETA, or another criterion?",
+          "Which whole-batch recommendation predicate and split-assessment predicate should be labeled separately?",
+          "Does split_requested record interest only, with saving/commit disallowed until a separate split contract exists?"
+        ],
+        "recommended_decision": "Recommend NEEDS_REVIEW/SPLIT_REVIEW under the current preview contract, with an explicit positive/zero/negative saving comparison against the earliest permitted whole batch using continuous expected turnaround. Treat split_requested as interest, not authorization; retain whole-batch policy selection separately. Ratify unconditional review for this conditional wording.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R23",
+          "examples/chat_rubric.json:cases.R23",
+          "examples/dispatch_inputs.json:R23",
+          "track2/data/orders.csv:ORD-005",
+          "docs/DISPATCH_CONTRACT.md:Two-workshop split assessment",
+          "docs/V3_EVALUATION.md:R23 conditional split",
+          "tests/test_dispatch.py:test_late_preferred_or_split_candidate_requires_review",
+          "tests/test_replies.py:test_review_cards_carry_the_split_and_earliest_options"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "d5e62a4500769a05301da0b91f5dbb2ef7dee546ed9d62a8409c89d3ed1830c5"
+      }
+    },
+    {
+      "id": "R24",
+      "raw_text": "Little Loom does lovely work \u2014 ORD-015 to them?",
+      "speaker": "Boss",
+      "split": "development",
+      "scenario_family": "unsupported-category-suggestion",
+      "categories": [
+        "ineligible_workshop_suggestion",
+        "retrieval"
+      ],
+      "expected_status": "REFUSE_SUGGESTION",
+      "expected_fields": {
+        "order_id": "ORD-015",
+        "suggested_workshop": "W4",
+        "pieces": null,
+        "due_date": null
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-015",
+        "batch.order_id": "ORD-015",
+        "batch.category": "TOPS",
+        "batch.pieces": 300,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-16"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": "W4",
+        "refusal_reason": "unsupported_TOPS_category",
+        "alternative_predicate": "eligible_permitted_candidate_selected_by_effective_policy",
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "SUGGESTION_REFUSED"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "refusal_reason",
+          "eligible_alternative_if_available",
+          "disclose_alternative_lateness"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R24",
+          "examples/chat_rubric.json:cases.R24",
+          "examples/dispatch_inputs.json:R24",
+          "track2/data/orders.csv:ORD-015"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:48",
+      "course_kind": "ineligible_suggestion",
+      "historical_observation": {
+        "status": "REFUSE_SUGGESTION",
+        "workshop_id": "W6",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain REFUSE_SUGGESTION: W4 supports ACCESSORIES, but ORD-015 is a TOPS vest batch. Retrieve 300 pieces and Apr 16; quality praise does not override eligibility.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R24",
+          "examples/chat_rubric.json:cases.R24",
+          "examples/dispatch_inputs.json:R24",
+          "track2/data/orders.csv:ORD-015",
+          "track2/data/orders.csv:ORD-015",
+          "track2/data/workshops.csv:W4",
+          "docs/V3_EVALUATION.md:R24"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "752fd417fd6196a2cfe8c567399355cfb749db56c4f81d48d528f763c058463e"
+      }
+    },
+    {
+      "id": "R25",
+      "raw_text": "ORD-109 \u2014 500 vests for Harbor Knits, due Apr 13. \u2026and keep it away from BudgetWorks, the last batch came back rough.",
+      "speaker": "Mei",
+      "split": "development",
+      "scenario_family": "speaker-hard-exclusion",
+      "categories": [
+        "complete_request",
+        "exclusion_constraint",
+        "provenance"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-109",
+        "pieces": 500,
+        "product": "Vest",
+        "customer": "Harbor Knits",
+        "due_date": "2026-04-13",
+        "preference": "configured"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-109",
+        "batch.order_id": "ORD-109",
+        "batch.category": "TOPS",
+        "batch.pieces": 500,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-13"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [
+          {
+            "workshop_id": "W3",
+            "imposed_by": "Mei",
+            "reported_by": "Mei",
+            "evidence": "keep it away from BudgetWorks"
+          }
+        ],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R25",
+          "examples/chat_rubric.json:cases.R25",
+          "examples/dispatch_inputs.json:R25",
+          "track2/data/orders.csv:ORD-109"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Complaint supports an exclusion, not an explicit lowest_defects preference.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:53",
+      "course_kind": "constraint",
+      "historical_observation": {
+        "status": "RECOMMEND",
+        "workshop_id": "W6",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND with W3 excluded, Mei as imposer, and configured preference. A complaint explains this exclusion; it does not explicitly request globally lowest defects.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R25",
+          "examples/chat_rubric.json:cases.R25",
+          "examples/dispatch_inputs.json:R25",
+          "track2/data/orders.csv:ORD-109",
+          "track2/data/orders.csv:ORD-109",
+          "tests/test_evaluate_chat.py:test_omitted_exclusion_fails_even_when_response_state_matches",
+          "tests/test_replies.py:test_recommendation_card_uses_the_chosen_candidate_display"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "6da3a3cdeeb6bce4b425fba4cb5e3b3618f157b646849cef92f9501cbf900d0f"
+      }
+    },
+    {
+      "id": "R26",
+      "raw_text": "Can someone place ORD-010? 1000 cardigans, Cotton Club, due Apr 25.",
+      "speaker": "Chen",
+      "split": "development",
+      "scenario_family": "complete-registered-order",
+      "categories": [
+        "complete_request"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-010",
+        "pieces": 1000,
+        "product": "Cardigan",
+        "customer": "Cotton Club",
+        "due_date": "2026-04-25"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-010",
+        "batch.order_id": "ORD-010",
+        "batch.category": "TOPS",
+        "batch.pieces": 1000,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-25"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R26",
+          "examples/chat_rubric.json:cases.R26",
+          "examples/dispatch_inputs.json:R26",
+          "track2/data/orders.csv:ORD-010"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "09:59",
+      "course_kind": "complete_meetable",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W1",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain RECOMMEND for ORD-010, 1000 cardigans, Cotton Club, Apr 25 under configured policy; source agrees.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R26",
+          "examples/chat_rubric.json:cases.R26",
+          "examples/dispatch_inputs.json:R26",
+          "track2/data/orders.csv:ORD-010",
+          "track2/data/orders.csv:ORD-010",
+          "tests/test_dispatch.py:test_revised_v3_cases_and_queue_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "f14618b378517b75aeba893ee5d1519bd6c8164ea65da0b0e9a61a9b0efeef39"
+      }
+    },
+    {
+      "id": "R27",
+      "raw_text": "ORD-095 \u2014 800 hoodies for Bright Basics, due Apr 26. Bright Basics rejected a batch last month, so lowest defect rate you can get.",
+      "speaker": "Ravi",
+      "split": "development",
+      "scenario_family": "lowest-defects-preference",
+      "categories": [
+        "complete_request",
+        "recommendation_preference",
+        "temporal_expression"
+      ],
+      "expected_status": "RECOMMEND",
+      "expected_fields": {
+        "order_id": "ORD-095",
+        "pieces": 800,
+        "product": "Hoodie",
+        "customer": "Bright Basics",
+        "due_date": "2026-04-26",
+        "preference": "lowest_defects"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-095",
+        "batch.order_id": "ORD-095",
+        "batch.category": "TOPS",
+        "batch.pieces": 800,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-26"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_defect_risk_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": true
+      },
+      "required_flags": [],
+      "forbidden_flags": [
+        "NO_ON_TIME_OPTION",
+        "PAST_DEADLINE",
+        "SELECTED_OPTION_LATE",
+        "SUGGESTION_REFUSED",
+        "SPLIT_REVIEW"
+      ],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "eligible_recommendation",
+          "delivery_is_estimate_not_guarantee"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R27",
+          "examples/chat_rubric.json:cases.R27",
+          "examples/dispatch_inputs.json:R27",
+          "track2/data/orders.csv:ORD-095"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "Last month is historical context, not a deadline. The v3 provisional recommendation differs from the historical late result.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "10:03",
+      "course_kind": "constraint",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W2",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain lowest_defects and RECOMMEND under the v3 snapshot, minimizing risk among permitted candidates with stated tie rule. Last month is explanatory history, not due_date; historical late result does not override v3 evidence.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R27",
+          "examples/chat_rubric.json:cases.R27",
+          "examples/dispatch_inputs.json:R27",
+          "track2/data/orders.csv:ORD-095",
+          "track2/data/orders.csv:ORD-095",
+          "track2/data/workshops.csv:active TOPS defect rates",
+          "docs/evidence/data-v3.json:fixture_cases.R27",
+          "tests/test_dispatch.py:test_revised_v3_cases_and_queue_evidence"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "a4e0949601449586dcc8c22ebc18f78c6cadf1ed3b3c38a023a58ea4649512a0"
+      }
+    },
+    {
+      "id": "R28",
+      "raw_text": "Sending ORD-002 outside \u2014 1000 crewneck sweaters. Who has room this week? Due Mar 29.",
+      "speaker": "Priya",
+      "split": "development",
+      "scenario_family": "past-delivery-deadline",
+      "categories": [
+        "past_deadline",
+        "impossible_deadline",
+        "temporal_expression"
+      ],
+      "expected_status": "NEEDS_REVIEW",
+      "expected_fields": {
+        "order_id": "ORD-002",
+        "pieces": 1000,
+        "product": "Crewneck sweater",
+        "due_date": "2026-03-29"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-002",
+        "batch.order_id": "ORD-002",
+        "batch.category": "TOPS",
+        "batch.pieces": 1000,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-03-29"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "PAST_DEADLINE",
+        "NO_ON_TIME_OPTION",
+        "SELECTED_OPTION_LATE"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "review_required",
+          "tool_supported_options",
+          "no_guaranteed_on_time_promise"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R28",
+          "examples/chat_rubric.json:cases.R28",
+          "examples/dispatch_inputs.json:R28",
+          "track2/data/orders.csv:ORD-002"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "10:08",
+      "course_kind": "complete_impossible",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W1",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain NEEDS_REVIEW with PAST_DEADLINE, NO_ON_TIME_OPTION, SELECTED_OPTION_LATE. Mar 29 precedes Apr 01; this week cannot override the explicit delivery deadline. Show supported options without commitment.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R28",
+          "examples/chat_rubric.json:cases.R28",
+          "examples/dispatch_inputs.json:R28",
+          "track2/data/orders.csv:ORD-002",
+          "track2/data/orders.csv:ORD-002",
+          "track2/CHANGELOG.md:deliberately impossible R28",
+          "tests/test_dispatch.py:test_declared_impossible_requests_expose_earliest_delivery_and_options"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "346f6b19f6426eb61dc0e0d40e573f05d727aa6846f359ca887b5250fb580cce"
+      }
+    },
+    {
+      "id": "R29",
+      "raw_text": "The vests need to go out this week \u2014 who takes them?",
+      "speaker": "Boss",
+      "split": "development",
+      "scenario_family": "ambiguous-product-order",
+      "categories": [
+        "ambiguous_order",
+        "temporal_expression",
+        "shipping_delivery_semantics"
+      ],
+      "expected_status": "CLARIFY",
+      "expected_fields": {
+        "order_id": null,
+        "product": "Vest",
+        "due_date": null,
+        "date_uncertain": false
+      },
+      "expected_resolved_fields": {},
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days",
+        "due_date"
+      ],
+      "required_needs": [
+        "order"
+      ],
+      "forbidden_needs": [],
+      "expected_deferred_needs": null,
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "no_candidates_or_recommendation",
+        "selection_predicate": null,
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null
+      },
+      "required_flags": [],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "targeted_clarification",
+          "no_ranking_before_resolution"
+        ],
+        "forbidden_question_topics": [
+          "omitted_retrievable_quantity",
+          "omitted_retrievable_deadline"
+        ],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R29",
+          "examples/chat_rubric.json:cases.R29",
+          "examples/dispatch_inputs.json:R29"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "This week describes sending and does not establish an exact delivery deadline.",
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "10:14",
+      "course_kind": "ambiguous",
+      "historical_observation": {
+        "status": "CLARIFY",
+        "workshop_id": null,
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "NEEDS_WORDING/EXPECTATION_REFINEMENT",
+        "unresolved": true,
+        "confidence": "medium",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [
+          "Should absent and correctly deferred omitted secondary needs be accepted as equivalent?",
+          "Does go out this week describe dispatch context only, or require later date-kind clarification after identifying the order?",
+          "Should date_kind remain unspecified while due_date=null, and how is non-deferred deadline blocking rejected?"
+        ],
+        "recommended_decision": "Recommend CLARIFY once for the order and no precise deadline from this week. Keep date_kind unasserted at this turn. Accept absent or correctly deferred omitted secondary needs; document any later shipping clarification as a separate turn expectation.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R29",
+          "examples/chat_rubric.json:cases.R29",
+          "examples/dispatch_inputs.json:R29",
+          "docs/INTAKE_CONTRACT.md:date phrases and order evidence",
+          "tests/test_intake.py:test_omitted_secondary_need_is_deferred_until_order_identification",
+          "docs/CHAT_EVALUATION_RESULTS.md:repeated order question"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "a07ddd5f6494d813a49d62169f172dabb8fe7eaeeefa21844895093a1fe7301d"
+      }
+    },
+    {
+      "id": "R30",
+      "raw_text": "Please allocate ORD-099: 1500 polo shirts, Northwind Apparel. Deadline Apr 05.",
+      "speaker": "Mei",
+      "split": "development",
+      "scenario_family": "impossible-delivery-deadline",
+      "categories": [
+        "impossible_deadline"
+      ],
+      "expected_status": "NEEDS_REVIEW",
+      "expected_fields": {
+        "order_id": "ORD-099",
+        "pieces": 1500,
+        "product": "Polo shirt",
+        "customer": "Northwind Apparel",
+        "due_date": "2026-04-05"
+      },
+      "expected_resolved_fields": {
+        "order.order_id": "ORD-099",
+        "batch.order_id": "ORD-099",
+        "batch.category": "TOPS",
+        "batch.pieces": 1500,
+        "batch.sent_date": "2026-04-01",
+        "batch.due_date": "2026-04-05"
+      },
+      "forbidden_fields": [
+        "cost",
+        "eta",
+        "score",
+        "turnaround_days"
+      ],
+      "required_needs": [],
+      "forbidden_needs": [
+        "order",
+        "quantity",
+        "deadline",
+        "scope",
+        "constraint_change"
+      ],
+      "expected_deferred_needs": [],
+      "expected_constraints": {
+        "exclusions": [],
+        "split_requested": false
+      },
+      "expected_workshop_behavior": {
+        "candidate_policy": "eligible_for_resolved_batch_and_not_excluded",
+        "selection_predicate": "minimum_configured_score_among_permitted_candidates",
+        "refused_workshop_id": null,
+        "refusal_reason": null,
+        "alternative_predicate": null,
+        "tie_break": [
+          "expected_turnaround_days",
+          "workshop_id"
+        ],
+        "recommendation_must_be_on_time": false
+      },
+      "required_flags": [
+        "NO_ON_TIME_OPTION",
+        "SELECTED_OPTION_LATE"
+      ],
+      "forbidden_flags": [],
+      "expected_response_behavior": {
+        "commit_allowed": false,
+        "reserve_capacity": false,
+        "invent_order_or_estimate": false,
+        "numerical_claims": "bound_to_matching_tool_field_workshop_and_snapshot",
+        "required_concepts": [
+          "review_required",
+          "tool_supported_options",
+          "no_guaranteed_on_time_promise"
+        ],
+        "forbidden_question_topics": [],
+        "max_questions_per_topic": 1
+      },
+      "turns": [],
+      "gold_annotation": {
+        "status": "provisional_pending_independent_adjudication",
+        "independent_gold": false,
+        "annotators": [],
+        "adjudicator": null,
+        "adjudicated_at": null,
+        "prior_exposure": "development_material",
+        "pending_adjudication": [
+          "expected_status",
+          "expected_fields",
+          "expected_resolved_fields",
+          "forbidden_fields",
+          "needs_and_deferral",
+          "expected_constraints",
+          "expected_workshop_behavior",
+          "flags",
+          "expected_response_behavior",
+          "categories"
+        ],
+        "supporting_evidence": [
+          "track2/data/dispatch_requests.txt:R30",
+          "examples/chat_rubric.json:cases.R30",
+          "examples/dispatch_inputs.json:R30",
+          "track2/data/orders.csv:ORD-099"
+        ]
+      },
+      "freeze": {
+        "freeze_status": "not_frozen",
+        "frozen_at": null,
+        "content_sha256": null,
+        "development_exposed": true
+      },
+      "notes": [
+        "All expectations are provisional development annotations, not independent gold. Historical output is not the expected answer."
+      ],
+      "source_time": "10:18",
+      "course_kind": "complete_impossible",
+      "historical_observation": {
+        "status": "NEEDS_REVIEW",
+        "workshop_id": "W1",
+        "draft_checks": "pass",
+        "source": "docs/CHAT_EVALUATION_RESULTS.md",
+        "scope": "historical_pre_v3_not_current_wording_or_post_fix_evidence",
+        "raw_artifacts_available_in_checkout": false
+      },
+      "adjudication_review": {
+        "state": "READY_FOR_GOLD",
+        "unresolved": false,
+        "confidence": "high",
+        "confidence_scope": "provisional_semantics_not_model_accuracy_or_independent_agreement",
+        "questions": [],
+        "recommended_decision": "Retain NEEDS_REVIEW with NO_ON_TIME_OPTION and SELECTED_OPTION_LATE; keep Apr 05, disclose earliest permitted finish, and escalate rather than silently accepting lateness.",
+        "evidence": [
+          "track2/data/dispatch_requests.txt:R30",
+          "examples/chat_rubric.json:cases.R30",
+          "examples/dispatch_inputs.json:R30",
+          "track2/data/orders.csv:ORD-099",
+          "track2/data/orders.csv:ORD-099",
+          "track2/CHANGELOG.md:deliberately impossible R30",
+          "tests/test_dispatch.py:test_declared_impossible_requests_expose_earliest_delivery_and_options"
+        ],
+        "reviewer": null,
+        "adjudicator": null,
+        "human_decision": null,
+        "reviewed_on": "2026-10-13",
+        "review_document": "docs/RELIABILITY_GOLD_REVIEW.md",
+        "reviewed_case_sha256": "d1db24aaaf54a1a056e8d5c156e03245cb6f951fcf94bf96206b18cb7e9f90af"
+      }
+    }
+  ]
+}
