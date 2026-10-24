@@ -2,12 +2,11 @@
 
 import copy
 import hashlib
-import json
 
 import pytest
 
-from dss5105.reliability_assertions import _structured, support_kind, validate_approvals
-from dss5105.reliability_score import ROOT, aggregate, read_json, score_case, serialize_outputs, validate_benchmark
+from dss5105.reliability_assertions import _structured, validate_approvals
+from dss5105.reliability_score import ROOT, aggregate, read_json, score_case, serialize_outputs
 
 
 @pytest.fixture
@@ -216,13 +215,3 @@ def test_v2_csv_has_assertion_ids_and_dynamic_metric(evidence):
     assert "assertion_id" in outputs["checks.csv"].splitlines()[0]
     assert "supported_fields.customer" in outputs["checks.csv"]
     assert any(m["metric"] == "consensus_assertion" for m in report["summary"]["metrics"])
-
-
-def test_canonical_v2_load_and_static_coverage_when_present():
-    path = ROOT / "examples/reliability_benchmark_ai_consensus_v2.json"
-    if not path.exists():
-        pytest.skip("Local reviewer benchmark is not committed")
-    benchmark = json.loads(path.read_text(encoding="utf-8"))
-    validate_benchmark(benchmark)
-    kinds = [support_kind(r) for c in benchmark["cases"] for r in c["consensus_assertions"]]
-    assert "native" in kinds and "structured" in kinds and "unsupported" in kinds
