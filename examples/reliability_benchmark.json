@@ -26,7 +26,7 @@
       "docs/CHAT_EVALUATION_RESULTS.md": "8ef353e2f8ac3b1d8b6f9f2134da0b04b1238a706b15fa7dd41d97eef2743826",
       "tests/test_intake.py": "ad7d0f6a90c977d6c29122a71d5360074ddbe391aaf54ad3ec35b190e3d2b9ea",
       "tests/test_dispatch.py": "abac3594c8bcff84e6080c24275fb2f4e7298fda6d8d2cabab4840f4a3879da7",
-      "tests/test_chat_ui.py": "7a9b887d43603db54bf561d09d833d9aa2692409d113926685720a3ec81dda02"
+      "tests/test_chat_ui.py": "26c6af7c7c4e1b0e096ae1e6d5a7362602094626158fada67690559fcf78537f"
     },
     "source_hash_modes": {
       "track2/data/dispatch_requests.txt": "raw_bytes_sha256",

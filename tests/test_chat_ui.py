@@ -3,8 +3,9 @@ from dataclasses import replace
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from dss5105 import llm
+from dss5105 import chat_ui, llm
 from dss5105.dispatch import ROOT
+from dss5105.replies import build_reply
 
 
 class FakeModel:
@@ -31,6 +32,24 @@ def patch(*updates, exclusions=None, needs=None):
     }
 
 
+@pytest.fixture
+def ui(monkeypatch):
+    fake = FakeModel([])
+    monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
+    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    assert fake.calls == 0
+    assert "history" not in app.session_state
+    return app, fake
+
+
+def say(app, text):
+    return app.chat_input(key="dispatch_chat").set_value(text).run()
+
+
+def requests(app):
+    return [row for row in app.session_state["history"] if row["type"] == "request"]
+
+
 def test_validated_chat_can_be_saved_without_another_provider_call(tmp_path, monkeypatch):
     from dss5105 import records
 
@@ -39,11 +58,12 @@ def test_validated_chat_can_be_saved_without_another_provider_call(tmp_path, mon
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
     app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
     app.radio(key="workspace_mode").set_value("saved").run()
-    app.radio(key="input_source").set_value("chat").run()
-    app.chat_input(key="dispatch_chat").set_value("Please allocate ORD-109.").run()
+    say(app, "Please allocate ORD-109.")
     assert not app.exception
-    assert app.session_state["preview"]["commit_allowed"]
-    app.button(key="review_confirmation").click().run()
+    entry = requests(app)[-1]
+    assert entry["kind"] == "chat"
+    assert entry["result"]["commit_allowed"]
+    app.button(key=f"review_{entry['uid']}").click().run()
     app.text_input(key="confirmed_by").set_value("Chat dispatcher").run()
     app.button(key="confirm_allocation").click().run()
     assert not app.exception
@@ -51,18 +71,7 @@ def test_validated_chat_can_be_saved_without_another_provider_call(tmp_path, mon
     saved = records.AllocationStore().records()
     assert len(saved) == 1
     assert saved[0]["intake_evidence"]["conversation"]["turns"][0]["text"] == "Please allocate ORD-109."
-    assert app.session_state["preview"]["status"] == "ALREADY_ALLOCATED"
-
-
-@pytest.fixture
-def ui(monkeypatch):
-    fake = FakeModel([])
-    monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
-    app.radio(key="input_source").set_value("chat").run()
-    assert fake.calls == 0
-    assert "preview" not in app.session_state
-    return app, fake
+    assert requests(app)[-1]["saved"]
 
 
 def test_chat_clarifies_then_allocates_without_losing_exclusion(ui):
@@ -70,44 +79,40 @@ def test_chat_clarifies_then_allocates_without_losing_exclusion(ui):
     fake.outputs = [
         patch(
             ("order_id", "ORD-109"),
-            exclusions=[
-                {
-                    "workshop": "BudgetWorks",
-                    "imposed_by": "",
-                    "evidence": "no BudgetWorks",
-                }
-            ],
+            exclusions=[{"workshop": "BudgetWorks", "imposed_by": "", "evidence": "no BudgetWorks"}],
             needs=["deadline"],
         ),
         patch(("due_date", "Apr 15")),
     ]
-    app.chat_input(key="dispatch_chat").set_value("ORD-109, no BudgetWorks; I will confirm the new deadline.").run()
+    say(app, "ORD-109, no BudgetWorks; I will confirm the new deadline.")
     assert not app.exception
-    assert app.session_state["preview"]["status"] == "CLARIFY"
-    assert app.button(key="review_confirmation").disabled
-    app.chat_input(key="dispatch_chat").set_value("Apr 15").run()
+    assert requests(app)[-1]["result"]["status"] == "CLARIFY"
+    assert not [button.key for button in app.button if button.key.startswith("review_")]
+    say(app, "Apr 15")
     assert not app.exception
-    assert app.session_state["preview"]["status"] == "RECOMMEND"
-    assert "W3" not in {row["estimate"]["workshop_id"] for row in app.session_state["preview"]["candidates"]}
+    assert [row["result"]["status"] for row in requests(app)] == ["CLARIFY", "RECOMMEND"]
+    final = requests(app)[-1]["result"]
+    assert "W3" not in {row["estimate"]["workshop_id"] for row in final["candidates"]}
     assert fake.calls == 2
     app.radio(key="objective").set_value("hybrid").run()
     assert fake.calls == 2
     assert len(app.session_state["conversation"].turns) == 2
 
 
-def test_failed_followup_hides_old_preview_and_retry_is_explicit(ui):
+def test_failed_followup_adds_nothing_and_retry_is_explicit(ui):
     app, fake = ui
     fake.outputs = [
         patch(("order_id", "ORD-109")),
         RuntimeError("private-error-secret"),
         patch(("due_date", "Apr 15")),
     ]
-    app.chat_input(key="dispatch_chat").set_value("ORD-109").run()
-    app.button(key="review_confirmation").click().run()
-    app.chat_input(key="dispatch_chat").set_value("Apr 15").run()
+    say(app, "ORD-109")
+    entry = requests(app)[-1]
+    app.button(key=f"review_{entry['uid']}").click().run()
+    say(app, "Apr 15")
     assert not app.exception
-    assert "preview" not in app.session_state
-    assert "reviewing_preview" not in app.session_state
+    assert len(requests(app)) == 1
+    assert "reviewing" not in app.session_state
     assert app.chat_input(key="dispatch_chat").disabled
     assert "private-error-secret" not in app.error[0].value
     assert len(app.session_state["conversation"].turns) == 1
@@ -115,46 +120,28 @@ def test_failed_followup_hides_old_preview_and_retry_is_explicit(ui):
     assert fake.calls == 2
     app.button(key="retry_intake").click().run()
     assert fake.calls == 3
-    assert app.session_state["preview"]["status"] == "RECOMMEND"
+    assert [row["result"]["status"] for row in requests(app)] == ["RECOMMEND", "RECOMMEND"]
     assert "pending_turn" not in app.session_state
 
 
-def test_new_request_discards_previous_constraints_and_confirmation(ui):
+def test_new_request_discards_constraints_but_keeps_the_thread(ui):
     app, fake = ui
     fake.outputs = [patch(("order_id", "ORD-109"))]
-    app.chat_input(key="dispatch_chat").set_value("ORD-109").run()
-    app.button(key="review_confirmation").click().run()
-    app.button(key="confirm_demo").click().run()
-    assert "confirmed_preview" in app.session_state
+    say(app, "ORD-109")
     app.button(key="new_chat").click().run()
     assert not app.exception
     assert "conversation" not in app.session_state
-    assert "confirmed_preview" not in app.session_state
-    assert "preview" not in app.session_state
+    assert len(requests(app)) == 1
     assert fake.calls == 1
 
 
-def test_switching_modes_clears_confirmation_without_provider_call(ui):
+def test_examples_do_not_call_the_model_and_do_not_need_a_new_request(ui):
     app, fake = ui
-    fake.outputs = [patch(("order_id", "ORD-109"))]
-    app.chat_input(key="dispatch_chat").set_value("ORD-109").run()
-    app.button(key="review_confirmation").click().run()
-    app.radio(key="input_source").set_value("examples").run()
-    assert "reviewing_preview" not in app.session_state
-    app.radio(key="input_source").set_value("chat").run()
-    assert fake.calls == 1
+    app.button(key="scenario_R07").click().run()
     assert not app.exception
-
-
-def test_inbox_mode_sends_raw_request_not_fixture(ui):
-    app, fake = ui
-    fake.outputs = [patch(("order_id", "ORD-109"))]
-    app.selectbox(key="chat_seed").set_value("R25").run()
     assert fake.calls == 0
-    app.button(key="interpret_inbox").click().run()
-    assert fake.calls == 1
-    assert app.session_state["conversation"].turns[0]["speaker"] == "Mei"
-    assert app.session_state["preview"]["input"]["exclusions"] == []  # Not backfilled from a fixture.
+    assert requests(app)[-1]["kind"] == "example"
+    assert "conversation" not in app.session_state
 
 
 def test_ui_reply_rebuild_and_clicked_selection_preserve_deferred_needs(ui):
@@ -162,65 +149,64 @@ def test_ui_reply_rebuild_and_clicked_selection_preserve_deferred_needs(ui):
     fake.outputs = [patch(("customer", "TrendCart"), needs=["order", "quantity"])]
     app.chat_input(key="dispatch_chat").set_value("Can we get the TrendCart order moving?").run()
     original = app.session_state["conversation"]
-    # Remove the stored reply so remember_tool_reply must rebuild the conversation.
+    # Rebuild a reply using the current UI helper without dropping pending state.
     turns = tuple({key: value for key, value in turn.items() if key != "reply"} for turn in original.turns)
-    app.session_state["conversation"] = replace(original, turns=turns, deferred_needs=("quantity",))
-    app.run()
-    assert not app.exception
-    rebuilt = app.session_state["conversation"]
+    pending = replace(original, turns=turns, deferred_needs=("quantity",))
+    rebuilt = chat_ui.remember_reply(pending, requests(app)[-1]["result"])
+    app.session_state["conversation"] = rebuilt
     assert rebuilt.turns[-1]["reply"]
     assert rebuilt.deferred_needs == ("quantity",)
-    assert app.session_state["preview"]["conversation"]["deferred_needs"] == ("quantity",)
-    choices = app.session_state["chat_replies"][0]["choices"]
+    assert original.deferred_needs == ("quantity",)
+    assert requests(app)[-1]["result"]["conversation"]["deferred_needs"] == ("quantity",)
+    choices = build_reply(requests(app)[-1]["result"])["choices"]
     index = [choice["value"] for choice in choices].index("ORD-017")
     app.button(key=f"choice_{index}").click().run()
     assert not app.exception
     assert fake.calls == 1
     assert app.session_state["conversation"].deferred_needs == ()
     assert app.session_state["conversation"].needs == ()
-    assert app.session_state["preview"]["status"] == "RECOMMEND"
+    assert requests(app)[-1]["result"]["status"] == "RECOMMEND"
 
 
 def test_clicking_a_matching_order_resolves_without_a_model_call(ui):
     app, fake = ui
     fake.outputs = [patch(("customer", "TrendCart"), needs=["order"])]
-    app.chat_input(key="dispatch_chat").set_value("Can we get the TrendCart order moving?").run()
-    assert app.session_state["preview"]["status"] == "CLARIFY"
-    choices = app.session_state["chat_replies"][0]["choices"]
-    index = [choice["value"] for choice in choices].index("ORD-017")
-    app.button(key=f"choice_{index}").click().run()
+    say(app, "Can we get the TrendCart order moving?")
+    first = requests(app)[-1]
+    assert first["result"]["status"] == "CLARIFY"
+    choices = [choice["value"] for choice in build_reply(first["result"])["choices"]]
+    app.button(key=f"choice_{choices.index('ORD-017')}").click().run()
     assert not app.exception
     assert fake.calls == 1
-    assert app.session_state["preview"]["status"] == "RECOMMEND"
-    assert app.session_state["preview"]["order"]["order_id"] == "ORD-017"
-    replies = app.session_state["chat_replies"]
-    assert replies[0]["label"] == "Clarification needed"
-    assert replies[1]["headline"].startswith("Send ORD-017 to ")
+    final = requests(app)[-1]
+    assert final["result"]["status"] == "RECOMMEND"
+    assert final["result"]["order"]["order_id"] == "ORD-017"
+    assert final["text"] == "ORD-017"
+    assert len(requests(app)) == 2
 
 
 def test_clicking_the_alternative_replaces_a_refused_workshop(ui):
     app, fake = ui
     fake.outputs = [patch(("order_id", "ORD-008"), ("suggested_workshop", "OldMill"))]
-    app.chat_input(key="dispatch_chat").set_value("OldMill is free right now - give them ORD-008.").run()
-    first = app.session_state["preview"]
+    say(app, "OldMill is free right now - give them ORD-008.")
+    first = requests(app)[-1]["result"]
     assert first["status"] == "REFUSE_SUGGESTION"
     app.button(key="choice_0").click().run()
     assert not app.exception
     assert fake.calls == 1
-    result = app.session_state["preview"]
+    result = requests(app)[-1]["result"]
     assert result["status"] == "RECOMMEND"
     assert result["recommendation"] == first["alternative"]
     provenance = result["conversation"]["provenance"][-1]
     assert (provenance["field"], provenance["speaker"]) == ("suggested_workshop", "Dispatcher")
 
 
-def test_latest_card_follows_settings_but_history_is_kept(ui):
+def test_earlier_answer_keeps_its_objective_when_settings_change(ui):
     app, fake = ui
     fake.outputs = [patch(("order_id", "ORD-109"))]
-    app.chat_input(key="dispatch_chat").set_value("ORD-109").run()
-    before = app.session_state["chat_replies"][0]
+    say(app, "ORD-109")
+    before = requests(app)[0]["result"]
     app.radio(key="objective").set_value("defects").run()
-    after = app.session_state["chat_replies"][0]
     assert fake.calls == 1
-    assert after["headline"] == "Send ORD-109 to " + app.session_state["preview"]["candidates"][0]["name"] + "."
-    assert before != after
+    assert requests(app)[0]["result"] == before
+    assert requests(app)[0]["objective"] == "lateness"
