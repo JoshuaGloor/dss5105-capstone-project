@@ -4,12 +4,11 @@ This is a data layer only. It does not implement scoring or invoke a model.
 `examples/reliability_benchmark.json` contains R01-R30, all development-exposed,
 with provisional expectations pending independent adjudication. Neither the
 existing rubric, fixtures, historical run, nor this representation is independent
-gold. `examples/reliability_heldout_template.json` contains ten authoring slots,
-not ten authored queries or a frozen held-out set.
+gold. No independently authored or frozen held-out dataset is included.
 
 ## Envelope and context
 
-Both files use `schema_version = reliability-case-v1` and a `cases` array.
+The benchmark uses `schema_version = reliability-case-v1` and a `cases` array.
 The envelope records artifact kind, annotation status, independent-gold status,
 creation date, freeze status, limitations, and a shared context. Context identifies
 the independent 2026-04-01 workshop queue snapshot, registered-order preview scope,
@@ -23,8 +22,7 @@ Hashes identify the source context; they do not mean annotations are frozen.
 The additive `context.source_hash_modes` map uses exactly the same paths and
 declares how each digest is computed. There is no implicit mode or automatic
 file-extension/binary detection. The shared offline helper is
-`src/dss5105/benchmark_integrity.py`; `tests/benchmark_integrity.py` preserves the
-existing test imports. It reads bytes, not newline-translated text.
+`src/dss5105/benchmark_integrity.py`. It reads bytes, not newline-translated text.
 
 - `normalized_text_sha256`: explicitly declared UTF-8 text only. Validate UTF-8,
   replace CRLF with LF, then remaining lone CR with LF, and hash the resulting
@@ -47,8 +45,7 @@ existing test imports. It reads bytes, not newline-translated text.
 | `track2/data/workshops.csv` | `raw_bytes_sha256` |
 
 The six normalized-text sources are ordinary Git-normalized text; their previous
-Windows-working-tree CRLF digests were replaced by LF-normalized digests in both
-artifacts. The three course-source digests are unchanged. `.gitattributes` keeps
+Windows-working-tree CRLF digests were replaced by LF-normalized digests. The three course-source digests are unchanged. `.gitattributes` keeps
 `track2/**` byte-exact with `-text`; do not normalize those files to make a test pass.
 No arbitrary binary data is normalized. Synthetic and real-source checkout tests
 exercise the explicit modes without changing tracked source files.
@@ -57,13 +54,13 @@ exercise the explicit modes without changing tracked source files.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `id` | string | Unique Rxx development ID or Hxx authoring-slot ID |
-| `raw_text` | string or null | Exact inbox text; null for un-authored held-out slots |
+| `id` | string | Unique case ID |
+| `raw_text` | string or null | Exact request text; required for scoring |
 | `speaker` | string or null | Requester, not necessarily the constraint imposer |
-| `split` | enum | `development`, `held_out_template`, or future `held_out` |
+| `split` | enum | `development` or independently authored `held_out` |
 | `scenario_family` | string | Semantic family for later leakage-aware partitioning |
 | `categories` | string array | Overlapping behavior labels, not disjoint counts |
-| `expected_status` | string or null | Provisional top-level initial-response status; template authoring target |
+| `expected_status` | string or null | Expected top-level initial-response status |
 | `expected_fields` | object | Partial assertions on normalized request fields, not raw model patches |
 | `expected_resolved_fields` | object | Partial assertions on retrieved `order.*` and constructed `batch.*` fields |
 | `forbidden_fields` | string array | Request keys that must be absent or null; defaults are not forbidden |
@@ -117,13 +114,10 @@ questions without prescribing the wording. No predicate is executed in this laye
 
 ## Held-out authoring and adjudication
 
-H01-H10 use `split = held_out_template`, null raw text/speaker, no final follow-up
-wording, and explicit `freeze_status = not_frozen` both on the slot and in freeze
-metadata. Their `authoring_specification` lists scenario requirements, not final
-queries. Empty maps and default constraints in templates are placeholders, not
-final labels. An initial status is only a provisional authoring target. Final
-wording and subsequent turn outcomes must be independently authored/adjudicated
-against an appropriate snapshot before conversion into held-out cases.
+Create held-out cases independently with final request text, speaker, expectations,
+source context, and `split = held_out`. Record exposure and adjudication before
+freezing the dataset. Do not tune on it. Unauthored templates are rejected by the
+scorer; an empty scaffold does not establish held-out coverage.
 
 For development, all expected statuses, fields, negative assertions, needs,
 constraints, workshop predicates, flags, response concepts, and category labels
@@ -160,8 +154,7 @@ metadata retain their provisional/not-frozen meanings regardless of review state
 of UTF-8 JSON with sorted keys, ASCII escaping, and compact separators, excluding
 only `adjudication_review`. It is a review-integrity marker, not a freeze hash.
 Any later semantic refinement requires a new review rather than silently changing
-the values covered by the marker. Held-out templates have no development review
-object and remain un-authored/not frozen.
+the values covered by the marker.
 
 ## Alternate assertion-consensus benchmarks
 

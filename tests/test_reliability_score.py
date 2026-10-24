@@ -14,6 +14,7 @@ from dss5105.reliability_score import (
     STANDARD_QUESTIONS,
     aggregate,
     exact_equal,
+    load_artifact,
     main,
     read_json,
     score_run,
@@ -367,8 +368,76 @@ def test_missing_record_is_unattempted_and_zero_denominator_is_null(data):
 
 
 def test_templates_cannot_be_scored(data):
+    benchmark = copy.deepcopy(data[0])
+    benchmark["cases"][0].update(split="held_out_template", raw_text=None)
     with pytest.raises(ValueError, match="Templates"):
-        score_run(read_json(ROOT / "examples/reliability_heldout_template.json"), [], data[1])
+        score_run(benchmark, [], data[1])
+
+
+def test_single_record_and_bundle_load_identically_without_changing_inputs(data, tmp_path):
+    _, manifest, make = data
+    record = make()
+    contents = {
+        "record.json": record,
+        "manifest.json": manifest,
+        "bundle.json": {
+            "manifest": manifest,
+            "records": [record],
+        },
+    }
+    for name, value in contents.items():
+        (tmp_path / name).write_text(json.dumps(value), encoding="utf-8")
+    before = {name: (tmp_path / name).read_bytes() for name in contents}
+    single = load_artifact(tmp_path / "record.json", tmp_path / "manifest.json")
+    bundle = load_artifact(tmp_path / "bundle.json")
+    assert single[:2] == bundle[:2] == ([record], manifest)
+    assert single[2] == load_artifact(tmp_path / "record.json", tmp_path / "manifest.json")[2]
+    with pytest.raises(ValueError, match="requires --manifest"):
+        load_artifact(tmp_path / "record.json")
+    assert {name: (tmp_path / name).read_bytes() for name in contents} == before
+
+
+def test_cli_reads_held_out_directory_records_and_ignores_recorder_metadata(data, tmp_path):
+    benchmark, manifest, make = data
+    record = make()
+    case = next(case for case in benchmark["cases"] if case["id"] == "R04")
+    case.update(id="H01", split="held_out")
+    record["request"]["request_id"] = "H01"
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    for name, value in {
+        "manifest.json": manifest,
+        "H01.json": record,
+        "source_snapshot.json": {"ignored": "source material"},
+        "summary.json": {"ignored": "historical scores"},
+    }.items():
+        (input_dir / name).write_text(json.dumps(value), encoding="utf-8")
+    benchmark_path = tmp_path / "benchmark.json"
+    benchmark_path.write_text(json.dumps(benchmark), encoding="utf-8")
+    output = tmp_path / "output"
+    assert (
+        main(
+            [
+                "--input",
+                str(input_dir),
+                "--benchmark",
+                str(benchmark_path),
+                "--output",
+                str(output),
+                "--source-type",
+                "synthetic",
+                "--no-tool-audit",
+            ]
+        )
+        == 0
+    )
+    summary = read_json(output / "summary.json")
+    assert summary["attempted"] == 1
+    assert "H01" not in summary["unattempted_ids"]
+    cases = [json.loads(line) for line in (output / "cases.jsonl").read_text(encoding="utf-8").splitlines()]
+    held_out = next(case for case in cases if case["case_id"] == "H01")
+    assert held_out["compatibility"]["compatible"] is True
+    assert next(c for c in held_out["checks"] if c["metric"] == "status_correctness")["outcome"] == "PASS"
 
 
 def test_serialization_is_deterministic_and_record_order_independent(data):

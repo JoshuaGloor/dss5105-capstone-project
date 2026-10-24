@@ -983,7 +983,8 @@ def load_artifact(path, manifest_path=None):
         if manifest_path is not None:
             raise ValueError("Directory inputs already contain manifest.json")
         manifest_path = path / "manifest.json"
-        files = sorted(path.glob("R*.json"))
+        metadata = {"manifest.json", "source_snapshot.json", "summary.json"}
+        files = sorted(file for file in path.glob("*.json") if file.name not in metadata)
         manifest = read_json(manifest_path)
         records = [read_json(file) for file in files]
         consumed = [manifest_path, *files]

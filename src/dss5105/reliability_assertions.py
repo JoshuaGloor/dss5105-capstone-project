@@ -80,28 +80,6 @@ def validate_approvals(rows):
             raise ValueError("Need membership approval must be true")
 
 
-def support_kind(row):
-    """Static coverage classification; no records or score execution needed."""
-    if not approved(row):
-        return "unresolved"
-    if native_mapping(row):
-        return "native"
-    family, key = row["assertion_family"], row["assertion_key"]
-    if family == "exclusions" and key.startswith(("required.", "forbidden.")):
-        return "structured"
-    if family == "clarification" and key == "required_needs_exact":
-        return "structured"
-    if family == "operational_predicates" and key in {
-        "workshop_hard_eligibility_ids",
-        "explicit_exclusion_workshop_ids",
-        "named_workshop_refusal_reason_code",
-        "ranking_requires_tool",
-        "split_extension_review_path",
-    }:
-        return "structured"
-    return "unsupported"
-
-
 def _native_case(case, rows):
     clone = copy.deepcopy(case)
     clone.pop("consensus_assertions")

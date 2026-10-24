@@ -159,11 +159,14 @@ current-audit-contract diagnostic against verified source data, not reconstructi
 of a historical implementation. Unknown legacy display shapes are NOT_SCORABLE.
 Recorded estimates/displays are never recomputed into replacement observations.
 
-Inputs can be a recorder directory with manifest.json and Rxx.json files, or a
+Inputs can be a recorder directory with manifest.json and case JSON files, or a
 JSON bundle with `manifest` and `records`. A single saved record requires a separate
 --manifest path. Source type is explicitly selected as `recorded_model_run`,
 `structured_fixture`, or `synthetic`. Fixture/synthetic scores must not be presented
 as model performance. No historical rubric pass/fail is used as the expected answer.
+Directory loading includes held-out case IDs as well as Rxx IDs. Only recorder
+metadata (`manifest.json`, `source_snapshot.json`, `summary.json`) is excluded;
+other JSON files must be valid records with benchmark IDs, or scoring is rejected.
 
 ## Outputs and CLI
 

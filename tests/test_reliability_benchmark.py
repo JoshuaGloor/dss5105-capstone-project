@@ -7,7 +7,8 @@ from collections import Counter
 from pathlib import Path
 
 import pytest
-from benchmark_integrity import hash_bytes, source_sha256
+
+from dss5105.benchmark_integrity import hash_bytes, source_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_TYPES = {
@@ -78,12 +79,11 @@ def read(name):
 
 
 DEVELOPMENT = read("reliability_benchmark.json")
-TEMPLATES = read("reliability_heldout_template.json")
-ALL_CASES = DEVELOPMENT["cases"] + TEMPLATES["cases"]
+ALL_CASES = DEVELOPMENT["cases"]
 
 
-@pytest.mark.parametrize("artifact", [DEVELOPMENT, TEMPLATES], ids=["development", "templates"])
-def test_envelope_and_context_are_explicit(artifact):
+def test_envelope_and_context_are_explicit():
+    artifact = DEVELOPMENT
     assert artifact["schema_version"] == "reliability-case-v1"
     assert artifact["annotation_status"] == "pending_independent_adjudication"
     assert artifact["independent_gold"] is False
@@ -218,22 +218,6 @@ def test_retrieved_quantity_is_not_request_extraction_and_winners_are_not_hardco
             assert isinstance(workshop["selection_predicate"], str)
 
 
-def test_held_out_slots_are_exactly_ten_unfrozen_authoring_templates():
-    assert Counter(case["id"] for case in TEMPLATES["cases"]) == Counter(f"H{i:02d}" for i in range(1, 11))
-    for case in TEMPLATES["cases"]:
-        assert case["split"] == "held_out_template"
-        assert case["raw_text"] is None
-        assert case["speaker"] is None
-        assert case["turns"] == []
-        assert case["freeze_status"] == case["freeze"]["freeze_status"] == "not_frozen"
-        assert case["gold_annotation"]["status"] == "authoring_template_pending_independent_authoring_and_adjudication"
-        assert case["freeze"]["development_exposed"] is False
-        specification = case["authoring_specification"]
-        assert specification["requirements"]
-        assert specification["final_wording_location"] is None
-        assert specification["follow_up_wording_finalized"] is False
-
-
 @pytest.mark.parametrize("case", DEVELOPMENT["cases"], ids=lambda case: case["id"])
 def test_development_adjudication_state_is_explicit_and_not_final_gold(case):
     assert "adjudication_review" in case
@@ -276,8 +260,6 @@ def test_known_unresolved_review_cases_are_not_marked_ready():
         assert cases[case_id]["adjudication_review"]["state"] == "NEEDS_POLICY_DECISION"
     for case_id in refinement:
         assert cases[case_id]["adjudication_review"]["state"] == "NEEDS_WORDING/EXPECTATION_REFINEMENT"
-    for case in TEMPLATES["cases"]:
-        assert "adjudication_review" not in case
 
 
 def test_normalized_text_hash_is_identical_for_lf_crlf_and_lone_cr():
@@ -309,8 +291,7 @@ def test_unknown_hash_mode_is_rejected():
 def test_real_text_source_metadata_survives_checkout_line_endings(path, tmp_path):
     data = (ROOT / path).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
     source = tmp_path / "checkout.txt"
-    for artifact in (DEVELOPMENT, TEMPLATES):
-        expected = artifact["context"]["source_sha256"][path]
-        for checkout in (data, data.replace(b"\n", b"\r\n"), data.replace(b"\n", b"\r")):
-            source.write_bytes(checkout)
-            assert source_sha256(source, mode="normalized_text_sha256") == expected
+    expected = DEVELOPMENT["context"]["source_sha256"][path]
+    for checkout in (data, data.replace(b"\n", b"\r\n"), data.replace(b"\n", b"\r")):
+        source.write_bytes(checkout)
+        assert source_sha256(source, mode="normalized_text_sha256") == expected
