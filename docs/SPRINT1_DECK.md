@@ -7,7 +7,7 @@ differently, present the PDF. The format is a live 5-minute talk plus 2 minutes 
 a hard stop.
 
 The [speaker script](slides/reviewed/Opening_Script_Group11.txt) is about 670 words, roughly
-4 minutes 26 seconds at 150 words per minute. CHEN ZEPENG presents slides 1-3.
+4 minutes 28 seconds at 150 words per minute. CHEN ZEPENG presents slides 1-3.
 
 ## Build
 
@@ -33,8 +33,8 @@ earlier GPT revision is kept under `slides/reviewed/previous/`.
 | Slide | Content | Time |
 |---|---|---|
 | 1 | Title, team, primary objective, the workshop network | 0:25 |
-| 2 | Problem: one chat message is the decision; three questions; only 7 of 30 inbox requests are plain | 0:40 |
-| 3 | Solution and architecture: the modules behind "the model reads, Python calculates, a person approves", their data flows and stores, and the trust boundary around the one external model call | 0:40 |
+| 2 | Problem: one chat message is the decision; three questions; only 7 of 30 inbox requests are plain | 0:35 |
+| 3 | Solution and architecture: the modules behind "the model reads, Python calculates, a person approves", their data flows and stores, and the trust boundary around the one external model call | 0:50 |
 | 4 | Objective declaration and an honest scoreboard across all four course objectives | 0:35 |
 | 5 | Business value | 0:30 |
 | 6 | Progress: simulator evidence, the earliest-finish tie, and the AWS deployment pipeline | 0:35 |

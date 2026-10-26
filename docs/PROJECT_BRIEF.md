@@ -50,6 +50,7 @@ covers only part of Track 2.
 | Structured request resolution and constraints | Implemented read-only previews; hand-authored inputs | `src/dss5105/dispatch.py` |
 | Natural-language extraction and clarification conversation | Implemented; pre-v3 live evaluation historical, revised live run pending | `src/dss5105/intake.py`, `src/dss5105/chat_ui.py` |
 | Dispatcher UI | Streamlit with independent previews and saved local plan; HTML design reference retained | `streamlit_app.py`, `docs/prototype/index.html` |
+| Workshop lookup and extra-work scenarios | Implemented direct read-only tools and offline Streamlit controls; language-query routing pending | `dispatch.py`, `workshop_ui.py` |
 | Confirmed allocation records and queue updates | Implemented in local saved-plan mode: SQLite transactions, retries, stale-state checks, audit export | `src/dss5105/records.py` |
 | Chat evaluation and faithfulness checker | Live inbox runner and partial tool-integrity checks implemented; independent gold/held-out/full faithfulness pending | See evaluation plan |
 
@@ -89,8 +90,8 @@ require bidding, negotiation, or a particular scorer formula. Our current design
 uses one deterministic weighted scorer. Objectives are parameters, never separate
 branches in allocation logic. Eligibility remains a hard constraint.
 
-The primary objective is **not yet selected**. Lateness is the current recommendation
-for team discussion: evaluate both late fraction and mean late days. The pure-defects
+The team has selected **minimise lateness** as its primary objective for Sprint 1.
+Evaluate both late fraction and mean late days. The pure-defects
 preset fails the new random-lateness guardrail and is a tradeoff diagnostic, not a
 successful defects policy. See [current evidence](V3_EVALUATION.md). The course candidates are:
 minimise lateness, minimise defects, fair allocation, or robustness to workshop
@@ -98,8 +99,8 @@ failure. Cost is an additional measured tradeoff, not one of these primary choic
 
 Lateness, defects, and a lateness/defects hybrid are initial experiment presets.
 The hybrid is exploratory, not a validated business default. Fairness scoring and
-a dedicated robustness policy are not implemented. Choose the primary objective
-and justify the final hybrid weights after reviewing evidence; do not assume a
+a dedicated robustness policy are not implemented. Justify the final comparison
+and hybrid weights after reviewing evidence; do not assume a
 cost/quality frontier or speculate about what other teams will select.
 
 ## Milestones and final submission

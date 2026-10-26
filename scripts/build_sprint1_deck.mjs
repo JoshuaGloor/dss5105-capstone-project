@@ -130,7 +130,7 @@ function source(slide, text) {
 {
   const s = pres.addSlide({ masterName: 'DARK' });
   T(s, 'SWEATERCO', { x: 0.6, y: 0.5, w: 4, h: 0.3, fontFace: HEAD, fontSize: 13, color: C.onInk, charSpacing: 9 });
-  T(s, 'GROUP 11  /  TRACK 2  /  SPRINT 1 REVIEW', { x: 0.6, y: 1.32, w: 6, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
+  T(s, 'GROUP 11 \u2014 TRACK 2  /  SPRINT 1 REVIEW', { x: 0.6, y: 1.32, w: 6, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
   T(s, 'The Quick-Response\nSubcontracting Desk', { x: 0.6, y: 1.6, w: 6.3, h: 1.45, fontFace: HEAD, fontSize: 38, color: C.onInk, valign: 'middle' });
   T(s, 'Who should make this batch? Answered in minutes, with the reasoning on record.',
     { x: 0.6, y: 3.12, w: 5.8, h: 0.6, fontFace: HEAD, fontSize: 15, italic: true, color: C.onInkMuted });
@@ -445,8 +445,8 @@ function source(slide, text) {
   ];
   const tone = { High: C.oxblood, Medium: C.camelText, Certain: C.ink };
   T(s, 'RISK', { x: 0.6, y: 1.42, w: 1.85, h: 0.2, fontSize: 7, bold: true, color: C.muted, charSpacing: 1.5 });
-  T(s, 'CHANCE / IMPACT', { x: 2.5, y: 1.42, w: 1.3, h: 0.2, fontSize: 7, bold: true, color: C.muted, charSpacing: 1.5 });
-  T(s, 'WHAT WE DO ABOUT IT', { x: 3.9, y: 1.42, w: 2.45, h: 0.2, fontSize: 7, bold: true, color: C.muted, charSpacing: 1.5 });
+  T(s, 'PROBABILITY / IMPACT', { x: 2.5, y: 1.42, w: 1.38, h: 0.2, fontSize: 7, bold: true, color: C.muted, charSpacing: 0.5 });
+  T(s, 'MITIGATION', { x: 3.9, y: 1.42, w: 2.45, h: 0.2, fontSize: 7, bold: true, color: C.muted, charSpacing: 1.5 });
   s.addShape(pres.shapes.LINE, { x: 0.6, y: 1.66, w: 5.75, h: 0, line: { color: C.ink, width: 1 } });
   risks.forEach(([r, l, im, m], i) => {
     const y = 1.74 + i * 0.64;
@@ -457,16 +457,25 @@ function source(slide, text) {
     if (i < risks.length - 1) s.addShape(pres.shapes.LINE, { x: 0.6, y: y + 0.58, w: 5.75, h: 0, line: { color: C.line, width: 0.75 } });
   });
   T(s, 'KEY ASSUMPTIONS', { x: 6.75, y: 1.42, w: 2.65, h: 0.2, fontSize: 8, bold: true, color: C.camelText, charSpacing: 2 });
+  // Each assumption carries how we check it and its risk if wrong, as in the course's example deck.
   const assumptions = [
-    'Each inbox request is judged on the 1 April queues, on its own.',
-    'A defect means half the batch is redone, as in the simulator.',
-    'Workshop prices are our subcontract cost, not the customer\u2019s price, so price questions are declined.',
-    'A person confirms every allocation. No workshop is contacted automatically.',
+    ['Each inbox request is judged on the 1 April queues, on its own.',
+      'The data sets no order for requests; confirm with the course team.', 'Medium'],
+    ['A defect means half the batch is redone, as in the simulator.',
+      'simulate.py adds 1.5x the work days; confirm with dispatchers.', 'Medium'],
+    ['Workshop prices are our subcontract cost, not the customer\u2019s price.',
+      'workshops.csv has cost per piece and no selling prices.', 'Low'],
+    ['A person confirms every allocation. No workshop is contacted automatically.',
+      'Only Confirm writes an allocation (records.py).', 'Low'],
   ];
-  assumptions.forEach((a, i) => {
-    const y = 1.72 + i * 0.77;
-    card(s, 6.75, y, 2.65, 0.66, C.wash, C.wash);
-    T(s, a, { x: 6.9, y: y + 0.08, w: 2.4, h: 0.52, fontSize: 9, valign: 'middle' });
+  const level = { Medium: C.camelText, Low: C.ink };
+  assumptions.forEach(([a, check, risk], i) => {
+    const y = 1.72 + i * 0.8;
+    card(s, 6.75, y, 2.65, 0.72, C.wash, C.wash);
+    T(s, a, { x: 6.9, y: y + 0.07, w: 2.4, h: 0.32, fontSize: 9 });
+    T(s, [{ text: 'Check: ', options: { bold: true, color: C.ink } }, { text: `${check} ` },
+      { text: 'Risk if wrong: ', options: { bold: true, color: C.ink } }, { text: risk, options: { bold: true, color: level[risk] } }],
+      { x: 6.9, y: y + 0.41, w: 2.4, h: 0.26, fontSize: 7, color: C.inkSoft });
   });
   s.addNotes(notesFor(8));
 }

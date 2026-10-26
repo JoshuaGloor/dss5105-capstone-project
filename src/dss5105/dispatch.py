@@ -35,6 +35,83 @@ BASELINES = {
     "greedy_biggest": ("Biggest capacity", greedy_biggest),
     "random_choice": ("Random eligible (seeded)", random_choice),
 }
+# Metric, its formatting as shown in display_fields (defect risk in percent), and its superlative.
+SHOWN = {
+    "expected_turnaround_days": ("{:.2f}", 1, "Earliest delivery"),
+    "cost": ("{:,.2f}", 1, "Lowest cost"),
+    "defect_risk": ("{:.1f}", 100, "Lowest defect risk"),
+}
+
+
+def _shown(estimate: dict, key: str) -> float:
+    """The value exactly as the user sees it, so differences agree with the table."""
+    text, scale, _ = SHOWN[key]
+    return float(text.format(estimate[key] * scale).replace(",", ""))
+
+
+def _difference(value: float, text: str, more: str, less: str, same: str) -> str:
+    if value == 0:
+        return same
+    return f"{text.format(abs(value))} {more if value > 0 else less}"
+
+
+def decision_basis(result: dict) -> dict | None:
+    """Why the chosen workshop: tool-computed comparisons with the other permitted candidates.
+
+    Explains a ranking that has already happened; it never chooses or reorders anything.
+    Every difference is taken between displayed values, so it matches the comparison table.
+    """
+    candidates = result["candidates"]
+    chosen_id = result["recommendation"] or result["alternative"]
+    chosen = next((row for row in candidates if row["estimate"]["workshop_id"] == chosen_id), None)
+    if chosen is None:
+        return None
+    mine = chosen["estimate"]
+    on_time = [row for row in candidates if row["meets_deadline"]]
+    pools = [(candidates, f"of the {len(candidates)} permitted workshops")]
+    if chosen["meets_deadline"] and 1 < len(on_time) < len(candidates):
+        pools.append((on_time, f"of the {len(on_time)} that meet the deadline"))
+    reasons = ["The only permitted workshop for this batch."] if len(candidates) == 1 else []
+    for pool, scope in pools if len(candidates) > 1 else ():
+        found = False
+        for key, (_, _, label) in SHOWN.items():
+            best = min(_shown(row["estimate"], key) for row in pool)
+            if _shown(mine, key) == best:
+                tied = [row["name"] for row in pool if row is not chosen and _shown(row["estimate"], key) == best]
+                shared = f", shared with {', '.join(tied)}" if tied else ""
+                reasons.append(f"{label} {scope}{shared}.")
+                found = True
+        if found:
+            break
+    slack = mine["available_days"] - _shown(mine, "expected_turnaround_days")
+    if chosen["meets_deadline"]:
+        reasons.append(f"Expected {slack:.2f} days before the deadline.")
+    else:
+        reasons.append(f"Expected {mine['lateness_days']:.2f} days after the deadline.")
+    basis = {"workshop_id": chosen_id, "permitted": len(candidates), "slack_days": slack, "compared_with": None}
+    other = next((row for row in candidates if row is not chosen), None)
+    if other is not None:
+        theirs = other["estimate"]
+        delivery, cost, defects = (
+            round(_shown(theirs, key) - _shown(mine, key), 2)
+            for key in ("expected_turnaround_days", "cost", "defect_risk")
+        )
+        parts = [
+            _difference(delivery, "{:.2f}", "days slower", "days faster", "same delivery"),
+            _difference(cost, "{:,.2f}", "more in cost", "less in cost", "same cost"),
+            _difference(defects, "{:.1f}", "points more defect risk", "points less defect risk", "same defect risk"),
+        ]
+        if chosen["meets_deadline"] != other["meets_deadline"]:
+            parts.append("meets the deadline" if other["meets_deadline"] else "misses the deadline")
+        rank = "Next ranked" if candidates[0] is chosen else "Ranked first"
+        reasons.append(f"{rank}: {other['name']}, " + ", ".join(parts) + ".")
+        basis.update(
+            compared_with=theirs["workshop_id"],
+            delivery_days_difference=delivery,
+            cost_difference=cost,
+            defect_points_difference=defects,
+        )
+    return {**basis, "reasons": reasons}
 
 
 @dataclass(frozen=True)
@@ -83,6 +160,47 @@ class DispatchInput:
             raise ValueError("Duplicate workshop exclusions must be consolidated with their provenance")
 
 
+@dataclass(frozen=True)
+class WorkshopQuery:
+    category: str | None = None
+    status: str | None = None
+    pieces: int | None = None
+    due_date: str | None = None
+
+    def __post_init__(self):
+        for name in ("category", "status"):
+            value = getattr(self, name)
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                raise ValueError(f"{name} must be a nonempty string or null")
+        if self.pieces is not None:
+            if type(self.pieces) is not int or self.pieces <= 0:
+                raise ValueError("pieces must be a positive integer")
+            if self.category is None:
+                raise ValueError("A batch quantity requires a product category")
+        if self.due_date is not None:
+            if not isinstance(self.due_date, str) or self.pieces is None:
+                raise ValueError("A delivery deadline requires a batch quantity")
+            date.fromisoformat(self.due_date)
+
+
+@dataclass(frozen=True)
+class LoadScenario:
+    workshop_id: str
+    category: str
+    pieces: int
+    additional_pieces: int
+    due_date: str
+
+    def __post_init__(self):
+        if not isinstance(self.workshop_id, str) or not self.workshop_id.strip():
+            raise ValueError("A workshop ID is required")
+        if self.category is None or self.pieces is None or self.due_date is None:
+            raise ValueError("Category, batch quantity and delivery deadline are required")
+        WorkshopQuery(category=self.category, pieces=self.pieces, due_date=self.due_date)
+        if type(self.additional_pieces) is not int or self.additional_pieces <= 0:
+            raise ValueError("additional_pieces must be a positive integer")
+
+
 def ship_date_is_due_date(request: DispatchInput, order: dict) -> bool:
     """A stated ship date needs no question when it is the order's recorded due date."""
     return request.date_kind == "shipping" and request.due_date == order["due_date"]
@@ -116,6 +234,170 @@ class DispatchDesk:
             path.name: hashlib.sha256(path.read_bytes()).hexdigest()
             for path in (DATA / "orders.csv", DATA / "workshops.csv", DATA / "dispatch_requests.txt", HARNESS_PATH)
         }
+
+    def snapshot(self) -> dict:
+        """Validate and identify the exact state used by every read-only tool."""
+        if set(self.queues) != set(self.workshops) or any(
+            isinstance(value, bool) or not isinstance(value, (float, int)) or not isfinite(value) or value < 0
+            for value in self.queues.values()
+        ):
+            raise ValueError("A complete finite nonnegative queue snapshot is required")
+        snapshot = {
+            "as_of": self.as_of.isoformat(),
+            "queues": self.queues.copy(),
+            "sources": self.source_hashes.copy(),
+        }
+        return {**snapshot, "id": hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()}
+
+    @staticmethod
+    def eligibility_reasons(batch: dict, workshop) -> list[str]:
+        """Explain helper exclusions; the course helper alone decides membership."""
+        reasons = []
+        if workshop.status != "ACTIVE":
+            reasons.append(f"Status is {workshop.status}.")
+        if batch["category"] not in workshop.makes:
+            reasons.append(f"Cannot make {batch['category']}.")
+        if workshop.max_batch is not None and batch["pieces"] > workshop.max_batch:
+            reasons.append(f"Batch exceeds the {workshop.max_batch}-piece limit.")
+        return reasons or ["Excluded by the course eligibility helper."]
+
+    def query_register(self, query: WorkshopQuery) -> dict:
+        snapshot = self.snapshot()
+        if query.category is not None and query.category not in {c for w in self.workshops.values() for c in w.makes}:
+            raise ValueError("Unknown product category")
+        if query.status is not None and query.status not in {w.status for w in self.workshops.values()}:
+            raise ValueError("Unknown workshop status")
+        batch = None
+        eligible = None
+        if query.pieces is not None:
+            batch = {
+                "order_id": "WORKSHOP_QUERY",
+                "category": query.category,
+                "pieces": query.pieces,
+                "sent_date": self.as_of,
+                "due_date": date.fromisoformat(query.due_date) if query.due_date else self.as_of,
+            }
+            eligible = {w.workshop_id for w in eligible_workshops(batch, self.workshops)}
+        matches = []
+        for key, workshop in sorted(self.workshops.items()):
+            if query.category is not None and query.category not in workshop.makes:
+                continue
+            if query.status is not None and query.status != workshop.status:
+                continue
+            estimate = estimate_delivery(batch, workshop, self.queues) if query.due_date and key in eligible else None
+            matches.append(
+                {
+                    "workshop_id": key,
+                    "name": workshop.name,
+                    "status": workshop.status,
+                    "makes": sorted(workshop.makes),
+                    "capacity": workshop.capacity,
+                    "max_batch": workshop.max_batch,
+                    "queue_days": self.queues[key],
+                    "eligible": key in eligible if eligible is not None else None,
+                    "reasons": self.eligibility_reasons(batch, workshop)
+                    if eligible is not None and key not in eligible
+                    else [],
+                    "estimate": asdict(estimate) if estimate else None,
+                    "meets_deadline": estimate.lateness_days == 0 if estimate else None,
+                    "display": {
+                        "capacity": f"{workshop.capacity:,} pieces/day",
+                        "max_batch": f"{workshop.max_batch:,} pieces"
+                        if workshop.max_batch is not None
+                        else "No batch cap",
+                        "queue": f"{self.queues[key]:.2f} days",
+                        **(self.display_fields(estimate) if estimate else {}),
+                    },
+                }
+            )
+        return {
+            "status": "MATCHES" if matches else "NO_MATCHES",
+            "query": asdict(query),
+            "snapshot": snapshot,
+            "tool_sources": {
+                name: hashlib.sha256((ROOT / "src" / "dss5105" / name).read_bytes()).hexdigest()
+                for name in ("allocator.py", "dispatch.py")
+            },
+            "matches": matches,
+            "display": {"pieces": f"{query.pieces:,} pieces" if query.pieces is not None else "No batch specified"},
+            "assumption": "Current queue snapshot. Delivery includes expected rework and is an estimate.",
+        }
+
+    def probe_load(self, scenario: LoadScenario) -> dict:
+        register = self.query_register(
+            WorkshopQuery(category=scenario.category, pieces=scenario.pieces, due_date=scenario.due_date)
+        )
+        if scenario.workshop_id not in self.workshops:
+            raise ValueError("Unknown workshop ID")
+        batch = {
+            "order_id": "LOAD_PROBE",
+            "category": scenario.category,
+            "pieces": scenario.pieces,
+            "sent_date": self.as_of,
+            "due_date": date.fromisoformat(scenario.due_date),
+        }
+        extra = {**batch, "pieces": scenario.additional_pieces}
+        workshop = self.workshops[scenario.workshop_id]
+        result = {
+            "scenario": asdict(scenario),
+            "snapshot": register["snapshot"],
+            "tool_sources": register["tool_sources"],
+            "workshop_name": workshop.name,
+            "status": "UNSUPPORTED",
+            "reasons": [],
+            "before": None,
+            "after": None,
+            "candidates_after": [],
+            "fastest_alternative": None,
+            "assumption": "Additional work waits ahead of the reference batch at the same planning date. "
+            "Expected rework occupies capacity; transport does not. No planning queues change.",
+        }
+        for label, work in (("Reference batch", batch), ("Additional batch", extra)):
+            if scenario.workshop_id not in {w.workshop_id for w in eligible_workshops(work, self.workshops)}:
+                result["reasons"].extend(label + ": " + reason for reason in self.eligibility_reasons(work, workshop))
+        if result["reasons"]:
+            return result
+        before = estimate_delivery(batch, workshop, self.queues)
+        extra_estimate = estimate_delivery(extra, workshop, self.queues)
+        increment = extra_estimate.process_days * (1 + 0.5 * extra_estimate.defect_risk)
+        queues_after = {**self.queues, scenario.workshop_id: self.queues[scenario.workshop_id] + increment}
+        after = estimate_delivery(batch, workshop, queues_after)
+        for candidate in eligible_workshops(batch, self.workshops):
+            estimate = estimate_delivery(batch, candidate, queues_after)
+            result["candidates_after"].append(
+                {
+                    "workshop_id": candidate.workshop_id,
+                    "name": candidate.name,
+                    "estimate": asdict(estimate),
+                    "display": self.display_fields(estimate),
+                    "meets_deadline": estimate.lateness_days == 0,
+                }
+            )
+        result["candidates_after"].sort(
+            key=lambda row: (row["estimate"]["expected_turnaround_days"], row["workshop_id"])
+        )
+        alternatives = [row for row in result["candidates_after"] if row["workshop_id"] != scenario.workshop_id]
+        result.update(
+            status="ASSESSED",
+            queues_after=queues_after,
+            additional_processing_days=increment,
+            before={
+                "estimate": asdict(before),
+                "display": self.display_fields(before),
+                "meets_deadline": before.lateness_days == 0,
+            },
+            after={
+                "estimate": asdict(after),
+                "display": self.display_fields(after),
+                "meets_deadline": after.lateness_days == 0,
+            },
+            fastest_alternative=alternatives[0] if alternatives else None,
+            display={
+                "additional_pieces": f"{scenario.additional_pieces:,} pieces",
+                "additional_processing": f"{increment:.2f} days",
+            },
+        )
+        return result
 
     def display_fields(self, estimate, score=None) -> dict:
         """Single source of the formatted strings shown to a user, for every policy."""
@@ -196,11 +478,7 @@ class DispatchDesk:
         return {"status": status, "matches": matches}
 
     def preview(self, envelope: dict, request: DispatchInput, weights: ObjectiveWeights) -> dict:
-        if set(self.queues) != set(self.workshops) or any(
-            isinstance(value, bool) or not isinstance(value, (float, int)) or not isfinite(value) or value < 0
-            for value in self.queues.values()
-        ):
-            raise ValueError("A complete finite nonnegative queue snapshot is required")
+        snapshot = self.snapshot()
         for workshop_id in [request.suggested_workshop, *(item["workshop_id"] for item in request.exclusions)]:
             if workshop_id is not None and workshop_id not in self.workshops:
                 raise ValueError(f"Unknown workshop: {workshop_id}")
@@ -208,16 +486,10 @@ class DispatchDesk:
             if constraint["evidence"] not in envelope["text"]:
                 raise ValueError("Exclusion evidence must occur in the original message")
         effective = PREFERENCES.get(request.preference, weights)
-        snapshot = {
-            "as_of": self.as_of.isoformat(),
-            "queues": self.queues.copy(),
-            "sources": self.source_hashes.copy(),
-        }
-        snapshot_id = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()
         result = {
             "request": envelope,
             "input": asdict(request),
-            "snapshot": {**snapshot, "id": snapshot_id},
+            "snapshot": snapshot,
             "configured_weights": asdict(weights),
             "effective_weights": asdict(effective),
             "scales": asdict(ScoreScales()),
@@ -242,7 +514,7 @@ class DispatchDesk:
         }
 
         def finish(status, message):
-            result.update(status=status, message=message)
+            result.update(status=status, message=message, decision_basis=decision_basis(result))
             return result
 
         if request.intent in ("quote", "history"):
@@ -311,15 +583,7 @@ class DispatchDesk:
         for key, workshop in self.workshops.items():
             reasons = []
             if key not in eligible:
-                # Diagnostics explain the helper's decision; membership comes only from the helper above.
-                if workshop.status != "ACTIVE":
-                    reasons.append(f"Status is {workshop.status}.")
-                if batch["category"] not in workshop.makes:
-                    reasons.append(f"Cannot make {batch['category']}.")
-                if workshop.max_batch is not None and batch["pieces"] > workshop.max_batch:
-                    reasons.append(f"Batch exceeds the {workshop.max_batch}-piece limit.")
-                if not reasons:
-                    reasons.append("Excluded by the course eligibility helper.")
+                reasons.extend(self.eligibility_reasons(batch, workshop))
             if key in constraints:
                 reasons.append(f"Excluded by {constraints[key]['imposed_by']}: {constraints[key]['evidence']}")
             if reasons:

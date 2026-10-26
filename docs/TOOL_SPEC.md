@@ -118,6 +118,37 @@ It checkpoints raw extraction and tool evidence without committing allocations.
 
 ## Proposed agent tools and later extensions
 
+### Workshop lookup and workload scenario contract
+
+These deterministic Python contracts are finalized for the Sprint 1 refinement.
+They are called directly by the Streamlit workshop workspace, not registered with
+the language model. They never write records or change queue state.
+
+- `DispatchDesk.query_register(WorkshopQuery)`: optional category and status filters,
+  plus positive integer pieces and an ISO delivery deadline when estimating a batch.
+  A quantity requires a category; a deadline requires a quantity. Return matching
+  profiles, capability, status, batch limit, current queue, course-helper eligibility,
+  and per-candidate delivery evidence when a deadline is provided. Membership comes
+  from `eligible_workshops()`. Return an empty match normally; reject invalid filters
+  and missing/nonfinite/negative queue state. ACTIVE never guarantees delivery.
+- `DispatchDesk.probe_load(LoadScenario)`: workshop ID, category, positive integer
+  reference-batch pieces, additional pieces, and ISO delivery deadline. Model the
+  additional batch ahead of the reference batch at the same planning date. Both
+  batches must pass the course helper at the selected workshop. Return before/after
+  delivery estimates, expected additional processing occupancy, a fresh comparison
+  across eligible workshops, and the fastest alternative if one exists. Invalid
+  inputs raise `ValueError`; ineligible scenarios return `UNSUPPORTED` with reasons.
+  This is a hypothetical workload check, not closure prediction or authorization
+  to send extra work. Occupancy includes expected rework and excludes transport.
+- `AllocationStore.query_register` and `probe_load` wrap those methods in a read
+  transaction using saved planning queues and include the database revision.
+  Independent queries use the untouched course snapshot.
+
+No tool infers what "this week" means. The UI requires an explicit delivery date.
+Outputs include source hashes, a queue-snapshot ID, raw quantities and tool-formatted
+display fields. The workload probe does not model queue drainage or other jobs'
+deadlines and therefore does not establish network-wide effects.
+
 These contracts are design proposals for the next increment. Finalize their schemas
 and write relevant tests before implementation. Shared inputs should carry a resolved
 request, its source text, requester, requested date, constraints with provenance,
@@ -127,12 +158,12 @@ and an explicit state snapshot. Do not infer these from simulator replay outcome
 |---|---|---|---|---|---|
 | `resolve_order` | Reference text and optional filters | RESOLVED, AMBIGUOUS, or NOT_FOUND with candidate IDs and supporting fields | Identify the intended order | Choosing an arbitrary match | Return ambiguity or absence for the agent to explain or clarify |
 | `get_order` | Order ID | Order fields with source reference, or NOT_FOUND | Retrieve recorded facts | Inventing quotes or past allocations | Distinguish an unknown order from an absent field |
-| `query_register` | Capability/status/batch filters and state reference | Matching workshop profiles and queue snapshot | Answer workshop lookup questions | Ranking or interpreting ACTIVE as a delivery guarantee | Empty match is a valid answer; missing state is an explicit failure |
+| `query_register` (Python implemented, chat adapter proposed) | Capability/status/batch filters and state reference | Matching workshop profiles and queue snapshot | Answer workshop lookup questions | Ranking or interpreting ACTIVE as a delivery guarantee | Empty match is a valid answer; missing state is an explicit failure |
 | `check_eligibility` | Resolved batch, workshops, optional workshop ID | Eligibility and reason per workshop | Explain the course helper's exclusions | Soft objective tradeoffs | Reject unresolved inputs; preserve no-eligible as a normal result |
 | `estimate_delivery` adapter | Resolved request, workshop ID, as-of date and queue state | Internal estimate plus calendar dates, source references and assumptions | Expose Python estimates to the agent | Silent use of stale state or an unconditional promise | Surface missing state, invalid inputs, and ineligible candidate handling explicitly |
 | `check_feasibility` | Resolved request, effective deadline, exclusions, queue state | Whether any permitted candidate meets the estimate criterion, with candidate dates and slips | Explain whether the request can be met under stated assumptions | Automatically committing a late order | Unknown deadline requires clarification; no feasible candidate returns options |
 | `rank_candidates` adapter | Resolved request, weights/scales, hard constraints and provenance | Full considered-candidate record, exclusions, ranked scores, and tie-break details | Recommend within the permitted set | Relaxing a hard constraint or committing | All candidates excluded returns a reason and escalation options |
-| `evaluate_options` | Resolved request and state, explicitly allowed alternatives | Compared whole-batch/split/load scenarios with assumptions | Examine overload and no-good-option cases. The two-workshop split part is implemented as `assess_split`; the overload probe is still proposed | Assuming a split is commercially permitted or simulator-supported | Unsupported scenarios or no improvement must be reported explicitly |
+| `evaluate_options` (chat adapter proposed) | Resolved request and state, explicitly allowed alternatives | Compared whole-batch/split/load scenarios with assumptions | Examine no-good-option cases. Python implements `assess_split` and the read-only `probe_load` scenario | Assuming a split is commercially permitted or simulator-supported | Unsupported scenarios or no improvement must be reported explicitly |
 | `commit_allocation` (implemented local subset) | Reviewed preview, dispatcher, idempotency key, explicit confirmation | Persisted allocation ID, timestamp, queue change and audit record | Save a local planning decision | Workshop contact, source edits, cancellations, authentication | Reject stale/unconfirmed/duplicate requests; exact retries return the existing record; see record contract |
 
 The course requires explicit handling of awkward cases; it does not require a

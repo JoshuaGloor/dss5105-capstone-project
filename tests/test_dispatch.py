@@ -302,3 +302,41 @@ def test_impossible_hard_date_keeps_earliest_evidence(desk):
     assert result["earliest_option"]
     assert result["review_options"]
     assert result["recommendation"] is None
+
+
+def _shown_days(row):
+    return float(row["display"]["turnaround"].split()[0])
+
+
+def test_decision_basis_differences_agree_with_the_displayed_table(desk):
+    result = preview(desk, pieces=500, due_date="2026-04-13")
+    basis = result["decision_basis"]
+    chosen, other = result["candidates"][0], result["candidates"][1]
+    assert basis["workshop_id"] == result["recommendation"] == chosen["estimate"]["workshop_id"]
+    assert basis["compared_with"] == other["estimate"]["workshop_id"]
+    gap = _shown_days(other) - _shown_days(chosen)
+    assert f"Next ranked: {other['name']}, {gap:.2f} days slower" in basis["reasons"][-1]
+    slack = chosen["estimate"]["available_days"] - _shown_days(chosen)
+    assert f"Expected {slack:.2f} days before the deadline." in basis["reasons"]
+    assert f"Earliest delivery of the {len(result['candidates'])} permitted workshops." in basis["reasons"]
+
+
+def test_decision_basis_scopes_a_hard_date_preference_to_on_time_options(desk):
+    item = next(item for item in read_inbox() if item["request_id"] == "R21")
+    fields = json.loads((ROOT / "examples" / "dispatch_inputs.json").read_text())["R21"]
+    assert fields["preference"] == "cheapest_on_time"
+    result = desk.preview(item, DispatchInput(**fields), ObjectiveWeights())
+    on_time = [row for row in result["candidates"] if row["meets_deadline"]]
+    assert 1 < len(on_time) < len(result["candidates"])
+    chosen = next(row for row in on_time if row["estimate"]["workshop_id"] == result["recommendation"])
+    assert chosen["estimate"]["cost"] == min(row["estimate"]["cost"] for row in on_time)
+    reasons = result["decision_basis"]["reasons"]
+    assert f"Lowest cost of the {len(on_time)} that meet the deadline." in reasons
+    assert reasons[-1].startswith(f"Ranked first: {result['candidates'][0]['name']}, ")
+    assert reasons[-1].endswith("misses the deadline.")
+
+
+def test_decision_basis_is_absent_without_a_chosen_workshop(desk):
+    result = desk.preview(envelope(), DispatchInput(customer="Harbor Knits"), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert result["decision_basis"] is None

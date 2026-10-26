@@ -20,7 +20,8 @@ writing code, in this order:
 
 Course requirements come from Spec v5 and Tracks v4 (Data v3); implementation status comes from
 code and reproducible evidence. Keep team proposals distinct from requirements and
-results. The primary objective is not yet selected. See
+results. The team has selected minimise lateness as the primary objective,
+measured by late fraction and mean late days. See
 [docs/ALLOCATION_ENGINE.md](docs/ALLOCATION_ENGINE.md) for the current offline allocator.
 
 Two rules that override convenience:

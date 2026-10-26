@@ -169,7 +169,7 @@ def test_clicking_a_matching_order_resolves_without_a_model_call(ui):
     assert app.session_state["preview"]["order"]["order_id"] == "ORD-017"
     replies = app.session_state["chat_replies"]
     assert replies[0]["label"] == "Clarification needed"
-    assert replies[1]["headline"].startswith("Send ORD-017 to ")
+    assert replies[1]["headline"].startswith("Recommended workshop for ORD-017: ")
 
 
 def test_clicking_the_alternative_replaces_a_refused_workshop(ui):
@@ -196,5 +196,8 @@ def test_latest_card_follows_settings_but_history_is_kept(ui):
     app.radio(key="objective").set_value("defects").run()
     after = app.session_state["chat_replies"][0]
     assert fake.calls == 1
-    assert after["headline"] == "Send ORD-109 to " + app.session_state["preview"]["candidates"][0]["name"] + "."
+    assert (
+        after["headline"]
+        == "Recommended workshop for ORD-109: " + app.session_state["preview"]["candidates"][0]["name"] + "."
+    )
     assert before != after

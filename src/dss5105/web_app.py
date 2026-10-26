@@ -18,13 +18,27 @@ from dss5105.evaluate import PRESETS
 from dss5105.intake import preview_conversation
 from dss5105.records import AllocationError, AllocationStore
 from dss5105.replies import STATUS_LABELS
+from dss5105.workshop_ui import render_workshops
 
 STYLE = Path(__file__).with_name("assets") / "desk.css"
-LABELS = {"lateness": "Lateness", "defects": "Defects", "hybrid": "Hybrid", "custom": "Custom weights"}
-MEETS_COLOR = "#26a37c"
-MISSES_COLOR = "#94631a"
-MEETS_LABEL = "Meets the deadline"
-MISSES_LABEL = "Misses the deadline"
+LABELS = {
+    "lateness": "Prioritise on-time delivery",
+    "defects": "Prioritise quality",
+    "hybrid": "Compare the mixed policy",
+    "custom": "Set relative priorities",
+}
+INK = "#1d1b18"
+MUTED = "#6b665d"
+GRID = "#ece6db"
+CARD = "#ffffff"
+# Delivery segments in timeline order: estimate field (None = expected rework), display key, label, color.
+# The four colors pass the dataviz palette checks on the paper surface and avoid the status green and red.
+SEGMENTS = (
+    ("queue_days", "queue", "Queue wait", "#a8742f"),
+    ("process_days", "processing", "Processing", "#2f6db5"),
+    ("transport_days", "transport", "Transport", "#14a08c"),
+    (None, "expected_rework", "Expected rework", "#8b55b0"),
+)
 FLAGS = {
     "PAST_DEADLINE": "The requested deadline is already in the past.",
     "NO_ON_TIME_OPTION": "No permitted whole-batch option meets the date.",
@@ -70,9 +84,9 @@ def request_card(envelope: dict, request: DispatchInput, desk: DispatchDesk):
 
 def settings(request: DispatchInput) -> ObjectiveWeights:
     with st.container(border=True, key="decision_settings"):
-        st.caption("DECISION SETTINGS")
-        st.subheader("Compare objectives")
-        st.caption("Primary selection is pending. These presets are exploratory.")
+        st.caption("ALLOCATION PRIORITIES")
+        st.subheader("Compare tradeoffs")
+        st.caption("Primary objective: minimise lateness. Compare alternatives below.")
         fixed = request.preference != "configured"
         mode = st.radio(
             "Objective",
@@ -103,58 +117,88 @@ def settings(request: DispatchInput) -> ObjectiveWeights:
             configured = ObjectiveWeights(**weights)
         else:
             configured = PRESETS[mode]
-        st.caption("Eligibility and exclusions always apply. A hybrid need not lie between the other results.")
+        st.caption("Workshop restrictions always apply. Priorities change the ranking of permitted options.")
         return configured
 
 
 def candidate_chart(result: dict):
-    """Plot only tool-produced estimates; tooltips reuse the tool's formatted strings."""
-    rows = [
-        {
-            "name": candidate["name"],
-            "days": candidate["estimate"]["expected_turnaround_days"],
-            "status": MEETS_LABEL if candidate["meets_deadline"] else MISSES_LABEL,
-            "turnaround": candidate["display"]["turnaround"],
-            "cost": candidate["display"]["cost"],
-            "defects": candidate["display"]["defects"],
-            "eta": candidate["display"]["eta"],
-        }
-        for candidate in result["candidates"]
-    ]
-    order = [row["name"] for row in rows]
-    axis = alt.Axis(grid=True, gridColor="#e6e9e4", gridWidth=1, domain=False, tickSize=0, labelColor="#60726c")
+    """Where each candidate's days go: the tool's own estimate segments, stacked against the deadline.
+
+    Segment lengths are estimate fields; tooltips and end labels reuse the tool's formatted strings.
+    """
+    rows, ends = [], []
+    for candidate in result["candidates"]:
+        estimate, display = candidate["estimate"], candidate["display"]
+        for index, (field, key, label, _) in enumerate(SEGMENTS):
+            days = estimate[field] if field else estimate["expected_turnaround_days"] - estimate["turnaround_days"]
+            rows.append(
+                {
+                    "name": candidate["name"],
+                    "segment": label,
+                    "order": index,
+                    "days": days,
+                    "shown": display[key],
+                    "turnaround": display["turnaround"],
+                    "eta": display["eta"],
+                }
+            )
+        late = "" if candidate["meets_deadline"] else ", late " + display["lateness"]
+        ends.append(
+            {
+                "name": candidate["name"],
+                "days": estimate["expected_turnaround_days"],
+                "label": display["turnaround"] + late,
+            }
+        )
+    order = [row["name"] for row in ends]
+    axis = alt.Axis(
+        grid=True, gridColor=GRID, gridWidth=1, domain=False, tickSize=0, labelColor=MUTED, titleColor=MUTED
+    )
+    y = alt.Y(
+        "name:N", sort=order, title=None, axis=alt.Axis(domain=False, tickSize=0, labelColor=INK, labelFontSize=12)
+    )
     bars = (
         alt.Chart(alt.Data(values=rows))
-        .mark_bar(cornerRadiusEnd=4, size=18)
+        .mark_bar(size=18, stroke=CARD, strokeWidth=2)
         .encode(
-            y=alt.Y("name:N", sort=order, title=None, axis=alt.Axis(domain=False, tickSize=0, labelColor="#203731")),
-            x=alt.X("days:Q", title="Expected days to delivery", axis=axis),
+            y=y,
+            x=alt.X("days:Q", stack="zero", title="Expected days to delivery", axis=axis),
             color=alt.Color(
-                "status:N",
-                scale=alt.Scale(domain=[MEETS_LABEL, MISSES_LABEL], range=[MEETS_COLOR, MISSES_COLOR]),
-                legend=alt.Legend(title=None, orient="top", labelColor="#203731"),
+                "segment:N",
+                scale=alt.Scale(domain=[s[2] for s in SEGMENTS], range=[s[3] for s in SEGMENTS]),
+                legend=alt.Legend(title=None, orient="top", labelColor=INK, symbolType="square"),
             ),
+            order=alt.Order("order:Q"),
             tooltip=[
                 alt.Tooltip("name:N", title="Workshop"),
-                alt.Tooltip("turnaround:N", title="Expected"),
+                alt.Tooltip("segment:N", title="Segment"),
+                alt.Tooltip("shown:N", title="Days"),
+                alt.Tooltip("turnaround:N", title="Expected total"),
                 alt.Tooltip("eta:N", title="ETA"),
-                alt.Tooltip("cost:N", title="Cost units"),
-                alt.Tooltip("defects:N", title="Defect risk"),
-                alt.Tooltip("status:N", title="Deadline"),
             ],
         )
+    )
+    labels = (
+        alt.Chart(alt.Data(values=ends))
+        .mark_text(align="left", dx=8, color=INK, fontSize=11.5)
+        .encode(y=alt.Y("name:N", sort=order), x="days:Q", text="label:N")
     )
     layers = [bars]
     available = result["candidates"][0]["estimate"]["available_days"]
     if available >= 0:
         marker = alt.Data(values=[{"available": available, "label": "Deadline"}])
-        layers.append(alt.Chart(marker).mark_rule(size=2, color="#203731").encode(x="available:Q"))
+        layers.append(alt.Chart(marker).mark_rule(size=1.5, color=INK, strokeDash=[4, 3]).encode(x="available:Q"))
         layers.append(
             alt.Chart(marker)
-            .mark_text(align="left", dx=6, dy=-2, baseline="top", color="#203731", fontSize=11, fontWeight=600)
-            .encode(x="available:Q", text="label:N")
+            .mark_text(align="left", dx=6, dy=-2, baseline="bottom", color=INK, fontSize=11, fontWeight=600)
+            .encode(x="available:Q", text="label:N", y=alt.value(0))
         )
-    chart = alt.layer(*layers).properties(height=alt.Step(30)).configure_view(stroke=None)
+    layers.append(labels)  # last, so the deadline rule never draws over a value
+    chart = (
+        alt.layer(*layers)
+        .properties(height=alt.Step(34), background=CARD, padding={"top": 14, "right": 90})
+        .configure_view(stroke=None)
+    )
     st.altair_chart(chart, width="stretch")
 
 
@@ -293,7 +337,7 @@ def render_decision(result: dict, preview_id: str, store: AllocationStore | None
     chosen_id = result["recommendation"] or result["alternative"]
     chosen = next((row for row in result["candidates"] if row["estimate"]["workshop_id"] == chosen_id), None)
     with st.container(border=True, key="decision"):
-        st.caption("TOOL-BACKED DECISION")
+        st.caption("RECOMMENDATION AND APPROVAL")
         if result["status"] == "RECOMMEND":
             st.success(STATUS_LABELS[result["status"]])
         elif result["status"] in ("CLARIFY", "RECORDED_STATUS"):
@@ -308,6 +352,12 @@ def render_decision(result: dict, preview_id: str, store: AllocationStore | None
             else ""
         )
         st.subheader(prefix + chosen["name"] if chosen else STATUS_LABELS[result["status"]])
+        if chosen and result.get("decision_basis"):
+            st.html(
+                '<ul class="qr-reasons" aria-label="Why this workshop">'
+                + "".join(f"<li>{html.escape(reason)}</li>" for reason in result["decision_basis"]["reasons"])
+                + "</ul>"
+            )
         st.write(result["message"])
         if result.get("deadline_note"):
             st.caption(result["deadline_note"])
@@ -330,8 +380,11 @@ def render_decision(result: dict, preview_id: str, store: AllocationStore | None
     with st.container(border=True, key="comparison"):
         st.subheader("Candidate workshops")
         st.caption(result["assumption"])
-        st.caption("Same order. Same queue snapshot. Ranked by effective configuration.")
         if result["candidates"]:
+            st.caption(
+                "Each bar splits the delivery estimate into queue wait, processing, transport and expected rework. "
+                "Compare it with cost and quality risk before approving the allocation."
+            )
             candidate_chart(result)
             candidate_table(result)
             with st.expander("How delivery estimates are built"):
@@ -381,10 +434,15 @@ def render_decision(result: dict, preview_id: str, store: AllocationStore | None
             baseline_table(result)
         if result["excluded"]:
             with st.expander("Why other workshops are excluded", expanded=True):
-                for row in result["excluded"]:
-                    st.markdown("**" + row["name"] + "**")
-                    for reason in row["reasons"]:
-                        st.write(reason)
+                st.html(
+                    '<table class="qr-table qr-excluded"><caption class="qr-sr-only">Excluded workshops</caption>'
+                    + "".join(
+                        f"<tr><td><strong>{html.escape(row['name'])}</strong></td>"
+                        f"<td>{html.escape(' '.join(row['reasons']))}</td></tr>"
+                        for row in result["excluded"]
+                    )
+                    + "</table>"
+                )
         if result.get("resolution", {}).get("status") == "AMBIGUOUS" and result["resolution"]["matches"]:
             with st.expander("Matching recorded orders"):
                 st.dataframe(
@@ -402,8 +460,10 @@ def main():
     )
     st.html("<style>" + STYLE.read_text() + "</style>")
     with st.sidebar:
-        st.html('<div class="qr-brand"><span>S</span>SweaterCo</div>')
-        st.caption("QUICK-RESPONSE SUBCONTRACTING DESK")
+        st.html(
+            '<div class="qr-brand"><span class="qr-wordmark">SWEATERCO</span>'
+            '<span class="qr-tagline">Quick-response subcontracting desk</span></div><div class="qr-rule"></div>'
+        )
         workspace = st.radio(
             "Workspace",
             options=["independent", "saved"],
@@ -412,11 +472,12 @@ def main():
         )
         source = st.radio(
             "Input source",
-            options=["chat", "examples"],
+            options=["chat", "examples", "workshops"],
             key="input_source",
             format_func=lambda value: {
-                "chat": "Group-chat request (language model)",
-                "examples": "Supplied examples (offline, no model)",
+                "chat": "Chat request (live model)",
+                "examples": "Inbox examples (offline)",
+                "workshops": "Workshop register (offline)",
             }[value],
         )
     if st.session_state.get("active_input_source") != (workspace, source):
@@ -456,9 +517,11 @@ def main():
                 if store is not None
                 else "Each request starts from the same queue snapshot. Previews do not reserve capacity."
             )
-    st.html('<div class="qr-eyebrow">SWEATERCO / DISPATCH DESK</div>')
-    st.title("The right workshop. A decision you can explain.")
-    st.caption("Understand the request, compare the options, keep the evidence.")
+    st.html(
+        '<div class="qr-eyebrow">SweaterCo / Dispatch desk / Planning snapshot ' + desk.as_of.isoformat() + "</div>"
+    )
+    st.title("Who should make this batch?")
+    st.caption("Compare permitted workshops on delivery, cost and quality, then approve with a decision record.")
     if store is not None:
         st.info("Saved local plan: confirmed allocations persist across sessions and update planning queues.")
         if receipt := st.session_state.get("allocation_receipt"):
@@ -496,6 +559,13 @@ def main():
                 )
             else:
                 st.write("No allocations have been saved in this plan.")
+    if source == "workshops":
+        clear_confirmation()
+        try:
+            render_workshops(desk, store)
+        except (ValueError, TypeError, KeyError, sqlite3.Error, OSError) as error:
+            st.error("Could not check workshop capacity: " + str(error))
+        return
     conversation = None
     reply_slot = None
     if source == "chat":
@@ -503,7 +573,7 @@ def main():
         request_id = "CHAT"
     else:
         st.info(
-            "Supplied examples use draft request interpretations and real Python estimates. No model calls. "
+            "Inbox examples use draft request interpretations and real Python estimates. No model calls. "
             + ("Confirmation saves to the local plan." if store is not None else "No allocations are saved.")
         )
     try:
@@ -536,7 +606,7 @@ def main():
         st.caption("Correct the configuration before reviewing a decision.")
         st.stop()
     with right:
-        with st.expander("Effective weights and scales", expanded=True):
+        with st.expander("Advanced scoring details", expanded=False):
             st.json({"weights": result["effective_weights"], "scales": result["scales"]}, expanded=True)
             st.caption("Weights are relative preferences, not probabilities. Scales are the existing reference units.")
         st.caption("Snapshot " + result["snapshot"]["as_of"])

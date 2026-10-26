@@ -47,9 +47,9 @@ def _ranking(result: dict) -> str:
     if preference in PREFERENCES:
         return "Ranked by " + PREFERENCES[preference] + "."
     effective = result["effective_weights"]
-    weights = ", ".join(f"{term} {effective[term]:g}" for term in ("lateness", "defects", "cost"))
-    buffer = effective.get("deadline_buffer_days", 0)
-    return "Ranked by configured weights: " + weights + (f"; deadline buffer {buffer:g} days." if buffer else ".")
+    labels = {"lateness": "delivery", "defects": "quality risk", "cost": "subcontracting cost"}
+    priorities = ", ".join(label for term, label in labels.items() if effective[term] > 0)
+    return "Compared permitted workshops using the configured priorities for " + priorities + "."
 
 
 def _open_matches(result: dict) -> list[dict] | None:
@@ -139,7 +139,7 @@ def build_reply(result: dict) -> dict:
     notes = []
     facts = []
     if status == "RECOMMEND" and chosen:
-        headline = f"Send {order_id} to {chosen['name']}."
+        headline = f"Recommended workshop for {order_id}: {chosen['name']}."
         notes.append(_ranking(result))
     elif status == "REFUSE_SUGGESTION":
         suggested = result["input"]["suggested_workshop"]
@@ -152,12 +152,14 @@ def build_reply(result: dict) -> dict:
         if chosen:
             notes.append(f"Alternative: {chosen['name']}. " + _ranking(result))
     elif status == "NEEDS_REVIEW" and chosen:
-        headline = f"Needs review before allocating {order_id}. Best whole-batch option: {chosen['name']}."
+        headline = f"Needs review before allocating {order_id}. Whole-batch option: {chosen['name']}."
         notes.append(result["message"])
     else:
         headline = result["message"]
     if chosen and status in ("RECOMMEND", "REFUSE_SUGGESTION", "NEEDS_REVIEW"):
         facts = _facts(result, chosen)
+        if result.get("decision_basis"):
+            notes.extend(result["decision_basis"]["reasons"])
     if result.get("deadline_note"):
         notes.append(result["deadline_note"])
     notes.extend(result["review_options"])

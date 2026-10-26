@@ -9,7 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from dss5105.allocator import ObjectiveWeights
-from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput
+from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, LoadScenario, WorkshopQuery
 
 DEFAULT_STORE_PATH = ROOT / "runtime" / "dispatch.sqlite3"
 INTAKE_FIELDS = {"conversation", "interpretation_source", "fixture_sha256"}
@@ -105,6 +105,7 @@ class AllocationStore:
                 message="This order already has a saved allocation. Review its record before requesting changes.",
                 recommendation=None,
                 alternative=None,
+                decision_basis=None,
             )
         elif result["status"] == "RECOMMEND" and order["status"] != "IN_PROGRESS":
             result.update(status="NEEDS_REVIEW", message="Only an in-progress order can be saved in this workspace.")
@@ -116,6 +117,22 @@ class AllocationStore:
         with self._transaction() as connection:
             state = self._state(connection, desk)
             return self._preview(connection, desk, state, envelope, request, weights)
+
+    def _read_tool(self, method: str, payload) -> dict:
+        desk = DispatchDesk()
+        with self._transaction() as connection:
+            state = self._state(connection, desk)
+            desk.queues = dict(state["queues"])
+            result = getattr(desk, method)(payload)
+            result["storage"] = {"database_id": state["database_id"], "revision": state["revision"]}
+            result["assumption"] += " Saved planning queues at a fixed date; queues do not drain with wall-clock time."
+            return result
+
+    def query_register(self, query: WorkshopQuery) -> dict:
+        return self._read_tool("query_register", query)
+
+    def probe_load(self, scenario: LoadScenario) -> dict:
+        return self._read_tool("probe_load", scenario)
 
     def commit_allocation(self, preview: dict, confirmed_by: str, idempotency_key: str, *, confirmed: bool) -> dict:
         if confirmed is not True:

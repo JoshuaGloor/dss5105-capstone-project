@@ -70,8 +70,8 @@ questions remains planned.
 ## Speaking scope
 
 CHEN ZEPENG presents the opening, problem and architecture. Target speaking time
-is 1 minute 45 seconds, leaving a buffer inside the allocated 2 minutes. The
-[plain-language script](slides/reviewed/Opening_Script_Group11.txt) also appears in
+is 1 minute 50 seconds, leaving a buffer inside the allocated 2 minutes. The
+[speaker script](slides/reviewed/Opening_Script_Group11.txt) also appears in
 the deck's first three speaker-note pages. The remaining slides cover the objective,
 business value, progress, risks and roadmap within the course's total presentation time.
 

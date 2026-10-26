@@ -36,16 +36,22 @@ and update local planning queues. Saved records survive restarts and can be expo
 They live in Git-ignored `runtime/dispatch.sqlite3`; no workshop is contacted.
 See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md) for queue semantics,
 duplicate/stale-preview protection, and local-prototype limitations.
-The page opens on **Group-chat request**: paste a message or start from a course
+The page opens on **Chat request (live model)**: paste a message or start from a course
 inbox message, and answer clarification questions using the configured model.
 Each reply is a card built by Python from tool output. Answer buttons for ambiguous
 orders and refused workshops apply the choice without another model call.
-Provider calls happen only on send/retry. **Supplied examples** is the offline mode
+Provider calls happen only on send/retry. **Inbox examples (offline)** is the offline mode
 with no model and no API key. See [the language guide](docs/NATURAL_LANGUAGE.md).
 The launcher keeps caches/temp files in this project and does not open a browser.
 The default port is fixed at 8501. Saved Python, CSS, data and example-input changes
 automatically rerun the open page; no model call or allocation is triggered by a rerun.
 See [the web app guide](docs/STREAMLIT_APP.md) for examples, tests, and limitations.
+
+Choose **Workshop register (offline)** to inspect the workshop register,
+check a batch against an explicit delivery date, and compare delivery before and
+after additional work. Checks use the selected workspace's queues and never reserve
+capacity. This is a direct tool workspace; free-text capacity questions are still
+planned. The refreshed layout keeps scoring details under an advanced expander.
 
 The [first real-model evaluation](docs/CHAT_EVALUATION_RESULTS.md) covers the old inbox
 and is historical evidence only. Data v3 fixture replay is refreshed; a new live
@@ -70,7 +76,8 @@ language agent. Confirmation demonstrates the UI only; it saves no allocation.
 See [PLAN.md](PLAN.md) for the staged build plan,
 [the dispatch run guide](docs/DISPATCH_PREVIEW.md) for input/state conventions, and
 [the Sprint 1 architecture](docs/sprint1-architecture.svg) for implemented vs planned
-components. The primary objective remains a team decision.
+components. The team's primary objective is **minimise lateness**, measured by
+late fraction and mean late days.
 
 Keep new artifacts, helper scripts, caches, and temporary files within the project.
 Prototype review does not require browser automation or an external browser profile;
@@ -109,7 +116,8 @@ facts and reproducible experiment results;
 [TOOL_SPEC.md](docs/TOOL_SPEC.md) separates implemented interfaces from planned tools;
 [EVALUATION_PLAN.md](docs/EVALUATION_PLAN.md) distinguishes course requirements from
 our proposed methodology. Team proposals are not verified results or extra course
-requirements. The primary objective remains undecided.
+requirements. [SPRINT1_REVIEW.md](docs/SPRINT1_REVIEW.md) ranks the open gaps before Sprint 2,
+and [DEFECTS_FRONTIER.md](docs/DEFECTS_FRONTIER.md) shows where a baseline still wins. The team has selected **minimise lateness** as its primary objective.
 
 When data or policies change, reproduce affected results with the documented runner
 and update their evidence. Do not treat the earlier, unretained probes as established

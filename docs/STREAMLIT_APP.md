@@ -44,14 +44,14 @@ No separate frontend build or API service is needed.
 
 ## Try the workflow
 
-The page opens on **Group-chat request**, which needs the model configured in `.env`
+The page opens on **Chat request (live model)**, which needs the model configured in `.env`
 (see [NATURAL_LANGUAGE.md](NATURAL_LANGUAGE.md)). For the steps below, choose
-**Supplied examples (offline, no model)** in the sidebar.
+**Inbox examples (offline)** in the sidebar.
 Start in **Independent previews** for the original reproducible inbox demo.
 
 1. Start with R25. BudgetWorks must remain excluded regardless of objective.
-2. Switch Lateness / Defects / Hybrid and inspect candidates on the same snapshot.
-3. Select Custom weights. Sliders call the same Python scorer; setting every weight
+2. Switch delivery / quality / mixed policy and inspect candidates on the same snapshot.
+3. Select Set relative priorities. Sliders call the same Python scorer; setting every weight
    to zero shows an error and removes the old preview and confirmation state.
 4. Try R08 (refusal), R03 or R05 (clarification), R13 (missing records), and R20
    (deadline exception). None can enter the confirmation demonstration.
@@ -88,6 +88,25 @@ and review again. Source changes require a separate workspace migration and fail
 explicitly. Concurrent saves cannot silently reuse an old state. The same order
 cannot be saved again under a new chat message. This version has no cancellation
 or reset workflow. See [the record contract](ALLOCATION_RECORD_CONTRACT.md).
+
+## Workshop capacity and additional work
+
+Choose **Workshop register (offline)** in the sidebar. The initial table
+shows recorded capabilities, status, batch limits and queues. Enter a category,
+quantity and explicit delivery deadline, then select **Check delivery capacity**.
+The table explains suspended/capped workshops and shows estimates for eligible ones.
+
+Under **What if we send more work here?**, choose a workshop and extra pieces.
+**Compare before and after** places that additional same-category batch ahead of
+the reference batch at the fixed planning date. The tools show delivery changes
+and the fastest eligible alternative. Both batches must satisfy the course helper.
+The scenario adds expected processing/rework, excluding transport. It never changes
+the stored plan and does not assess other jobs' deadlines or predict closures.
+
+Both tables recompute from the selected independent or saved-plan queues. Exports
+retain source/code hashes and snapshot identity; saved mode includes state revision.
+Model calls are never needed in this workspace. Chat routing for these tools is
+still planned. See [TOOL_SPEC.md](TOOL_SPEC.md) for the finalized contracts.
 
 ## Current boundaries
 
