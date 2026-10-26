@@ -21,12 +21,14 @@ const asset = (name) => path.join(root, 'docs', 'slides', 'assets', 'sprint2', n
 const GITHUB = 'github.com/JoshuaGloor/dss5105-capstone-project';
 const DEMO_LINK = process.env.DEMO_LINK || '[YouTube link: add after upload]';
 const ATTENDANCE = 'Present (in person)'; // per member below if anyone differs
+// An absence needs a reason on this slide and an email to the instructors before the session.
 const MEMBERS = [
-  ['Chen Zepeng', 'A0156784N', ATTENDANCE], ['Duong Thanh Nhan', 'A0296326W', ATTENDANCE],
+  ['Chen Zepeng', 'A0156784N', ATTENDANCE], ['Duong Thanh Nhan', 'A0296326W', 'Absent: [reason]'],
   ['Joshua Wesley Gloor', 'A0296944J', ATTENDANCE], ['Sridhar Niyanthri Rajeswari', 'A0351151U', ATTENDANCE],
   ['Sundara Rajan Saadhvika', 'A0352594W', ATTENDANCE], ['Tang Zheling', 'A0352177B', ATTENDANCE],
 ];
-// Feature, owner, status (Done / In progress / Planned). Owners from git history; TBD rows need the team.
+// Feature, owner, status (Done / In progress / Planned). Owners agreed by the team; [TBD] rows are still open.
+const EVAL_OWNERS = 'Saadhvika and Niyanthri';
 const PROGRESS = [
   ['Voice assistant: phone UI, speech in and out, slide to book', 'Chen Zepeng', 'Done'],
   ['Long-term memory: rules from confirmed bookings, log, profile', 'Chen Zepeng', 'Done'],
@@ -35,9 +37,9 @@ const PROGRESS = [
   ['Chat-first desk redesign', 'Duong Thanh Nhan', 'Done'],
   ['AWS deployment behind HTTPS (demo site)', 'Joshua Wesley Gloor', 'Done'],
   ['Clarification reliability fixes and 247-assertion benchmark', 'Tang Zheling', 'In progress'],
-  ['Live run on all 30 inbox requests, two independent labellers', '[TBD]', 'In progress'],
-  ['Held-out rewordings and prompt-injection items', '[TBD]', 'Planned'],
-  ['Usability test: two people acting as dispatchers, four tasks', '[TBD]', 'Planned'],
+  ['Evaluation set: 50 new held-out requests, written and labelled', EVAL_OWNERS, 'In progress'],
+  ['Independent labels for the 30 inbox requests', EVAL_OWNERS, 'In progress'],
+  ['Live run on the full evaluation set; usability test', '[TBD]', 'Planned'],
 ];
 
 // ---- Evidence ---------------------------------------------------------------------------------
@@ -257,7 +259,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   frame(s, 'VALIDATION PLAN', 'What we measure, against what, and the hard cases');
   const plan = [
     ['WHAT WE MEASURE, AND WHY', 'Late batches and late days (our objective), defective pieces, largest share, change under a closure: the course simulator\'s own metrics. For language: the right behaviour on each request, and every number traced to a tool.'],
-    ['HOW THE EVALUATION SET IS BUILT', 'All 30 inbox requests, grouped by the 7 kinds in the data dictionary; held-out rewordings and bait items; two teammates label separately, then agree. A model judge is used only where it agrees with them.'],
+    ['HOW THE EVALUATION SET IS BUILT', `All 30 inbox requests, grouped by the 7 kinds in the data dictionary, plus 50 new held-out requests (rewordings, bait items) written and labelled by ${EVAL_OWNERS}. Labels are made separately, then agreed; a model judge counts only where it matches them.`],
     ['BASELINE AND TRACK MINIMUM', 'Random, biggest capacity and cheapest, plus the earliest-finish rule. Minimum: beat all three baselines on late batches and late days, and handle all 30 requests by kind.'],
   ];
   plan.forEach(([k, t], i) => {

@@ -1,6 +1,7 @@
 Recording script, Group 11, Sprint 2 video (due Fri 30 Oct 2026, 15:00)
 Hard stop at 5:00. Target 4:40: project about 2:40, demo about 2:00.
-Timed at 138 words a minute. scripts/build_sprint2_deck.mjs copies each SLIDE section into
+Timed at 138 words a minute. Saadhvika presents slide 5 and Niyanthri slide 6, as the owners
+of the evaluation set; assign the other slides and the demo voice before recording. scripts/build_sprint2_deck.mjs copies each SLIDE section into
 that slide's speaker notes. Numbers come from docs/evidence/objective-study.json and the
 live app; if either changes, update both.
 
@@ -38,17 +39,17 @@ Deterministic tools then find the order, apply remembered rules, check eligibili
 rank. Replies are Python templates, so the model never does arithmetic. A person confirms, and
 SQLite keeps the record and the memory, as exact rules rather than a vector store.
 
-SLIDE 5 - Progress (0:18)
+SLIDE 5 - Progress (Saadhvika, 0:18)
 Here is every feature with its owner. The assistant, memory, the four-objective scorer, the desk
-redesign and the AWS deployment are done. Clarification reliability and the live inbox
-benchmark are in progress. Next: independent labels, a held-out set, and a usability test.
+redesign and the AWS deployment are done. In progress: clarification reliability, and our
+evaluation set of 50 new requests with independent labels. Next: a live run and a usability test.
 
-SLIDE 6 - Validation plan (0:33)
+SLIDE 6 - Validation plan (Niyanthri, 0:35)
 For allocation we measure late batches and late days in the course simulator, normal and with a
 closure, against the three baselines and earliest finish, choosing settings on separate seeds
 first. Our default is 1.4 percent late against 1.7, with 68 percent fewer late days. For
-language: all 30 inbox requests by kind, plus held-out rewordings, labelled by two teammates
-separately. Hard cases: impossible dates, ineligible workshops, misheard orders. We give
+language: all 30 inbox requests by kind, plus 50 new held-out requests that we are writing and
+labelling separately. Hard cases: impossible dates, ineligible workshops, misheard orders. We give
 options, refuse with a reason, and read the order back before booking.
 
 SLIDE 7 - Demo (2:00)
@@ -74,6 +75,9 @@ SLIDE 8 - Thank you (0:05)
 Thank you. The code and the video link are on the first slide.
 
 Q&A PREPARATION (not read aloud)
+- Ruby (Duong Thanh Nhan) cannot attend: she emails Salman and Jack with her reason before the
+  session, and slide 1 shows "Absent" with that reason. Any member may be asked about her desk
+  redesign: one answer at a time, objective panel, saved plan, Show working.
 - Why voice? The track's bonus asks how a dispatcher would really use it: on the floor, on a
   phone. Typing still works everywhere, and the course inbox is still evaluated as text.
 - Can a misheard "yes" book something? No. "Book it" only opens the sheet. Saving needs a
