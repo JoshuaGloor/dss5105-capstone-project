@@ -31,7 +31,8 @@ Two rules that override convenience:
   tool output. A hallucinated delivery estimate is the worst failure in this track and we
   check compliance automatically.
 - **The objective is configuration, not a branch.** The scorer takes lateness, defects,
-  fairness, robustness and cost weights, plus a deadline buffer and capacity reservation.
+  fairness, robustness and cost weights, plus a deadline buffer, capacity reservation and
+  an on-time-first charge.
   Future objective terms must also be configurable, never policy-name `if` statements in
   allocation logic. Presets are frozen by `objective_study.py`; see docs/OBJECTIVE_STUDY.md.
 
@@ -64,6 +65,20 @@ Two rules that override convenience:
 - Never `pip install`, never activate a venv by hand.
 - If you change `pyproject.toml`, commit the updated `uv.lock` too. CI runs
   `uv sync --locked` and fails when the two disagree.
+
+## Deployment
+
+- Everything deployment-related lives in `infra/`: the Dockerfile, the compose
+  files, the Caddyfile, and OpenTofu under `infra/tofu/`. Workflows are in
+  `.github/workflows/`. Read [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) before
+  changing any of it.
+- `tofu`, not `terraform`. The two configs are separate on purpose: `bootstrap/`
+  creates the state bucket the main config uses as its backend.
+- Secrets reach the server from SSM Parameter Store, fetched by the instance's
+  own role. Never route them through GitHub Actions, and never put them in
+  OpenTofu state.
+- Editing `infra/tofu/user_data.sh` replaces the instance and wipes `/opt/app`,
+  so the site is down until the next deploy.
 
 ## Models
 

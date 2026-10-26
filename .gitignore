@@ -19,5 +19,14 @@ build/
 # Jupyter
 .ipynb_checkpoints/
 
+# OpenTofu
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+crash.*.log
+# .terraform.lock.hcl is committed on purpose: it pins provider versions.
+
 # macOS
 .DS_Store

@@ -142,8 +142,7 @@ def test_workshop_workspace_never_calls_model_and_recomputes_on_mode_switch(monk
 
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: pytest.fail("Workshop tools must stay offline"))
     monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "ui.sqlite3")
-    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
-    app.radio(key="input_source").set_value("workshops").run()
+    app = AppTest.from_function(workshops_page, default_timeout=15).run()
     assert not app.exception
     app.button(key="check_capacity").click().run()
     assert app.session_state["register_result"]["query"]["pieces"] == 1500
@@ -154,3 +153,9 @@ def test_workshop_workspace_never_calls_model_and_recomputes_on_mode_switch(monk
     assert "storage" in app.session_state["register_result"]
     assert "storage" in app.session_state["load_result"]
     assert not records.AllocationStore().records()
+
+
+def workshops_page():
+    from dss5105.workshop_ui import render_page
+
+    render_page()

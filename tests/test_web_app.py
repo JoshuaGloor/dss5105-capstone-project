@@ -7,58 +7,114 @@ from streamlit.testing.v1 import AppTest
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
 from dss5105.evaluate import DEFAULT_PRESET, PRESETS
+from dss5105.web_app import SCENARIOS
 
 
 @pytest.fixture
 def app(monkeypatch):
     from dss5105 import llm
 
-    def no_provider(*args, **kwargs):
-        raise AssertionError("The demo page must not construct a live model")
-
-    monkeypatch.setattr(llm, "get_model", no_provider)
-    return offline_app()
+    monkeypatch.setattr(llm, "get_model", lambda **kwargs: pytest.fail("the examples must not construct a model"))
+    return AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
 
 
-def offline_app():
-    """The page opens on the chat; these tests exercise the offline examples mode."""
-    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
-    assert "preview" not in app.session_state
-    return app.radio(key="input_source").set_value("examples").run()
+def send(app, request_id):
+    """Click an example in the Examples list, as a dispatcher would."""
+    return app.button(key=f"example_{request_id}").click().run()
 
 
-def test_page_opens_on_chat_without_calling_a_model(monkeypatch):
-    from dss5105 import llm
+def requests(app):
+    return [row for row in app.session_state["history"] if row["type"] == "request"]
 
-    monkeypatch.setattr(llm, "get_model", lambda **kwargs: pytest.fail("no model call on page load"))
-    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
+
+def latest(app):
+    return requests(app)[-1]
+
+
+def markup(app):
+    return "".join(element.body for element in app.main if element.type == "html")
+
+
+def test_page_opens_on_start_screen_without_calling_a_model(app):
     assert not app.exception
-    assert app.radio(key="input_source").value == "chat"
-    assert app.button(key="interpret_inbox")
-    assert "preview" not in app.session_state
+    assert "history" not in app.session_state
+    assert app.chat_input(key="dispatch_chat")
+    assert "Which order needs a workshop today?" in markup(app)
+    assert "Try an example scenario" in markup(app)
 
 
-def test_page_uses_live_python_tools_not_bundled_html_results(app):
+def test_example_runs_live_python_tools_not_bundled_html_results(app):
+    send(app, "R25")
     assert not app.exception
-    assert app.radio(key="request_id").value == "R25"
-    assert app.session_state["preview"]["status"] == "RECOMMEND"
-    assert app.button(key="review_confirmation").disabled is False
+    result = latest(app)["result"]
+    assert result["status"] == "RECOMMEND"
     envelope = next(item for item in read_inbox() if item["request_id"] == "R25")
     inputs = json.loads((ROOT / "examples" / "dispatch_inputs.json").read_text())
     expected = DispatchDesk().preview(envelope, DispatchInput(**inputs["R25"]), PRESETS[DEFAULT_PRESET])
-    assert app.session_state["preview"]["candidates"] == expected["candidates"]
-    assert "W3" not in {row["estimate"]["workshop_id"] for row in expected["candidates"]}
+    assert result["candidates"] == expected["candidates"]
+    assert "W3" not in {row["estimate"]["workshop_id"] for row in result["candidates"]}
 
 
-def test_custom_weights_recompute_and_invalid_weights_fail_closed(app):
+def test_only_the_newest_request_is_shown_but_history_is_kept(app):
+    send(app, "R25")
+    first = latest(app)["result"]
+    send(app, "R08")
+    send(app, "R01")
+    assert not app.exception
+    assert [row["request_id"] for row in requests(app)] == ["R25", "R08", "R01"]
+    assert requests(app)[0]["result"] == first
+    page = markup(app)
+    assert requests(app)[-1]["text"] in page
+    assert requests(app)[0]["text"] not in page
+    assert requests(app)[1]["text"] not in page
+    assert len([button for button in app.button if button.key.startswith("work_")]) == 1
+    marked = [button.key for button in app.button if button.label.startswith("\u2713")]
+    assert marked == ["example_R01"]
+
+
+def test_sending_scrolls_back_to_the_top_once(app):
+    assert "scrollTo" not in markup(app)
+    send(app, "R25")
+    assert "scrollTo" in markup(app)
+    app.radio(key="objective").set_value("lateness").run()
+    assert "scrollTo" not in markup(app)
+    send(app, "R08")
+    assert "scrollTo" in markup(app)
+    assert "(function ()" in markup(app), "the script must not redeclare globals when it runs again"
+
+
+EXPECTED = {
+    "R07": "RECOMMEND",
+    "R30": "NEEDS_REVIEW",
+    "R25": "RECOMMEND",
+    "R01": "CLARIFY",
+    "R05": "CLARIFY",
+    "R08": "REFUSE_SUGGESTION",
+    "R02": "DECLINE",
+}
+
+
+def test_scenario_cards_cover_the_seven_course_request_kinds():
+    assert len(SCENARIOS) == 7
+    assert {request_id for request_id, *_ in SCENARIOS} == set(EXPECTED)
+    assert {request_id for request_id, *_ in SCENARIOS} <= {item["request_id"] for item in read_inbox()}
+
+
+@pytest.mark.parametrize("request_id,status", sorted(EXPECTED.items()))
+def test_scenario_cards_run_offline_examples(app, request_id, status):
+    app.button(key=f"scenario_{request_id}").click().run()
+    assert not app.exception
+    assert latest(app)["kind"] == "example"
+    assert latest(app)["result"]["status"] == status
+
+
+def test_custom_weights_apply_to_the_next_request_and_zero_weights_fail_closed(app):
     app.radio(key="objective").set_value("custom").run()
     app.slider(key="weight_lateness").set_value(0.0)
     app.slider(key="weight_defects").set_value(1.0)
-    app.slider(key="weight_fairness").set_value(0.0)
-    app.slider(key="weight_robustness").set_value(0.0)
     app.slider(key="weight_cost").set_value(0.0).run()
-    assert not app.exception
-    result = app.session_state["preview"]
+    send(app, "R25")
+    result = latest(app)["result"]
     assert result["effective_weights"] == asdict(
         ObjectiveWeights(
             lateness=0.0, defects=1.0, deadline_buffer_days=2.0, capacity_reservation=1.0, deadline_miss_days=7.0
@@ -66,134 +122,170 @@ def test_custom_weights_recompute_and_invalid_weights_fail_closed(app):
     )
     assert result["recommendation"] == "W2"
     app.slider(key="weight_defects").set_value(0.0).run()
+    assert any("every weight is zero" in error.value.lower() for error in app.error)
+    send(app, "R07")
     assert not app.exception
-    assert "not all zero" in app.error[0].value
-    assert "preview" not in app.session_state
-    assert "confirmed_preview" not in app.session_state
-    assert not app.button
+    assert "not all zero" in app.session_state["send_error"]
+    assert [row["request_id"] for row in requests(app)] == ["R25"]
     app.slider(key="weight_lateness").set_value(1.0).run()
-    assert not app.error
-    assert app.session_state["preview"]["status"] == "RECOMMEND"
+    send(app, "R07")
+    assert "send_error" not in app.session_state
+    assert latest(app)["result"]["status"] == "RECOMMEND"
 
 
-@pytest.mark.parametrize(
-    "request_id,status",
-    [
-        ("R03", "CLARIFY"),
-        ("R05", "CLARIFY"),
-        ("R08", "REFUSE_SUGGESTION"),
-        ("R13", "DECLINE"),
-        ("R18", "DECLINE"),
-        ("R20", "NEEDS_REVIEW"),
-        ("R23", "NEEDS_REVIEW"),
-    ],
-)
-def test_exception_states_cannot_be_confirmed(app, request_id, status):
-    app.radio(key="request_id").set_value(request_id).run()
+def test_each_answer_keeps_the_objective_it_was_produced_with(app):
+    send(app, "R25")
+    first = latest(app)
+    app.radio(key="objective").set_value("defects").run()
+    send(app, "R25")
+    assert [row["objective"] for row in requests(app)] == ["hybrid", "defects"]
+    assert requests(app)[0]["result"] == first["result"]
+    assert requests(app)[1]["result"]["effective_weights"] != first["result"]["effective_weights"]
+    assert "Objective: <b>Defect</b>" in markup(app)
+
+
+def test_objective_can_be_chosen_before_the_first_request(app):
+    app.radio(key="objective").set_value("fairness").run()
     assert not app.exception
-    assert app.session_state["preview"]["status"] == status
-    assert app.button(key="review_confirmation").disabled
-    assert "confirmed_preview" not in app.session_state
-
-
-def test_ship_date_on_record_is_used_and_split_evidence_is_shown(app):
-    app.radio(key="request_id").set_value("R06").run()
-    assert not app.exception
-    assert app.session_state["preview"]["status"] == "RECOMMEND"
-    assert any("recorded due date" in caption.value for caption in app.caption)
-    app.radio(key="request_id").set_value("R23").run()
-    assert not app.exception
-    split = app.session_state["preview"]["split_option"]
-    assert any(split["summary"] == block.value for block in app.markdown)
+    app.button(key="scenario_R07").click().run()
+    assert latest(app)["objective"] == "fairness"
+    assert app.radio(key="objective").value == "fairness"
 
 
 def test_request_preference_overrides_global_preset(app):
     app.radio(key="objective").set_value("defects").run()
-    app.radio(key="request_id").set_value("R21").run()
-    assert not app.exception
-    result = app.session_state["preview"]
+    send(app, "R21")
+    result = latest(app)["result"]
     assert result["effective_weights"] == asdict(ObjectiveWeights(lateness=0, cost=1))
-    app.radio(key="objective").set_value("hybrid").run()
-    assert app.session_state["preview"]["effective_weights"] == result["effective_weights"]
-    assert app.session_state["preview"]["recommendation"] == result["recommendation"]
     chosen = next(row for row in result["candidates"] if row["estimate"]["workshop_id"] == result["recommendation"])
     assert chosen["meets_deadline"]
+    assert "Request asks for: <b>cheapest on time</b>" in markup(app)
 
 
-def test_demo_confirmation_is_two_step_and_invalidated_by_settings(app):
-    queues = app.session_state["preview"]["snapshot"]["queues"].copy()
-    app.button(key="review_confirmation").click().run()
-    assert "confirmed_preview" not in app.session_state
-    assert app.session_state["reviewing_preview"] == app.session_state["preview_id"]
-    app.button(key="confirm_demo").click().run()
+@pytest.mark.parametrize("request_id", ["R03", "R05", "R08", "R13", "R18", "R20", "R23", "R28", "R30"])
+def test_only_ready_answers_offer_saving(app, request_id):
+    send(app, request_id)
     assert not app.exception
-    assert app.session_state["confirmed_preview"] == app.session_state["preview_id"]
-    assert app.session_state["preview"]["snapshot"]["queues"] == queues
-    assert app.session_state["preview"]["commit_allowed"] is False
-    app.radio(key="objective").set_value("defects").run()
-    assert "confirmed_preview" not in app.session_state
-    assert "reviewing_preview" not in app.session_state
-    app.radio(key="objective").set_value("fairness").run()
-    assert "confirmed_preview" not in app.session_state
+    assert latest(app)["result"]["status"] != "RECOMMEND"
+    assert not [button.key for button in app.button if button.key.startswith("review_")]
 
 
-def test_switching_request_clears_pending_confirmation_and_sessions_are_separate(app):
-    app.button(key="review_confirmation").click().run()
-    app.radio(key="request_id").set_value("R03").run()
-    assert "reviewing_preview" not in app.session_state
-    separate = offline_app()
-    assert separate.radio(key="request_id").value == "R25"
-    assert "reviewing_preview" not in separate.session_state
-    assert "confirmed_preview" not in separate.session_state
-
-
-def test_cancel_does_not_confirm(app):
-    app.button(key="review_confirmation").click().run()
-    app.button(key="cancel_confirmation").click().run()
+def test_ship_date_on_record_is_used_and_split_evidence_is_shown(app):
+    send(app, "R06")
     assert not app.exception
-    assert "reviewing_preview" not in app.session_state
-    assert "confirmed_preview" not in app.session_state
+    assert latest(app)["result"]["status"] == "RECOMMEND"
+    assert "recorded due date" in markup(app)
+    send(app, "R23")
+    split = latest(app)["result"]["split_option"]
+    assert split["summary"] in markup(app)
 
 
-def test_chart_and_baseline_table_render_from_tool_fields(app):
-    assert not app.exception
-    preview = app.session_state["preview"]
+def open_working(app, entry=None):
+    entry = entry or latest(app)
+    return app.button(key=f"work_{entry['uid']}").click().run()
+
+
+def test_working_column_renders_chart_and_reference_policies_from_tool_fields(app):
+    send(app, "R25")
+    result = latest(app)["result"]
+    assert not [element for element in app.main if element.type in ("arrow_vega_lite_chart", "vega_lite_chart")]
+    open_working(app)
     charts = [element for element in app.main if element.type in ("arrow_vega_lite_chart", "vega_lite_chart")]
-    assert charts, "the candidate comparison must include a chart"
-    markup = "".join(element.body for element in app.main if element.type == "html")
-    assert "Cheapest eligible" in markup
-    assert "This desk (effective weights)" in markup
-    cheapest_row = next(row for row in preview["baselines"] if row["policy"] == "cheapest")
-    assert cheapest_row["name"] in markup
-    assert cheapest_row["display"]["turnaround"] in markup
+    assert charts, "the comparison must include a chart"
+    html = markup(app)
+    assert "This desk (effective weights)" in html
+    cheapest = next(row for row in result["baselines"] if row["policy"] == "cheapest")
+    assert cheapest["respects_exclusions"] is False
+    assert "Ignores an exclusion" in html
+    assert cheapest["display"]["turnaround"] in html
 
 
-def test_baseline_row_shows_when_a_reference_policy_breaks_an_exclusion(app):
-    preview = app.session_state["preview"]
-    assert preview["input"]["exclusions"], "R25 excludes BudgetWorks"
-    cheapest_row = next(row for row in preview["baselines"] if row["policy"] == "cheapest")
-    assert cheapest_row["respects_exclusions"] is False
-    markup = "".join(element.body for element in app.main if element.type == "html")
-    assert "Ignores an exclusion" in markup
+def test_working_opens_beside_the_answer_and_follows_the_newest_one(app):
+    send(app, "R25")
+    first = latest(app)
+    assert "working" not in app.session_state
+    open_working(app, first)
+    assert not app.exception
+    assert app.session_state["working"] == first["uid"]
+    assert "R25: Mei" in markup(app)
+    assert app.button(key=f"work_{first['uid']}").label == "Hide working"
+    send(app, "R08")
+    second = latest(app)
+    assert app.session_state["working"] == second["uid"]
+    assert "R08: " in markup(app)
+    assert "R25: Mei" not in markup(app)
+    assert len([e for e in app.main if e.type in ("arrow_vega_lite_chart", "vega_lite_chart")]) == 1
 
 
-def test_changing_weights_recomputes_the_baseline_comparison(app):
-    before = app.session_state["preview"]
-    app.radio(key="objective").set_value("defects").run()
-    after = app.session_state["preview"]
-    assert after["effective_weights"] != before["effective_weights"]
-    assert after["baselines"] == before["baselines"], "reference policies do not follow our weights"
-    assert app.session_state["preview_id"] != app.session_state.get("confirmed_preview")
+def test_hide_working_closes_it_even_after_it_followed_a_newer_answer(app):
+    send(app, "R25")
+    open_working(app)
+    send(app, "R08")
+    assert app.session_state["working"] == latest(app)["uid"]
+    assert app.button(key=f"work_{latest(app)['uid']}").label == "Hide working"
+    app.button(key=f"work_{latest(app)['uid']}").click().run()
+    assert "working" not in app.session_state
+    assert app.button(key=f"work_{latest(app)['uid']}").label == "Show working"
+
+
+def test_working_is_cleared_with_the_chat(app):
+    send(app, "R25")
+    open_working(app)
+    app.button(key="clear_chat").click().run()
+    assert "working" not in app.session_state
+    assert "Which order needs a workshop today?" in markup(app)
 
 
 @pytest.mark.parametrize("request_id", ["R20", "R28", "R30"])
-def test_impossible_request_displays_tool_options_and_blocks_confirmation(app, request_id):
-    app.radio(key="request_id").set_value(request_id).run()
-    result = app.session_state["preview"]
+def test_impossible_request_shows_tool_options(app, request_id):
+    send(app, request_id)
+    result = latest(app)["result"]
+    assert result["review_options"][0] in markup(app)
+
+
+def test_demo_confirmation_is_two_step_and_changes_nothing(app):
+    send(app, "R25")
+    queues = latest(app)["result"]["snapshot"]["queues"].copy()
+    uid = latest(app)["uid"]
+    app.button(key=f"review_{uid}").click().run()
+    assert app.session_state["reviewing"] == uid
+    assert not latest(app)["confirmed"]
+    app.button(key="confirm_demo").click().run()
     assert not app.exception
-    content = " ".join(element.value for element in app.markdown)
-    assert result["review_options"][0] in content
-    assert app.button(key="review_confirmation").disabled
+    assert latest(app)["confirmed"]
+    assert latest(app)["result"]["snapshot"]["queues"] == queues
+    assert latest(app)["result"]["commit_allowed"] is False
+    assert app.session_state["history"][-1]["type"] == "note"
+    assert "Nothing was saved" in app.session_state["history"][-1]["text"]
+
+
+def test_cancel_does_not_confirm_and_sending_again_closes_the_review(app):
+    send(app, "R25")
+    app.button(key=f"review_{latest(app)['uid']}").click().run()
+    app.button(key="cancel_confirmation").click().run()
+    assert "reviewing" not in app.session_state
+    assert not latest(app)["confirmed"]
+    app.button(key=f"review_{latest(app)['uid']}").click().run()
+    send(app, "R07")
+    assert "reviewing" not in app.session_state
+
+
+def test_next_button_sends_the_next_unsent_example(app):
+    send(app, "R01")
+    send(app, "R25")
+    app.button(key=f"review_{latest(app)['uid']}").click().run()
+    app.button(key="confirm_demo").click().run()
+    note = app.session_state["history"][-1]
+    assert note["next"] == "R02"
+    app.button(key="next_" + note["uid"]).click().run()
+    assert latest(app)["request_id"] == "R02"
+
+
+def test_clear_chat_returns_to_the_start_screen(app):
+    send(app, "R25")
+    app.button(key="clear_chat").click().run()
+    assert "history" not in app.session_state
+    assert "Which order needs a workshop today?" in markup(app)
 
 
 def test_saved_plan_requires_identity_and_persists_across_sessions(app, tmp_path, monkeypatch):
@@ -201,38 +293,51 @@ def test_saved_plan_requires_identity_and_persists_across_sessions(app, tmp_path
 
     path = tmp_path / "ui-plan.sqlite3"
     monkeypatch.setattr(records, "DEFAULT_STORE_PATH", path)
-    initial_queues = app.session_state["preview"]["snapshot"]["queues"]
     app.radio(key="workspace_mode").set_value("saved").run()
-    assert not app.exception
-    assert app.session_state["preview"]["commit_allowed"]
-    app.button(key="review_confirmation").click().run()
+    send(app, "R25")
+    initial_queues = latest(app)["result"]["snapshot"]["queues"].copy()
+    assert latest(app)["result"]["commit_allowed"]
+    app.button(key=f"review_{latest(app)['uid']}").click().run()
     assert app.button(key="confirm_allocation").disabled
     app.text_input(key="confirmed_by").set_value("Test dispatcher").run()
     assert not app.button(key="confirm_allocation").disabled
     app.button(key="confirm_allocation").click().run()
     assert not app.exception
-    assert app.session_state["preview"]["status"] == "ALREADY_ALLOCATED"
-    assert app.button(key="review_confirmation").disabled
+    assert latest(app)["saved"]
     saved = records.AllocationStore(path).records()
     assert len(saved) == 1
     assert saved[0]["confirmed_by"] == "Test dispatcher"
-    assert app.session_state["allocation_receipt"]["allocation_id"] == saved[0]["allocation_id"]
-    separate = offline_app()
-    assert separate.session_state["preview"]["snapshot"]["queues"] == initial_queues
+    send(app, "R25")
+    assert latest(app)["result"]["status"] == "ALREADY_ALLOCATED"
+    separate = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
+    separate.button(key="example_R25").click().run()
+    assert latest(separate)["result"]["snapshot"]["queues"] == initial_queues
     separate.radio(key="workspace_mode").set_value("saved").run()
-    assert separate.session_state["preview"]["status"] == "ALREADY_ALLOCATED"
-    assert separate.session_state["preview"]["snapshot"]["queues"] == saved[0]["queues_after"]
+    separate.button(key="example_R25").click().run()
+    assert latest(separate)["result"]["status"] == "ALREADY_ALLOCATED"
+    assert latest(separate)["result"]["snapshot"]["queues"] == saved[0]["queues_after"]
 
 
-def test_switching_mode_cancels_pending_save_and_does_not_reserve(app, tmp_path, monkeypatch):
+def test_older_independent_answer_cannot_be_saved_in_the_saved_plan(app, tmp_path, monkeypatch):
+    from dss5105 import records
+
+    monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "mixed-plan.sqlite3")
+    send(app, "R25")
+    app.radio(key="workspace_mode").set_value("saved").run()
+    assert not [button.key for button in app.button if button.key.startswith("review_")]
+    assert not records.AllocationStore().records()
+
+
+def test_switching_workspace_closes_a_pending_review_and_reserves_nothing(app, tmp_path, monkeypatch):
     from dss5105 import records
 
     monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "mode-plan.sqlite3")
     app.radio(key="workspace_mode").set_value("saved").run()
-    app.button(key="review_confirmation").click().run()
+    send(app, "R25")
+    app.button(key=f"review_{latest(app)['uid']}").click().run()
     assert "confirmation_key" in app.session_state
     app.radio(key="workspace_mode").set_value("independent").run()
-    assert "reviewing_preview" not in app.session_state
+    assert "reviewing" not in app.session_state
     assert "confirmation_key" not in app.session_state
     assert not records.AllocationStore().records()
 
@@ -242,7 +347,8 @@ def test_failed_save_never_shows_success_receipt(app, tmp_path, monkeypatch):
 
     monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "failed-plan.sqlite3")
     app.radio(key="workspace_mode").set_value("saved").run()
-    app.button(key="review_confirmation").click().run()
+    send(app, "R25")
+    app.button(key=f"review_{latest(app)['uid']}").click().run()
     app.text_input(key="confirmed_by").set_value("Test dispatcher").run()
 
     def reject(*args, **kwargs):
@@ -252,5 +358,5 @@ def test_failed_save_never_shows_success_receipt(app, tmp_path, monkeypatch):
     app.button(key="confirm_allocation").click().run()
     assert not app.exception
     assert any("stale" in error.value for error in app.error)
-    assert "allocation_receipt" not in app.session_state
+    assert not latest(app)["saved"]
     assert not records.AllocationStore().records()

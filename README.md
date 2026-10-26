@@ -35,6 +35,8 @@ Open `http://localhost:8501` in Chrome. The top bar has four pages:
   with your name saves the booking. Constraints from a confirmed booking can be
   remembered as standing rules for that customer. See [VOICE_ASSISTANT.md](docs/VOICE_ASSISTANT.md).
 - **Desk**: the desktop dispatch desk described below.
+- **Workshops**: the workshop register, delivery checks for a batch and date, and what
+  extra work would do to a workshop's estimate. Read-only.
 - **Objective lab**: sliders for all four course objectives (lateness, defects,
   fairness, robustness) plus cost, buffer and capacity reservation. Each change replays
   the course simulator on the ten course seeds, normal and with the closure.
@@ -48,32 +50,31 @@ still answers the course inbox examples from their reviewed interpretations.
 
 ### The desk
 
-The desk supports request selection, live Python previews, objective presets and custom
-weight sliders for the four objectives, candidate comparison, exclusion reasons,
-evidence export, and confirmation. Supplied examples need no API key.
-The default **Independent previews** workspace keeps the course snapshot unchanged.
+The desk is the chat-first desktop view: one request and its answer at a time, objective
+presets and custom weight sliders for the four objectives in the **Objective** panel,
+candidate comparison, exclusion reasons, evidence export, and confirmation. Supplied
+examples need no API key. **Preview only** keeps the course snapshot unchanged.
 Choose **Saved local plan**, review an on-time recommendation, enter the confirming
-dispatcher's name, and select **Confirm and save allocation** to persist a record
-and update local planning queues. Saved records survive restarts and can be exported.
+dispatcher's name, and confirm to persist a record and update local planning queues. Saved records survive restarts and can be exported.
 They live in Git-ignored `runtime/dispatch.sqlite3`; no workshop is contacted.
 See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md) for queue semantics,
 duplicate/stale-preview protection, and local-prototype limitations.
-The desk opens on **Chat request (live model)**: paste a message or start from a course
-inbox message, and answer clarification questions using the configured model.
-Each reply is a card built by Python from tool output. Answer buttons for ambiguous
+The desk opens on **Start here**: type or paste a group-chat message and answer
+clarification questions using the configured model, or click an example scenario or any
+message in the **Examples** list to run it offline. The page shows one request and its
+answer at a time, a card built by Python from tool output. Answer buttons for ambiguous
 orders and refused workshops apply the choice without another model call.
-Provider calls happen only on send/retry. **Inbox examples (offline)** is the offline mode
-with no model and no API key. See [the language guide](docs/NATURAL_LANGUAGE.md).
+Provider calls happen only on send/retry. Examples need no model and no API key. See [the language guide](docs/NATURAL_LANGUAGE.md).
 The launcher keeps caches/temp files in this project and does not open a browser.
 The default port is fixed at 8501. Saved Python, CSS, data and example-input changes
 automatically rerun the open page; no model call or allocation is triggered by a rerun.
 See [the web app guide](docs/STREAMLIT_APP.md) for examples, tests, and limitations.
 
-Choose **Workshop register (offline)** to inspect the workshop register,
+Open **Workshops** to inspect the workshop register,
 check a batch against an explicit delivery date, and compare delivery before and
 after additional work. Checks use the selected workspace's queues and never reserve
-capacity. This is a direct tool workspace; free-text capacity questions are still
-planned. The refreshed layout keeps scoring details under an advanced expander.
+capacity. Free-text capacity questions ("who can take 1,500 crewnecks by April 15?")
+are answered in the assistant and the desk chat with the same estimates.
 
 The [first real-model evaluation](docs/CHAT_EVALUATION_RESULTS.md) covers the old inbox
 and is historical evidence only. Data v3 fixture replay is refreshed; a new live
@@ -162,6 +163,16 @@ and update their evidence. Do not treat the earlier, unretained probes as establ
 findings. Finalize proposed tool contracts before implementing them. The scorer
 supports lateness, defects, fairness, robustness and cost weights, a deadline buffer
 and capacity reservation.
+
+## Deployment
+
+The app runs on AWS as two containers, the Streamlit app behind Caddy, on one
+EC2 instance that is stopped between demos. Merging to `main` builds an image;
+deploying is a manual **Deploy app** run in the Actions tab, and **Power**
+starts and stops the instance.
+
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for the day-to-day steps, the one-time
+setup, and teardown. Everything it describes lives in `infra/`.
 
 ## Understanding the repo
 

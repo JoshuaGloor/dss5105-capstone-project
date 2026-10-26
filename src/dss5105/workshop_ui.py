@@ -1,6 +1,7 @@
 """Read-only workshop and workload workspace, available without a language model."""
 
 import json
+import sqlite3
 from datetime import timedelta
 
 import streamlit as st
@@ -157,3 +158,20 @@ def render_workshops(desk: DispatchDesk, store: AllocationStore | None):
             mime="application/json",
             key="export_load",
         )
+
+
+def render_page():
+    """The register as its own page: the course snapshot, or the saved local plan's queues."""
+    st.caption("SWEATERCO / WORKSHOPS")
+    st.title("Who has room?")
+    workspace = st.radio(
+        "Queues",
+        options=["independent", "saved"],
+        key="workspace_mode",
+        format_func=lambda value: {"independent": "Course snapshot", "saved": "Saved local plan"}[value],
+        horizontal=True,
+    )
+    try:
+        render_workshops(DispatchDesk(), AllocationStore() if workspace == "saved" else None)
+    except (ValueError, TypeError, KeyError, sqlite3.Error, OSError) as error:
+        st.error("Could not check workshop capacity: " + str(error))

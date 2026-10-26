@@ -9,6 +9,7 @@ from pathlib import Path
 
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
 from dss5105.evaluate import SPRINT1_PRESETS as PRESETS
+from dss5105.replies import build_reply
 
 
 def build_bundle() -> dict:
@@ -31,6 +32,10 @@ def build_bundle() -> dict:
         "inbox_count": str(len(inbox)),
         "inbox": inbox,
         "previews": previews,
+        "replies": {
+            rid: {name: build_reply(result) for name, result in by_preset.items()}
+            for rid, by_preset in previews.items()
+        },
         "preset_labels": {"lateness": "Lateness", "defects": "Defects", "hybrid": "Hybrid"},
         "fixture_sha256": hashlib.sha256(fixture_path.read_bytes()).hexdigest(),
         "interpretation_source": "Hand-authored development inputs; not model extraction or gold labels.",
@@ -63,13 +68,14 @@ def annotation_sheet(inbox: list[dict]) -> str:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "docs" / "prototype" / "index.html")
+    parser.add_argument("--template", type=Path, default=ROOT / "docs" / "prototype" / "template.html")
     parser.add_argument("--evidence", type=Path, default=ROOT / "results" / "dispatch-previews.json")
     parser.add_argument("--annotations", type=Path, help="Create a NEW blank annotation CSV; never overwrite labels")
     args = parser.parse_args()
     if args.annotations and args.annotations.exists():
         parser.error("Annotation destination already exists; choose a new file to preserve labels")
     bundle = build_bundle()
-    template = (ROOT / "docs" / "prototype" / "template.html").read_text()
+    template = args.template.read_text()
     encoded = json.dumps(bundle, ensure_ascii=True, separators=(",", ":")).replace("<", "\\u003c")
     if template.count("__DISPATCH_DATA__") != 1:
         raise ValueError("Expected exactly one prototype data placeholder")
