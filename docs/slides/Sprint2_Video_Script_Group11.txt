@@ -42,7 +42,8 @@ SQLite keeps the record and the memory, as exact rules rather than a vector stor
 SLIDE 5 - Progress (Saadhvika, 0:18)
 Here is every feature with its owner. The assistant, memory, the four-objective scorer, the desk
 redesign and the AWS deployment are done. In progress: clarification reliability, and our
-evaluation set of 50 new requests with independent labels. Next: a live run and a usability test.
+evaluation set of 50 new requests with independent labels. Next: Lynn's live run on the full
+set, and a usability test.
 
 SLIDE 6 - Validation plan (Niyanthri, 0:35)
 For allocation we measure late batches and late days in the course simulator, normal and with a

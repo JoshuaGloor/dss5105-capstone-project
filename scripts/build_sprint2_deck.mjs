@@ -23,7 +23,7 @@ const DEMO_LINK = process.env.DEMO_LINK || '[YouTube link: add after upload]';
 const ATTENDANCE = 'Present (in person)'; // per member below if anyone differs
 // An absence needs a reason on this slide and an email to the instructors before the session.
 const MEMBERS = [
-  ['Chen Zepeng', 'A0156784N', ATTENDANCE], ['Duong Thanh Nhan', 'A0296326W', 'Absent: [reason]'],
+  ['Chen Zepeng', 'A0156784N', ATTENDANCE], ['Duong Thanh Nhan', 'A0296326W', 'Absent: business trip to China'],
   ['Joshua Wesley Gloor', 'A0296944J', ATTENDANCE], ['Sridhar Niyanthri Rajeswari', 'A0351151U', ATTENDANCE],
   ['Sundara Rajan Saadhvika', 'A0352594W', ATTENDANCE], ['Tang Zheling', 'A0352177B', ATTENDANCE],
 ];
@@ -39,7 +39,8 @@ const PROGRESS = [
   ['Clarification reliability fixes and 247-assertion benchmark', 'Tang Zheling', 'In progress'],
   ['Evaluation set: 50 new held-out requests, written and labelled', EVAL_OWNERS, 'In progress'],
   ['Independent labels for the 30 inbox requests', EVAL_OWNERS, 'In progress'],
-  ['Live run on the full evaluation set; usability test', '[TBD]', 'Planned'],
+  ['Live model run on the full evaluation set (30 inbox + 50 new)', 'Tang Zheling', 'Planned'],
+  ['Usability test: two people acting as dispatchers, four tasks', '[TBD]', 'Planned'],
 ];
 
 // ---- Evidence ---------------------------------------------------------------------------------
@@ -247,7 +248,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   s.addTable([[tableHead('FEATURE'), tableHead('OWNER'), tableHead('STATUS')],
     ...PROGRESS.map(([f, o, st]) => [tableCell(f), tableCell(o, { color: o.startsWith('[') ? C.oxblood : C.inkSoft }),
       tableCell(st, { bold: true, color: tone[st] })])],
-  { x: 0.6, y: 1.32, w: 8.8, colW: [5.6, 2.0, 1.2], rowH: [0.24, ...PROGRESS.map(() => 0.31)] });
+  { x: 0.6, y: 1.32, w: 8.8, colW: [5.6, 2.0, 1.2], rowH: [0.24, ...PROGRESS.map(() => 0.29)] });
   const done = PROGRESS.filter((r) => r[2] === 'Done').length;
   source(s, `${done} of ${PROGRESS.length} done. Code: ${GITHUB} (PR #15 for this sprint, PR #14 for clarification reliability).`);
   notes(s, 5);
