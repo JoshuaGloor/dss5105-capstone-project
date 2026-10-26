@@ -1,5 +1,10 @@
 # What the allocator adds over earliest finish
 
+> Sprint 2 note: the scorer now weights the defect term by batch pieces. The lateness
+> and cost-buffer rows still reproduce; the defects-buffer candidates and the 0.7/0.3
+> hybrid do not, so run this study from commit e8c40a5 to reproduce the evidence
+> exactly. Current presets and results: [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md).
+
 Tracks v4 asks what the full system adds over the best simple rule, such as
 "earliest estimated finish". This study answers that for the allocation policy.
 The language layer's value is a separate question, measured on the chat inbox.

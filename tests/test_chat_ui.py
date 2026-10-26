@@ -35,7 +35,7 @@ def test_validated_chat_can_be_saved_without_another_provider_call(tmp_path, mon
     monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "chat-plan.sqlite3")
     fake = FakeModel([patch(("order_id", "ORD-109"))])
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     app.radio(key="workspace_mode").set_value("saved").run()
     app.radio(key="input_source").set_value("chat").run()
     app.chat_input(key="dispatch_chat").set_value("Please allocate ORD-109.").run()
@@ -56,7 +56,7 @@ def test_validated_chat_can_be_saved_without_another_provider_call(tmp_path, mon
 def ui(monkeypatch):
     fake = FakeModel([])
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     app.radio(key="input_source").set_value("chat").run()
     assert fake.calls == 0
     assert "preview" not in app.session_state

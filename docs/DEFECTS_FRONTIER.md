@@ -1,5 +1,9 @@
 # Can we beat greedy_biggest on defects?
 
+> Sprint 2 note: superseded by [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md), where a
+> defects configuration now beats greedy_biggest. The scorer weights the defect term by
+> batch pieces since Sprint 2, so this grid reproduces exactly only from commit e8c40a5.
+
 Tracks v4 asks for at least one objective besides the primary one. For "minimise
 defects" the metric is `% def pcs` and the guardrail is `% late` no worse than random.
 This study asks whether any defects-weighted configuration of our scorer clears both.

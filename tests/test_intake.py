@@ -1,4 +1,5 @@
 import json
+from dataclasses import asdict
 from datetime import date
 
 import pytest
@@ -60,7 +61,7 @@ def test_reference_and_raw_date_reach_allocator_without_model_arithmetic():
     assert result["status"] == "RECOMMEND"
     assert result["batch"]["due_date"] == "2026-04-13"
     assert result["batch"]["pieces"] == 500
-    assert result["conversation"]["traces"][0]["version"] == "intake-v2"
+    assert result["conversation"]["traces"][0]["version"] == "intake-v3"
     prompt = json.loads(model.calls[0][1].content)
     assert "queues" not in prompt and "cost" not in prompt
     assert prompt["latest_user_message"] == text
@@ -187,7 +188,7 @@ def test_lowest_cost_with_deadline_maps_to_tool_constraint():
         ),
     )
     result = preview_conversation(state, DispatchDesk(), ObjectiveWeights(lateness=0, defects=1))
-    assert result["effective_weights"] == {"lateness": 0, "defects": 0, "cost": 1, "deadline_buffer_days": 0}
+    assert result["effective_weights"] == asdict(ObjectiveWeights(lateness=0, cost=1))
     choice = next(row for row in result["candidates"] if row["estimate"]["workshop_id"] == result["recommendation"])
     assert choice["meets_deadline"]
 
@@ -245,3 +246,51 @@ def test_clicked_answer_is_validated_like_model_output_without_a_model():
         apply_selection(first, "suggested_workshop", "Nowhere", "Use Nowhere instead.", desk)
     with pytest.raises(IntakeError, match="Send a request"):
         apply_selection(Conversation(), "order_id", "ORD-017", "ORD-017", desk)
+
+
+def test_capacity_question_is_extracted_as_quoted_fields_and_needs_a_product():
+    text = "Who can take 1,500 crewnecks by April 15?"
+    conversation = turn(
+        text,
+        patch(
+            ("intent", "capacity", text),
+            ("product", "crewnecks", text),
+            ("pieces", "1,500", text),
+            ("due_date", "April 15", text),
+        ),
+    )
+    request = conversation.request
+    assert (request.intent, request.product, request.pieces, request.due_date) == (
+        "capacity",
+        "Crewneck sweater",
+        1500,
+        "2026-04-15",
+    )
+    asked = turn("Who has room for 300 by Friday?", patch(("intent", "capacity", "Who has room"), needs=["product"]))
+    assert "Which product" in asked.request.clarification
+
+
+def test_switching_to_a_new_request_reuses_the_same_patch():
+    first = turn("ORD-109 please", patch(("order_id", "ORD-109", "ORD-109")))
+    text = "And ORD-053?"
+    model = Extractor(patch(("order_id", "ORD-053", text)))
+    with pytest.raises(IntakeError, match="different order"):
+        interpret_turn(first, text, DispatchDesk(), model=model)
+    model = Extractor(patch(("order_id", "ORD-053", text)))
+    fresh = interpret_turn(first, text, DispatchDesk(), model=model, restart_new_requests=True)
+    assert fresh.request.order_id == "ORD-053" and len(fresh.turns) == 1 and len(model.calls) == 1
+    assert fresh.traces[-1]["restarted"] is True
+
+
+def test_a_recorded_order_needs_no_quantity_question_so_a_refusal_is_not_blocked():
+    # R14 live failure: the model asked for a quantity although ORD-103 records 2000 pieces.
+    text = "QuickStitch for the scarves on ORD-103?"
+    conversation = turn(
+        text,
+        patch(("order_id", "ORD-103", text), ("suggested_workshop", "QuickStitch", text), needs=["quantity"]),
+    )
+    assert conversation.needs == () and conversation.request.clarification is None
+    result = preview_conversation(conversation, DispatchDesk(), ObjectiveWeights())
+    assert result["status"] == "REFUSE_SUGGESTION"
+    unknown = turn("Send the scarves for Harbor Knits", patch(("product", "scarves", "scarves"), needs=["quantity"]))
+    assert "quantity" in unknown.needs

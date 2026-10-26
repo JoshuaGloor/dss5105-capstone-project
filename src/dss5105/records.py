@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -11,7 +12,9 @@ from uuid import uuid4
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, LoadScenario, WorkshopQuery
 
-DEFAULT_STORE_PATH = ROOT / "runtime" / "dispatch.sqlite3"
+# DSS5105_RUNTIME moves saved state elsewhere, e.g. a rehearsal plan that leaves runtime/ untouched.
+RUNTIME = Path(os.getenv("DSS5105_RUNTIME") or ROOT / "runtime")
+DEFAULT_STORE_PATH = RUNTIME / "dispatch.sqlite3"
 INTAKE_FIELDS = {"conversation", "interpretation_source", "fixture_sha256"}
 
 
@@ -78,9 +81,20 @@ class AllocationStore:
             raise AllocationError("Workspace sources have changed. Use a separately reviewed workspace migration.")
         return state
 
-    def _preview(self, connection, desk, state, envelope, request, weights):
+    @staticmethod
+    def _ledger(connection) -> dict[str, float]:
+        """Pieces confirmed per workshop in this plan, for the fairness objective."""
+        ledger = {}
+        for (payload,) in connection.execute("SELECT record FROM allocations ORDER BY sequence"):
+            record = json.loads(payload)
+            pieces = record["tool_evidence"]["batch"]["pieces"]
+            ledger[record["workshop_id"]] = ledger.get(record["workshop_id"], 0) + pieces
+        return ledger
+
+    def _preview(self, connection, desk, state, envelope, request, weights, rules=()):
         desk.queues = dict(state["queues"])
-        result = desk.preview(envelope, request, weights)
+        desk.ledger = self._ledger(connection)
+        result = desk.preview(envelope, request, weights, rules=rules)
         order = result.get("order")
         existing = (
             connection.execute(
@@ -112,17 +126,18 @@ class AllocationStore:
         result["commit_allowed"] = result["status"] == "RECOMMEND"
         return result
 
-    def preview(self, envelope: dict, request: DispatchInput, weights: ObjectiveWeights) -> dict:
+    def preview(self, envelope: dict, request: DispatchInput, weights: ObjectiveWeights, *, rules=()) -> dict:
         desk = DispatchDesk()
         with self._transaction() as connection:
             state = self._state(connection, desk)
-            return self._preview(connection, desk, state, envelope, request, weights)
+            return self._preview(connection, desk, state, envelope, request, weights, rules)
 
     def _read_tool(self, method: str, payload) -> dict:
         desk = DispatchDesk()
         with self._transaction() as connection:
             state = self._state(connection, desk)
             desk.queues = dict(state["queues"])
+            desk.ledger = self._ledger(connection)
             result = getattr(desk, method)(payload)
             result["storage"] = {"database_id": state["database_id"], "revision": state["revision"]}
             result["assumption"] += " Saved planning queues at a fixed date; queues do not drain with wall-clock time."
@@ -164,6 +179,7 @@ class AllocationStore:
                     preview["request"],
                     DispatchInput(**preview["input"]),
                     ObjectiveWeights(**preview["configured_weights"]),
+                    preview.get("standing_rules", ()),
                 )
             except (KeyError, TypeError, ValueError) as error:
                 raise AllocationError("The reviewed preview is invalid. Generate a fresh preview.") from error
@@ -209,6 +225,31 @@ class AllocationStore:
             )
             connection.execute("UPDATE state SET payload = ? WHERE singleton = 1", (encode(updated),))
             return record
+
+    def summary(self) -> dict:
+        """Plan identity, revision, queues and per-workshop booked pieces, for dashboards."""
+        desk = DispatchDesk()
+        with self._transaction() as connection:
+            state = self._state(connection, desk)
+            return {
+                "database_id": state["database_id"],
+                "revision": state["revision"],
+                "as_of": state["as_of"],
+                "queues": state["queues"],
+                "ledger": self._ledger(connection),
+            }
+
+    def archive(self) -> Path | None:
+        """Move this plan aside so a fresh one starts from the course snapshot; nothing is deleted."""
+        if not self.path.exists():
+            return None
+        target = (
+            self.path.parent / "archive" / f"{self.path.stem}-{datetime.now(timezone.utc):%Y%m%dT%H%M%S%f}.sqlite3"
+        )
+        target.parent.mkdir(parents=True, exist_ok=True)
+        self.path.rename(target)
+        self.__init__(self.path)
+        return target
 
     def records(self) -> list[dict]:
         with self._transaction() as connection:

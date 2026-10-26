@@ -11,7 +11,7 @@ already been evaluated.
 |---|---|
 | Use the shared simulator against all three provided baselines | Initial offline runs complete; reproducible runner and traces available |
 | Declare a primary objective at Sprint 1 | Team selected minimise lateness; the Sprint 1 deck declares it |
-| Report primary, another objective, and a justified weighted hybrid | Primary selected; lateness, defects, and hybrid experiments available; final configurations and hybrid rationale pending |
+| Report primary, another objective, and a justified weighted hybrid | Primary lateness, secondary defects; one frozen preset per objective and a lateness-then-defects hybrid, selected by stated rules on development seeds ([OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md)) |
 | Report shock averaged over ten seeds | Data v3 runs and paired normal controls complete; see V3_EVALUATION.md |
 | Beat all three baselines on the primary objective and report where baselines win | Initial lateness results are favorable; primary selected; final evaluation and tradeoff reporting remain pending |
 | Compare with a short heuristic and explain the system's added value | Allocator measured in [MARGIN_STUDY.md](MARGIN_STUDY.md): it ties earliest finish on lateness and adds a configurable cost/late-days tradeoff; language-layer value still to be measured |
@@ -33,6 +33,15 @@ capabilities. Completing the simulator rows does not complete the project.
 | Defects | Beat all three on `% def pcs` | `% late` no worse than random |
 | Fairness | `max share`; matching random's share while delivering on time counts as a win | `% late` no worse than random |
 | Robustness | Change in `% late` and `late days`, normal to shock, averaged over ten paired seeds | Normal `% late` no worse than random |
+
+Course-seed status of the frozen presets ([OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md)):
+lateness met by every preset, including the default hybrid; defects met by the defects
+preset (4.904 against greedy_biggest's 5.278, also under shock; 27.5% late against
+random's 34.2%); fairness met by the fairness preset (19.2% against 22.6%); robustness: the
+robustness preset changes least among guardrail-passing policies on `% late`, while the
+Sprint 1 lateness preset changes fewer late days, so no universal win is claimed.
+Selection used development seeds 6000-6029. The course seeds were run twice; the protocol
+note in the study explains why and what changed.
 
 Do not substitute batch defect percentage for `% def pcs`, or turnaround for late
 days. A low defect result with unusable lateness is not a primary-objective win.

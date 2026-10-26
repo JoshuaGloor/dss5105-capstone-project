@@ -183,3 +183,12 @@ def test_intake_evidence_is_separate_from_authoritative_tool_evidence(store):
     record = store.commit_allocation(reviewed, "Dispatcher", "with-chat", confirmed=True)
     assert record["intake_evidence"]["conversation"] == reviewed["conversation"]
     assert "conversation" not in record["tool_evidence"]
+
+
+def test_archive_moves_the_plan_aside_and_starts_from_the_snapshot(tmp_path):
+    store = AllocationStore(tmp_path / "plan.sqlite3")
+    database = store.summary()["database_id"]
+    target = store.archive()
+    assert target.exists() and target.parent == tmp_path / "archive"
+    fresh = store.summary()
+    assert fresh["database_id"] != database and fresh["revision"] == 0 and fresh["ledger"] == {}

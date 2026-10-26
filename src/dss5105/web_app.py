@@ -14,7 +14,7 @@ import streamlit as st
 from dss5105.allocator import ObjectiveWeights
 from dss5105.chat_ui import remember_tool_reply, render_chat, reset_preview
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox, ship_date_is_due_date
-from dss5105.evaluate import PRESETS
+from dss5105.evaluate import DEFAULT_PRESET, PRESETS
 from dss5105.intake import preview_conversation
 from dss5105.records import AllocationError, AllocationStore
 from dss5105.replies import STATUS_LABELS
@@ -22,11 +22,21 @@ from dss5105.workshop_ui import render_workshops
 
 STYLE = Path(__file__).with_name("assets") / "desk.css"
 LABELS = {
+    "hybrid": "Recommended: on time first, then quality",
     "lateness": "Prioritise on-time delivery",
     "defects": "Prioritise quality",
-    "hybrid": "Compare the mixed policy",
+    "fairness": "Spread the work fairly",
+    "robustness": "Absorb a workshop stoppage",
     "custom": "Set relative priorities",
 }
+# Custom sliders: term, label, help. Defaults start from the recommended preset.
+SLIDERS = (
+    ("lateness", "On time (lateness)", "Late batches and late days. Our primary objective."),
+    ("defects", "Quality (defects)", "Expected defective pieces. Our secondary objective."),
+    ("fairness", "Fair share (fairness)", "Spread booked pieces; uses this plan's saved bookings."),
+    ("robustness", "Resilience (robustness)", "Slack to absorb a two-week workshop stoppage."),
+    ("cost", "Cost", "Cheaper workshops. A measured tradeoff, not a course objective."),
+)
 INK = "#1d1b18"
 MUTED = "#6b665d"
 GRID = "#ece6db"
@@ -86,11 +96,12 @@ def settings(request: DispatchInput) -> ObjectiveWeights:
     with st.container(border=True, key="decision_settings"):
         st.caption("ALLOCATION PRIORITIES")
         st.subheader("Compare tradeoffs")
-        st.caption("Primary objective: minimise lateness. Compare alternatives below.")
+        st.caption("Primary objective: minimise lateness. Secondary: minimise defects.")
         fixed = request.preference != "configured"
         mode = st.radio(
             "Objective",
             options=list(LABELS),
+            index=list(LABELS).index(DEFAULT_PRESET),
             format_func=LABELS.get,
             key="objective",
             label_visibility="collapsed",
@@ -103,18 +114,39 @@ def settings(request: DispatchInput) -> ObjectiveWeights:
             )
         if mode == "custom":
             st.caption("Adjust relative weights. Every change recomputes the Python preview.")
+            start = asdict(PRESETS[DEFAULT_PRESET])
             weights = {
                 term: st.slider(
-                    term.capitalize() + " weight",
-                    min_value=0.0,
-                    max_value=1.0,
-                    value=value,
-                    step=0.01,
-                    key="weight_" + term,
+                    label, min_value=0.0, max_value=1.0, value=start[term], step=0.01, key="weight_" + term, help=hint
                 )
-                for term, value in (("lateness", 1.0), ("defects", 0.05), ("cost", 0.1))
+                for term, label, hint in SLIDERS
             }
-            configured = ObjectiveWeights(**weights)
+            weights["deadline_buffer_days"] = st.slider(
+                "Safety buffer (days)",
+                min_value=0.0,
+                max_value=10.0,
+                value=start["deadline_buffer_days"],
+                step=0.5,
+                key="weight_buffer",
+                help="Prefer workshops that finish this many days before the deadline.",
+            )
+            reserve = st.toggle(
+                "Protect scarce capacity",
+                value=start["capacity_reservation"] > 0,
+                key="weight_reservation",
+                help="Keep workshops that also make accessories free when a tops-only shop meets the date.",
+            )
+            on_time_first = st.toggle(
+                "On-time first",
+                value=start["deadline_miss_days"] > 0,
+                key="weight_on_time_first",
+                help="Missing the date costs a week of lateness, so an on-time workshop beats a late one.",
+            )
+            configured = ObjectiveWeights(
+                **weights,
+                capacity_reservation=1.0 if reserve else 0.0,
+                deadline_miss_days=7.0 if on_time_first else 0.0,
+            )
         else:
             configured = PRESETS[mode]
         st.caption("Workshop restrictions always apply. Priorities change the ranking of permitted options.")

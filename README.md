@@ -20,15 +20,37 @@ As suggested by the course, we run and manage everything using `uv`.
 No API key is needed for tests, allocation experiments, or the prototype. Set up
 `.env` only when deliberately running a provider-backed feature or live test.
 
-## Streamlit dispatch desk
+## The app: voice assistant, desk, objective lab and memory
 
 ```bash
 sh scripts/run_app.sh
 ```
 
-Open `http://localhost:8501` in Chrome. The page supports request selection, live
-Python previews, objective presets and custom weight sliders, candidate comparison,
-exclusion reasons, evidence export, and confirmation. Supplied examples need no API key.
+Open `http://localhost:8501` in Chrome. The top bar has four pages:
+
+- **Assistant** (opens first): the dispatcher's phone. Hold the microphone and say what
+  needs to go out ("ORD-109, 500 vests for Harbor Knits, due April 13, keep it away from
+  BudgetWorks"), or type. The answer arrives as a card and is read aloud; both are
+  written by Python from tool output. "Book it" opens a confirmation sheet, and a slide
+  with your name saves the booking. Constraints from a confirmed booking can be
+  remembered as standing rules for that customer. See [VOICE_ASSISTANT.md](docs/VOICE_ASSISTANT.md).
+- **Desk**: the desktop dispatch desk described below.
+- **Objective lab**: sliders for all four course objectives (lateness, defects,
+  fairness, robustness) plus cost, buffer and capacity reservation. Each change replays
+  the course simulator on the ten course seeds, normal and with the closure.
+- **Memory**: standing rules (pause or resume), the booking ledger, the conversation log,
+  the profile, and a non-destructive "start a fresh demo plan".
+
+Voice uses the browser's speech recognition (Chrome, Edge or Safari on localhost). The
+assistant and the desk's saved plan share `runtime/dispatch.sqlite3`; memory lives in
+`runtime/memory.sqlite3`. Both are Git-ignored. Without a configured model the assistant
+still answers the course inbox examples from their reviewed interpretations.
+
+### The desk
+
+The desk supports request selection, live Python previews, objective presets and custom
+weight sliders for the four objectives, candidate comparison, exclusion reasons,
+evidence export, and confirmation. Supplied examples need no API key.
 The default **Independent previews** workspace keeps the course snapshot unchanged.
 Choose **Saved local plan**, review an on-time recommendation, enter the confirming
 dispatcher's name, and select **Confirm and save allocation** to persist a record
@@ -36,7 +58,7 @@ and update local planning queues. Saved records survive restarts and can be expo
 They live in Git-ignored `runtime/dispatch.sqlite3`; no workshop is contacted.
 See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md) for queue semantics,
 duplicate/stale-preview protection, and local-prototype limitations.
-The page opens on **Chat request (live model)**: paste a message or start from a course
+The desk opens on **Chat request (live model)**: paste a message or start from a course
 inbox message, and answer clarification questions using the configured model.
 Each reply is a card built by Python from tool output. Answer buttons for ambiguous
 orders and refused workshops apply the choice without another model call.
@@ -85,13 +107,28 @@ open the HTML directly in Chrome.
 
 ## Allocation experiments (no API key needed)
 
+The Sprint 2 scorer adds capacity reservation, fairness and robustness terms. One
+command chooses a configuration per objective on development seeds and then reports it
+once on the course seeds:
+
+```bash
+uv run python -m dss5105.objective_study
+```
+
+The default `hybrid` preset (lateness first, then defects) beats all three baselines and
+the earliest-finish rule on late batches and late days, with fewer defective pieces and
+lower cost. The defects preset now beats all three baselines on `% def pcs`, and the
+fairness preset matches random's spread while staying on time. See
+[OBJECTIVE_STUDY.md](docs/OBJECTIVE_STUDY.md) for the protocol, every number, and where a
+baseline still wins.
+
 ```bash
 uv run python -m dss5105.evaluate --output results/allocation-normal.json
 uv run python -m dss5105.evaluate --shock --seeds 10 --output results/allocation-shock.json
 ```
 
 These compare the course baselines, a short earliest-finish heuristic, and
-lateness/defects/hybrid weight configurations. Delivery arithmetic stays in Python;
+the five objective presets. Delivery arithmetic stays in Python;
 objectives are configuration. Eligibility uses the course helper, and the course
 simulator is left unchanged. See [the allocation guide](docs/ALLOCATION_ENGINE.md)
 for the score definition, assumptions, saved traces, and current limitations.
@@ -101,6 +138,7 @@ The same entry point can run one preset or a custom mix without editing code:
 ```bash
 uv run python -m dss5105.evaluate --preset defects
 uv run python -m dss5105.evaluate --lateness-weight 1 --defects-weight 0.05 --cost-weight 0.1
+uv run python -m dss5105.evaluate --lateness-weight 1 --fairness-weight 0.05 --capacity-reservation 1
 ```
 
 For an exploratory weight grid and additional random-seed checks, run
@@ -121,8 +159,9 @@ and [DEFECTS_FRONTIER.md](docs/DEFECTS_FRONTIER.md) shows where a baseline still
 
 When data or policies change, reproduce affected results with the documented runner
 and update their evidence. Do not treat the earlier, unretained probes as established
-findings. Finalize proposed tool contracts before implementing them. The current
-scorer supports lateness, defects and cost weights; fairness scoring is future work.
+findings. Finalize proposed tool contracts before implementing them. The scorer
+supports lateness, defects, fairness, robustness and cost weights, a deadline buffer
+and capacity reservation.
 
 ## Understanding the repo
 

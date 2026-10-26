@@ -17,7 +17,8 @@ from dataclasses import asdict
 from pathlib import Path
 
 from dss5105.allocator import ObjectiveWeights
-from dss5105.evaluate import PRESETS, run_seed_series
+from dss5105.evaluate import SPRINT1_PRESETS as PRESETS
+from dss5105.evaluate import run_seed_series
 from dss5105.harness import HARNESS_PATH
 
 ROOT = Path(__file__).resolve().parents[1]

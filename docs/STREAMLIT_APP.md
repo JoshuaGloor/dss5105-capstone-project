@@ -1,5 +1,18 @@
 # Streamlit dispatch desk
 
+The app has four pages in the top bar: **Assistant** (the voice-first phone experience,
+[VOICE_ASSISTANT.md](VOICE_ASSISTANT.md)), **Desk** (this guide), **Objective lab**
+(sliders for the four objectives, replaying the course simulator), and **Memory**
+(standing rules, bookings, log, profile and plan). The desk's custom priorities offer
+sliders for lateness, defects, fairness, robustness and cost, a safety buffer, and a
+capacity-reservation switch; the default preset is the lateness-then-defects hybrid.
+Desk tests run it through `tests/desk_page.py`, because `streamlit_app.py` now opens on
+the assistant.
+
+To rehearse a demo without touching the real local plan, point saved state at another
+folder inside the project: `DSS5105_RUNTIME=$PWD/.cache/rehearsal sh scripts/run_app.sh`.
+Plans and memory then live there instead of `runtime/`.
+
 Data v3 is now loaded. Candidate tables show the April queue values; the Streamlit
 estimate breakdown also shows processing, transport and expected rework. Impossible
 requests show the earliest permitted estimated delivery and review options, with

@@ -1,0 +1,2538 @@
+{
+  "rules": {
+    "lateness": "Reservation rate with the lowest mean late days over the development normal and shock runs, then mean % late, then the rate closest to 1 (one day of scarce capacity costs one day of lateness).",
+    "hybrid": "Among lateness-first configurations whose development % late (normal and shock) is within 0.25 points of the lateness preset and whose late days are no higher, the lowest development expected % def pcs, then % late, then name. The lateness preset wins if none qualifies.",
+    "defects": "Among configurations whose development % late is at most 0.85 x random's (normal and shock), the lowest development expected % def pcs, then % late, then name.",
+    "fairness": "Among configurations within 1.0 point of the lateness preset's development % late, the lowest development max share, then % late, then name.",
+    "robustness": "The lowest development shock-minus-normal change in % late, then in late days, then the smaller weight. The lateness preset (weight 0) is a candidate, so 'no change' can win."
+  },
+  "lateness_grid": {
+    "lateness_r0": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 0.0,
+      "deadline_miss_days": 7.0
+    },
+    "lateness_r0.5": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 0.5,
+      "deadline_miss_days": 7.0
+    },
+    "lateness_r1": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 1.0,
+      "deadline_miss_days": 7.0
+    },
+    "lateness_r2": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 2.0,
+      "deadline_miss_days": 7.0
+    }
+  },
+  "grids": {
+    "hybrid": {
+      "hybrid_d0.02_b0": {
+        "lateness": 1.0,
+        "defects": 0.02,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.02_b2": {
+        "lateness": 1.0,
+        "defects": 0.02,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 2.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.02_b4": {
+        "lateness": 1.0,
+        "defects": 0.02,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 4.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.02_b6": {
+        "lateness": 1.0,
+        "defects": 0.02,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 6.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.02_b8": {
+        "lateness": 1.0,
+        "defects": 0.02,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 8.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.05_b0": {
+        "lateness": 1.0,
+        "defects": 0.05,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.05_b2": {
+        "lateness": 1.0,
+        "defects": 0.05,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 2.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.05_b4": {
+        "lateness": 1.0,
+        "defects": 0.05,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 4.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.05_b6": {
+        "lateness": 1.0,
+        "defects": 0.05,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 6.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.05_b8": {
+        "lateness": 1.0,
+        "defects": 0.05,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 8.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.1_b0": {
+        "lateness": 1.0,
+        "defects": 0.1,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.1_b2": {
+        "lateness": 1.0,
+        "defects": 0.1,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 2.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.1_b4": {
+        "lateness": 1.0,
+        "defects": 0.1,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 4.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.1_b6": {
+        "lateness": 1.0,
+        "defects": 0.1,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 6.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.1_b8": {
+        "lateness": 1.0,
+        "defects": 0.1,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 8.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.2_b0": {
+        "lateness": 1.0,
+        "defects": 0.2,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.2_b2": {
+        "lateness": 1.0,
+        "defects": 0.2,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 2.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.2_b4": {
+        "lateness": 1.0,
+        "defects": 0.2,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 4.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.2_b6": {
+        "lateness": 1.0,
+        "defects": 0.2,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 6.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.2_b8": {
+        "lateness": 1.0,
+        "defects": 0.2,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 8.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.3_b0": {
+        "lateness": 1.0,
+        "defects": 0.3,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.3_b2": {
+        "lateness": 1.0,
+        "defects": 0.3,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 2.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.3_b4": {
+        "lateness": 1.0,
+        "defects": 0.3,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 4.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.3_b6": {
+        "lateness": 1.0,
+        "defects": 0.3,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 6.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "hybrid_d0.3_b8": {
+        "lateness": 1.0,
+        "defects": 0.3,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 8.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      }
+    },
+    "defects": {
+      "defects_l0.1_b0": {
+        "lateness": 0.1,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.1_b5": {
+        "lateness": 0.1,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 5.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.15_b0": {
+        "lateness": 0.15,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.15_b5": {
+        "lateness": 0.15,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 5.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.2_b0": {
+        "lateness": 0.2,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.2_b5": {
+        "lateness": 0.2,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 5.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.25_b0": {
+        "lateness": 0.25,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.25_b5": {
+        "lateness": 0.25,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 5.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.3_b0": {
+        "lateness": 0.3,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.3_b5": {
+        "lateness": 0.3,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 5.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.4_b0": {
+        "lateness": 0.4,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.4_b5": {
+        "lateness": 0.4,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 5.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.5_b0": {
+        "lateness": 0.5,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "defects_l0.5_b5": {
+        "lateness": 0.5,
+        "defects": 1.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 5.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      }
+    },
+    "fairness": {
+      "fairness_0.02": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.02,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "fairness_0.05": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.05,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "fairness_0.1": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.1,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "fairness_0.2": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.2,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "fairness_0.5": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.5,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "fairness_1": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 1.0,
+        "robustness": 0.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      }
+    },
+    "robustness": {
+      "robustness_0.05": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.05,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "robustness_0.1": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.1,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "robustness_0.2": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.2,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "robustness_0.5": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 0.5,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      },
+      "robustness_1": {
+        "lateness": 1.0,
+        "defects": 0.0,
+        "cost": 0.0,
+        "fairness": 0.0,
+        "robustness": 1.0,
+        "deadline_buffer_days": 0.0,
+        "capacity_reservation": 1.0,
+        "deadline_miss_days": 7.0
+      }
+    }
+  },
+  "selected": {
+    "lateness": "lateness",
+    "hybrid": "hybrid_d0.2_b2",
+    "defects": "defects_l0.2_b5",
+    "fairness": "fairness_1",
+    "robustness": "robustness_0.5"
+  },
+  "frozen_weights": {
+    "lateness": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 1.0,
+      "deadline_miss_days": 7.0
+    },
+    "hybrid": {
+      "lateness": 1.0,
+      "defects": 0.2,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 2.0,
+      "capacity_reservation": 1.0,
+      "deadline_miss_days": 7.0
+    },
+    "defects": {
+      "lateness": 0.2,
+      "defects": 1.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 5.0,
+      "capacity_reservation": 1.0,
+      "deadline_miss_days": 7.0
+    },
+    "fairness": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 1.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 1.0,
+      "deadline_miss_days": 7.0
+    },
+    "robustness": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.5,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 1.0,
+      "deadline_miss_days": 7.0
+    },
+    "sprint1_lateness": {
+      "lateness": 1.0,
+      "defects": 0.0,
+      "cost": 0.0,
+      "fairness": 0.0,
+      "robustness": 0.0,
+      "deadline_buffer_days": 0.0,
+      "capacity_reservation": 0.0,
+      "deadline_miss_days": 0.0
+    }
+  },
+  "development": {
+    "lateness_stage": {
+      "seeds": [
+        6000,
+        6001,
+        6002,
+        6003,
+        6004,
+        6005,
+        6006,
+        6007,
+        6008,
+        6009,
+        6010,
+        6011,
+        6012,
+        6013,
+        6014,
+        6015,
+        6016,
+        6017,
+        6018,
+        6019,
+        6020,
+        6021,
+        6022,
+        6023,
+        6024,
+        6025,
+        6026,
+        6027,
+        6028,
+        6029
+      ],
+      "policies": {
+        "random": {
+          "normal": {
+            "% late": 35.38888888888888,
+            "late days": 6.216388888888889,
+            "% def pcs": 6.133689839572192,
+            "expected % def pcs": 6.000000000000003,
+            "max share": 22.620320855614974,
+            "cost": 111780.0,
+            "mean days": 22.103513802167093
+          },
+          "shock": {
+            "% late": 38.47222222222222,
+            "late days": 7.012500000000001,
+            "% def pcs": 6.133689839572192,
+            "expected % def pcs": 6.000000000000003,
+            "max share": 22.620320855614974,
+            "cost": 111780.0,
+            "mean days": 23.24281935772264
+          },
+          "delta": {
+            "% late": 3.083333333333343,
+            "late days": 0.7961111111111121
+          }
+        },
+        "greedy_biggest": {
+          "normal": {
+            "% late": 84.5277777777778,
+            "late days": 26.615555555555552,
+            "% def pcs": 5.270944741532976,
+            "expected % def pcs": 5.104812834224595,
+            "max share": 70.16042780748661,
+            "cost": 108429.99999999996,
+            "mean days": 50.43060355392157
+          },
+          "shock": {
+            "% late": 84.97222222222223,
+            "late days": 28.125277777777775,
+            "% def pcs": 5.270944741532976,
+            "expected % def pcs": 5.104812834224595,
+            "max share": 70.16042780748661,
+            "cost": 108429.99999999996,
+            "mean days": 51.95504799836601
+          },
+          "delta": {
+            "% late": 0.44444444444442865,
+            "late days": 1.5097222222222229
+          }
+        },
+        "cheapest": {
+          "normal": {
+            "% late": 91.97222222222226,
+            "late days": 82.32777777777778,
+            "% def pcs": 7.939393939393939,
+            "expected % def pcs": 7.806417112299459,
+            "max share": 70.16042780748661,
+            "cost": 85959.99999999999,
+            "mean days": 106.62276570048307
+          },
+          "shock": {
+            "% late": 92.00000000000003,
+            "late days": 84.73333333333335,
+            "% def pcs": 7.939393939393939,
+            "expected % def pcs": 7.806417112299459,
+            "max share": 70.16042780748661,
+            "cost": 85959.99999999999,
+            "mean days": 109.02998792270527
+          },
+          "delta": {
+            "% late": 0.027777777777771462,
+            "late days": 2.4055555555555657
+          }
+        },
+        "earliest_finish": {
+          "normal": {
+            "% late": 1.8055555555555558,
+            "late days": 0.16111111111111112,
+            "% def pcs": 6.684491978609626,
+            "expected % def pcs": 7.0399286987522265,
+            "max share": 26.29946524064171,
+            "cost": 115658.50000000001,
+            "mean days": 8.197954609565862
+          },
+          "shock": {
+            "% late": 1.9722222222222223,
+            "late days": 0.17194444444444446,
+            "% def pcs": 6.825311942959002,
+            "expected % def pcs": 6.999126559714796,
+            "max share": 26.572192513368986,
+            "cost": 115244.33333333336,
+            "mean days": 8.44486558967697
+          },
+          "delta": {
+            "% late": 0.16666666666666652,
+            "late days": 0.010833333333333334
+          }
+        },
+        "lateness_r0": {
+          "normal": {
+            "% late": 1.8055555555555558,
+            "late days": 0.16305555555555556,
+            "% def pcs": 6.7932263814616745,
+            "expected % def pcs": 7.027754010695186,
+            "max share": 26.155080213903748,
+            "cost": 115592.66666666666,
+            "mean days": 8.165371530022263
+          },
+          "shock": {
+            "% late": 1.9722222222222223,
+            "late days": 0.1738888888888889,
+            "% def pcs": 6.976827094474154,
+            "expected % def pcs": 6.985080213903744,
+            "max share": 26.602495543672017,
+            "cost": 115235.50000000004,
+            "mean days": 8.415636213654917
+          },
+          "delta": {
+            "% late": 0.16666666666666652,
+            "late days": 0.010833333333333334
+          }
+        },
+        "lateness_r0.5": {
+          "normal": {
+            "% late": 1.7222222222222228,
+            "late days": 0.09416666666666668,
+            "% def pcs": 6.481283422459891,
+            "expected % def pcs": 7.053297682709446,
+            "max share": 28.431372549019617,
+            "cost": 115792.66666666666,
+            "mean days": 9.785332354281365
+          },
+          "shock": {
+            "% late": 1.888888888888889,
+            "late days": 0.11111111111111112,
+            "% def pcs": 6.313725490196077,
+            "expected % def pcs": 7.028217468805705,
+            "max share": 28.664884135472374,
+            "cost": 115256.33333333333,
+            "mean days": 9.916718344203156
+          },
+          "delta": {
+            "% late": 0.1666666666666663,
+            "late days": 0.016944444444444443
+          }
+        },
+        "lateness_r1": {
+          "normal": {
+            "% late": 1.7222222222222228,
+            "late days": 0.09416666666666668,
+            "% def pcs": 6.481283422459891,
+            "expected % def pcs": 7.053297682709446,
+            "max share": 28.431372549019617,
+            "cost": 115792.66666666666,
+            "mean days": 9.785332354281365
+          },
+          "shock": {
+            "% late": 1.888888888888889,
+            "late days": 0.11111111111111112,
+            "% def pcs": 6.313725490196077,
+            "expected % def pcs": 7.028217468805705,
+            "max share": 28.664884135472374,
+            "cost": 115256.33333333333,
+            "mean days": 9.916718344203156
+          },
+          "delta": {
+            "% late": 0.1666666666666663,
+            "late days": 0.016944444444444443
+          }
+        },
+        "lateness_r2": {
+          "normal": {
+            "% late": 1.7222222222222228,
+            "late days": 0.09416666666666668,
+            "% def pcs": 6.481283422459891,
+            "expected % def pcs": 7.053297682709446,
+            "max share": 28.431372549019617,
+            "cost": 115792.66666666666,
+            "mean days": 9.785332354281365
+          },
+          "shock": {
+            "% late": 1.888888888888889,
+            "late days": 0.11111111111111112,
+            "% def pcs": 6.313725490196077,
+            "expected % def pcs": 7.028217468805705,
+            "max share": 28.664884135472374,
+            "cost": 115256.33333333333,
+            "mean days": 9.916718344203156
+          },
+          "delta": {
+            "% late": 0.1666666666666663,
+            "late days": 0.016944444444444443
+          }
+        }
+      }
+    },
+    "objective_stage": {
+      "seeds": [
+        6000,
+        6001,
+        6002,
+        6003,
+        6004,
+        6005,
+        6006,
+        6007,
+        6008,
+        6009,
+        6010,
+        6011,
+        6012,
+        6013,
+        6014,
+        6015,
+        6016,
+        6017,
+        6018,
+        6019,
+        6020,
+        6021,
+        6022,
+        6023,
+        6024,
+        6025,
+        6026,
+        6027,
+        6028,
+        6029
+      ],
+      "policies": {
+        "random": {
+          "normal": {
+            "% late": 35.38888888888888,
+            "late days": 6.216388888888889,
+            "% def pcs": 6.133689839572192,
+            "expected % def pcs": 6.000000000000003,
+            "max share": 22.620320855614974,
+            "cost": 111780.0,
+            "mean days": 22.103513802167093
+          },
+          "shock": {
+            "% late": 38.47222222222222,
+            "late days": 7.012500000000001,
+            "% def pcs": 6.133689839572192,
+            "expected % def pcs": 6.000000000000003,
+            "max share": 22.620320855614974,
+            "cost": 111780.0,
+            "mean days": 23.24281935772264
+          },
+          "delta": {
+            "% late": 3.083333333333343,
+            "late days": 0.7961111111111121
+          }
+        },
+        "greedy_biggest": {
+          "normal": {
+            "% late": 84.5277777777778,
+            "late days": 26.615555555555552,
+            "% def pcs": 5.270944741532976,
+            "expected % def pcs": 5.104812834224595,
+            "max share": 70.16042780748661,
+            "cost": 108429.99999999996,
+            "mean days": 50.43060355392157
+          },
+          "shock": {
+            "% late": 84.97222222222223,
+            "late days": 28.125277777777775,
+            "% def pcs": 5.270944741532976,
+            "expected % def pcs": 5.104812834224595,
+            "max share": 70.16042780748661,
+            "cost": 108429.99999999996,
+            "mean days": 51.95504799836601
+          },
+          "delta": {
+            "% late": 0.44444444444442865,
+            "late days": 1.5097222222222229
+          }
+        },
+        "cheapest": {
+          "normal": {
+            "% late": 91.97222222222226,
+            "late days": 82.32777777777778,
+            "% def pcs": 7.939393939393939,
+            "expected % def pcs": 7.806417112299459,
+            "max share": 70.16042780748661,
+            "cost": 85959.99999999999,
+            "mean days": 106.62276570048307
+          },
+          "shock": {
+            "% late": 92.00000000000003,
+            "late days": 84.73333333333335,
+            "% def pcs": 7.939393939393939,
+            "expected % def pcs": 7.806417112299459,
+            "max share": 70.16042780748661,
+            "cost": 85959.99999999999,
+            "mean days": 109.02998792270527
+          },
+          "delta": {
+            "% late": 0.027777777777771462,
+            "late days": 2.4055555555555657
+          }
+        },
+        "earliest_finish": {
+          "normal": {
+            "% late": 1.8055555555555558,
+            "late days": 0.16111111111111112,
+            "% def pcs": 6.684491978609626,
+            "expected % def pcs": 7.0399286987522265,
+            "max share": 26.29946524064171,
+            "cost": 115658.50000000001,
+            "mean days": 8.197954609565862
+          },
+          "shock": {
+            "% late": 1.9722222222222223,
+            "late days": 0.17194444444444446,
+            "% def pcs": 6.825311942959002,
+            "expected % def pcs": 6.999126559714796,
+            "max share": 26.572192513368986,
+            "cost": 115244.33333333336,
+            "mean days": 8.44486558967697
+          },
+          "delta": {
+            "% late": 0.16666666666666652,
+            "late days": 0.010833333333333334
+          }
+        },
+        "lateness": {
+          "normal": {
+            "% late": 1.7222222222222228,
+            "late days": 0.09416666666666668,
+            "% def pcs": 6.481283422459891,
+            "expected % def pcs": 7.053297682709446,
+            "max share": 28.431372549019617,
+            "cost": 115792.66666666666,
+            "mean days": 9.785332354281365
+          },
+          "shock": {
+            "% late": 1.888888888888889,
+            "late days": 0.11111111111111112,
+            "% def pcs": 6.313725490196077,
+            "expected % def pcs": 7.028217468805705,
+            "max share": 28.664884135472374,
+            "cost": 115256.33333333333,
+            "mean days": 9.916718344203156
+          },
+          "delta": {
+            "% late": 0.1666666666666663,
+            "late days": 0.016944444444444443
+          }
+        },
+        "hybrid_d0.02_b0": {
+          "normal": {
+            "% late": 1.4444444444444444,
+            "late days": 0.1127777777777778,
+            "% def pcs": 6.03921568627451,
+            "expected % def pcs": 5.909090909090909,
+            "max share": 41.6078431372549,
+            "cost": 107270.83333333334,
+            "mean days": 15.563224513421122
+          },
+          "shock": {
+            "% late": 1.9166666666666665,
+            "late days": 0.1566666666666667,
+            "% def pcs": 6.078431372549019,
+            "expected % def pcs": 5.974830659536542,
+            "max share": 40.819964349376114,
+            "cost": 107757.83333333331,
+            "mean days": 15.465767040930086
+          },
+          "delta": {
+            "% late": 0.4722222222222221,
+            "late days": 0.04388888888888891
+          }
+        },
+        "hybrid_d0.02_b2": {
+          "normal": {
+            "% late": 1.25,
+            "late days": 0.04333333333333333,
+            "% def pcs": 6.010695187165775,
+            "expected % def pcs": 5.968698752228164,
+            "max share": 40.802139037433165,
+            "cost": 107650.33333333331,
+            "mean days": 14.215729949635003
+          },
+          "shock": {
+            "% late": 1.8055555555555556,
+            "late days": 0.08555555555555555,
+            "% def pcs": 6.081996434937611,
+            "expected % def pcs": 6.028057040998218,
+            "max share": 40.078431372549026,
+            "cost": 108111.16666666666,
+            "mean days": 14.220965518360817
+          },
+          "delta": {
+            "% late": 0.5555555555555556,
+            "late days": 0.042222222222222223
+          }
+        },
+        "hybrid_d0.02_b4": {
+          "normal": {
+            "% late": 1.138888888888889,
+            "late days": 0.042777777777777776,
+            "% def pcs": 6.153297682709448,
+            "expected % def pcs": 6.067040998217469,
+            "max share": 39.985739750445624,
+            "cost": 108850.0,
+            "mean days": 13.22051913532972
+          },
+          "shock": {
+            "% late": 1.7222222222222219,
+            "late days": 0.07777777777777777,
+            "% def pcs": 6.174688057040999,
+            "expected % def pcs": 6.129144385026738,
+            "max share": 39.14081996434937,
+            "cost": 109156.16666666666,
+            "mean days": 13.245289125126085
+          },
+          "delta": {
+            "% late": 0.5833333333333328,
+            "late days": 0.03499999999999999
+          }
+        },
+        "hybrid_d0.02_b6": {
+          "normal": {
+            "% late": 1.138888888888889,
+            "late days": 0.0413888888888889,
+            "% def pcs": 6.274509803921569,
+            "expected % def pcs": 6.188217468805704,
+            "max share": 39.13012477718361,
+            "cost": 110014.49999999999,
+            "mean days": 11.86919201115972
+          },
+          "shock": {
+            "% late": 1.6111111111111107,
+            "late days": 0.06694444444444446,
+            "% def pcs": 6.2531194295900185,
+            "expected % def pcs": 6.235597147950089,
+            "max share": 38.35650623885919,
+            "cost": 110341.99999999999,
+            "mean days": 11.938132778287828
+          },
+          "delta": {
+            "% late": 0.47222222222222165,
+            "late days": 0.02555555555555556
+          }
+        },
+        "hybrid_d0.02_b8": {
+          "normal": {
+            "% late": 1.6666666666666672,
+            "late days": 0.08583333333333332,
+            "% def pcs": 6.303030303030304,
+            "expected % def pcs": 6.301568627450981,
+            "max share": 38.320855614973254,
+            "cost": 110410.16666666667,
+            "mean days": 10.97262398419048
+          },
+          "shock": {
+            "% late": 2.0,
+            "late days": 0.0986111111111111,
+            "% def pcs": 6.465240641711231,
+            "expected % def pcs": 6.320641711229945,
+            "max share": 37.60071301247771,
+            "cost": 110707.33333333333,
+            "mean days": 11.1884337165747
+          },
+          "delta": {
+            "% late": 0.3333333333333328,
+            "late days": 0.012777777777777777
+          }
+        },
+        "hybrid_d0.05_b0": {
+          "normal": {
+            "% late": 1.4444444444444444,
+            "late days": 0.1127777777777778,
+            "% def pcs": 6.03921568627451,
+            "expected % def pcs": 5.909090909090909,
+            "max share": 41.6078431372549,
+            "cost": 107270.83333333334,
+            "mean days": 15.563224513421122
+          },
+          "shock": {
+            "% late": 1.9166666666666665,
+            "late days": 0.1566666666666667,
+            "% def pcs": 6.078431372549019,
+            "expected % def pcs": 5.974830659536542,
+            "max share": 40.819964349376114,
+            "cost": 107757.83333333331,
+            "mean days": 15.465767040930086
+          },
+          "delta": {
+            "% late": 0.4722222222222221,
+            "late days": 0.04388888888888891
+          }
+        },
+        "hybrid_d0.05_b2": {
+          "normal": {
+            "% late": 1.2777777777777777,
+            "late days": 0.04361111111111111,
+            "% def pcs": 5.989304812834225,
+            "expected % def pcs": 5.959393939393939,
+            "max share": 40.89839572192514,
+            "cost": 107537.33333333331,
+            "mean days": 14.291174796655936
+          },
+          "shock": {
+            "% late": 1.8333333333333333,
+            "late days": 0.08583333333333333,
+            "% def pcs": 6.0606060606060606,
+            "expected % def pcs": 6.018538324420677,
+            "max share": 40.16399286987523,
+            "cost": 107983.49999999999,
+            "mean days": 14.303975784061302
+          },
+          "delta": {
+            "% late": 0.5555555555555556,
+            "late days": 0.042222222222222223
+          }
+        },
+        "hybrid_d0.05_b4": {
+          "normal": {
+            "% late": 1.138888888888889,
+            "late days": 0.042777777777777776,
+            "% def pcs": 6.046345811051694,
+            "expected % def pcs": 6.059126559714796,
+            "max share": 40.00713012477718,
+            "cost": 108697.33333333334,
+            "mean days": 13.26392241632811
+          },
+          "shock": {
+            "% late": 1.7222222222222219,
+            "late days": 0.07777777777777777,
+            "% def pcs": 6.1105169340463465,
+            "expected % def pcs": 6.121907308377896,
+            "max share": 39.237076648841345,
+            "cost": 109118.5,
+            "mean days": 13.285985732736053
+          },
+          "delta": {
+            "% late": 0.5833333333333328,
+            "late days": 0.03499999999999999
+          }
+        },
+        "hybrid_d0.05_b6": {
+          "normal": {
+            "% late": 1.138888888888889,
+            "late days": 0.0413888888888889,
+            "% def pcs": 6.188948306595366,
+            "expected % def pcs": 6.175775401069517,
+            "max share": 39.11229946524064,
+            "cost": 109735.5,
+            "mean days": 11.916098714058275
+          },
+          "shock": {
+            "% late": 1.6111111111111107,
+            "late days": 0.06694444444444446,
+            "% def pcs": 6.188948306595366,
+            "expected % def pcs": 6.232994652406416,
+            "max share": 38.3458110516934,
+            "cost": 110231.0,
+            "mean days": 11.967595687057804
+          },
+          "delta": {
+            "% late": 0.47222222222222165,
+            "late days": 0.02555555555555556
+          }
+        },
+        "hybrid_d0.05_b8": {
+          "normal": {
+            "% late": 1.6666666666666672,
+            "late days": 0.08583333333333332,
+            "% def pcs": 6.381461675579323,
+            "expected % def pcs": 6.298538324420678,
+            "max share": 38.40641711229946,
+            "cost": 110415.83333333334,
+            "mean days": 11.016178773302336
+          },
+          "shock": {
+            "% late": 2.0,
+            "late days": 0.0986111111111111,
+            "% def pcs": 6.500891265597149,
+            "expected % def pcs": 6.313012477718359,
+            "max share": 37.67914438502673,
+            "cost": 110606.0,
+            "mean days": 11.222401146588325
+          },
+          "delta": {
+            "% late": 0.3333333333333328,
+            "late days": 0.012777777777777777
+          }
+        },
+        "hybrid_d0.1_b0": {
+          "normal": {
+            "% late": 1.4444444444444444,
+            "late days": 0.1127777777777778,
+            "% def pcs": 6.03921568627451,
+            "expected % def pcs": 5.9062388591800365,
+            "max share": 41.6078431372549,
+            "cost": 107284.16666666667,
+            "mean days": 15.576555332928411
+          },
+          "shock": {
+            "% late": 1.9166666666666665,
+            "late days": 0.1563888888888889,
+            "% def pcs": 6.078431372549019,
+            "expected % def pcs": 5.966274509803921,
+            "max share": 40.819964349376114,
+            "cost": 107797.83333333331,
+            "mean days": 15.508524708099516
+          },
+          "delta": {
+            "% late": 0.4722222222222221,
+            "late days": 0.043611111111111114
+          }
+        },
+        "hybrid_d0.1_b2": {
+          "normal": {
+            "% late": 1.2777777777777777,
+            "late days": 0.04361111111111111,
+            "% def pcs": 5.96078431372549,
+            "expected % def pcs": 5.948912655971478,
+            "max share": 40.905525846702325,
+            "cost": 107315.33333333331,
+            "mean days": 14.32493385462695
+          },
+          "shock": {
+            "% late": 1.8333333333333333,
+            "late days": 0.08583333333333333,
+            "% def pcs": 6.032085561497326,
+            "expected % def pcs": 6.007629233511585,
+            "max share": 40.18894830659537,
+            "cost": 107768.83333333331,
+            "mean days": 14.348167108537952
+          },
+          "delta": {
+            "% late": 0.5555555555555556,
+            "late days": 0.042222222222222223
+          }
+        },
+        "hybrid_d0.1_b4": {
+          "normal": {
+            "% late": 1.138888888888889,
+            "late days": 0.042777777777777776,
+            "% def pcs": 6.0392156862745106,
+            "expected % def pcs": 6.043297682709447,
+            "max share": 40.07843137254902,
+            "cost": 108418.66666666666,
+            "mean days": 13.347767525023759
+          },
+          "shock": {
+            "% late": 1.7222222222222219,
+            "late days": 0.07777777777777777,
+            "% def pcs": 6.103386809269162,
+            "expected % def pcs": 6.102549019607841,
+            "max share": 39.34046345811052,
+            "cost": 108792.83333333331,
+            "mean days": 13.37976139698726
+          },
+          "delta": {
+            "% late": 0.5833333333333328,
+            "late days": 0.03499999999999999
+          }
+        },
+        "hybrid_d0.1_b6": {
+          "normal": {
+            "% late": 1.138888888888889,
+            "late days": 0.0413888888888889,
+            "% def pcs": 6.188948306595366,
+            "expected % def pcs": 6.171497326203207,
+            "max share": 39.208556149732615,
+            "cost": 109732.16666666667,
+            "mean days": 11.94140265930787
+          },
+          "shock": {
+            "% late": 1.6111111111111107,
+            "late days": 0.06694444444444446,
+            "% def pcs": 6.188948306595366,
+            "expected % def pcs": 6.22686274509804,
+            "max share": 38.44206773618538,
+            "cost": 110231.66666666669,
+            "mean days": 11.996395080096326
+          },
+          "delta": {
+            "% late": 0.47222222222222165,
+            "late days": 0.02555555555555556
+          }
+        },
+        "hybrid_d0.1_b8": {
+          "normal": {
+            "% late": 1.6666666666666672,
+            "late days": 0.08583333333333332,
+            "% def pcs": 6.345811051693405,
+            "expected % def pcs": 6.29903743315508,
+            "max share": 38.39572192513368,
+            "cost": 110381.16666666666,
+            "mean days": 11.02887506805026
+          },
+          "shock": {
+            "% late": 2.0,
+            "late days": 0.0986111111111111,
+            "% def pcs": 6.4652406417112305,
+            "expected % def pcs": 6.312798573975044,
+            "max share": 37.650623885917994,
+            "cost": 110571.99999999999,
+            "mean days": 11.229272708293648
+          },
+          "delta": {
+            "% late": 0.3333333333333328,
+            "late days": 0.012777777777777777
+          }
+        },
+        "hybrid_d0.2_b0": {
+          "normal": {
+            "% late": 1.4444444444444444,
+            "late days": 0.1127777777777778,
+            "% def pcs": 6.03921568627451,
+            "expected % def pcs": 5.9062388591800365,
+            "max share": 41.6078431372549,
+            "cost": 107284.16666666667,
+            "mean days": 15.576555332928411
+          },
+          "shock": {
+            "% late": 1.9166666666666665,
+            "late days": 0.1563888888888889,
+            "% def pcs": 6.078431372549019,
+            "expected % def pcs": 5.966274509803921,
+            "max share": 40.819964349376114,
+            "cost": 107797.83333333331,
+            "mean days": 15.508524708099516
+          },
+          "delta": {
+            "% late": 0.4722222222222221,
+            "late days": 0.043611111111111114
+          }
+        },
+        "hybrid_d0.2_b2": {
+          "normal": {
+            "% late": 1.3055555555555554,
+            "late days": 0.044444444444444446,
+            "% def pcs": 5.996434937611409,
+            "expected % def pcs": 5.9309803921568625,
+            "max share": 41.14438502673796,
+            "cost": 107167.83333333331,
+            "mean days": 14.45873877073126
+          },
+          "shock": {
+            "% late": 1.8333333333333333,
+            "late days": 0.08638888888888889,
+            "% def pcs": 6.01782531194296,
+            "expected % def pcs": 5.994260249554364,
+            "max share": 40.33155080213903,
+            "cost": 107634.66666666669,
+            "mean days": 14.48572566786841
+          },
+          "delta": {
+            "% late": 0.5277777777777779,
+            "late days": 0.041944444444444444
+          }
+        },
+        "hybrid_d0.2_b4": {
+          "normal": {
+            "% late": 1.1944444444444444,
+            "late days": 0.043333333333333335,
+            "% def pcs": 6.153297682709448,
+            "expected % def pcs": 6.038199643493761,
+            "max share": 40.29233511586453,
+            "cost": 108512.16666666666,
+            "mean days": 13.374049027544869
+          },
+          "shock": {
+            "% late": 1.8055555555555551,
+            "late days": 0.07944444444444443,
+            "% def pcs": 6.124777183600714,
+            "expected % def pcs": 6.098270944741533,
+            "max share": 39.540106951871664,
+            "cost": 108876.5,
+            "mean days": 13.436330687049997
+          },
+          "delta": {
+            "% late": 0.6111111111111107,
+            "late days": 0.036111111111111094
+          }
+        },
+        "hybrid_d0.2_b6": {
+          "normal": {
+            "% late": 1.1111111111111112,
+            "late days": 0.042222222222222223,
+            "% def pcs": 6.263814616755793,
+            "expected % def pcs": 6.115454545454546,
+            "max share": 39.39750445632799,
+            "cost": 108864.33333333331,
+            "mean days": 12.3200530954671
+          },
+          "shock": {
+            "% late": 1.6111111111111107,
+            "late days": 0.07194444444444444,
+            "% def pcs": 6.327985739750446,
+            "expected % def pcs": 6.159910873440286,
+            "max share": 38.65597147950089,
+            "cost": 109329.33333333331,
+            "mean days": 12.473842377251906
+          },
+          "delta": {
+            "% late": 0.49999999999999956,
+            "late days": 0.029722222222222212
+          }
+        },
+        "hybrid_d0.2_b8": {
+          "normal": {
+            "% late": 1.6666666666666672,
+            "late days": 0.08555555555555557,
+            "% def pcs": 6.270944741532977,
+            "expected % def pcs": 6.278288770053478,
+            "max share": 38.58467023172905,
+            "cost": 110166.83333333334,
+            "mean days": 11.101786939971085
+          },
+          "shock": {
+            "% late": 2.0,
+            "late days": 0.09833333333333333,
+            "% def pcs": 6.361853832442068,
+            "expected % def pcs": 6.284634581105169,
+            "max share": 37.81105169340462,
+            "cost": 110307.66666666666,
+            "mean days": 11.292390757213328
+          },
+          "delta": {
+            "% late": 0.3333333333333328,
+            "late days": 0.012777777777777763
+          }
+        },
+        "hybrid_d0.3_b0": {
+          "normal": {
+            "% late": 1.4444444444444444,
+            "late days": 0.11305555555555558,
+            "% def pcs": 6.03921568627451,
+            "expected % def pcs": 5.904812834224599,
+            "max share": 41.6078431372549,
+            "cost": 107290.83333333334,
+            "mean days": 15.576844422923383
+          },
+          "shock": {
+            "% late": 1.9166666666666665,
+            "late days": 0.1566666666666667,
+            "% def pcs": 6.078431372549019,
+            "expected % def pcs": 5.964848484848485,
+            "max share": 40.819964349376114,
+            "cost": 107804.49999999999,
+            "mean days": 15.50881379809449
+          },
+          "delta": {
+            "% late": 0.4722222222222221,
+            "late days": 0.04361111111111113
+          }
+        },
+        "hybrid_d0.3_b2": {
+          "normal": {
+            "% late": 1.3611111111111112,
+            "late days": 0.04027777777777775,
+            "% def pcs": 6.053475935828877,
+            "expected % def pcs": 5.937076648841354,
+            "max share": 41.19429590017825,
+            "cost": 107404.16666666664,
+            "mean days": 14.581756056473129
+          },
+          "shock": {
+            "% late": 1.888888888888889,
+            "late days": 0.07999999999999999,
+            "% def pcs": 6.124777183600713,
+            "expected % def pcs": 5.995115864527628,
+            "max share": 40.3885918003565,
+            "cost": 107789.99999999999,
+            "mean days": 14.614467900965666
+          },
+          "delta": {
+            "% late": 0.5277777777777779,
+            "late days": 0.039722222222222235
+          }
+        },
+        "hybrid_d0.3_b4": {
+          "normal": {
+            "% late": 1.1666666666666667,
+            "late days": 0.042222222222222223,
+            "% def pcs": 6.188948306595366,
+            "expected % def pcs": 6.007540106951871,
+            "max share": 40.534759358288774,
+            "cost": 108088.83333333333,
+            "mean days": 13.536096197304637
+          },
+          "shock": {
+            "% late": 1.7499999999999996,
+            "late days": 0.07805555555555554,
+            "% def pcs": 6.231729055258468,
+            "expected % def pcs": 6.072745098039214,
+            "max share": 39.682709447415334,
+            "cost": 108471.83333333331,
+            "mean days": 13.566496818162417
+          },
+          "delta": {
+            "% late": 0.5833333333333328,
+            "late days": 0.03583333333333332
+          }
+        },
+        "hybrid_d0.3_b6": {
+          "normal": {
+            "% late": 1.1111111111111112,
+            "late days": 0.04138888888888889,
+            "% def pcs": 6.281639928698753,
+            "expected % def pcs": 6.1358110516934055,
+            "max share": 39.51158645276291,
+            "cost": 109433.99999999999,
+            "mean days": 12.461391227384672
+          },
+          "shock": {
+            "% late": 1.6111111111111107,
+            "late days": 0.07194444444444444,
+            "% def pcs": 6.29590017825312,
+            "expected % def pcs": 6.1661853832442075,
+            "max share": 38.755793226381456,
+            "cost": 109533.33333333333,
+            "mean days": 12.607283304812078
+          },
+          "delta": {
+            "% late": 0.49999999999999956,
+            "late days": 0.030555555555555544
+          }
+        },
+        "hybrid_d0.3_b8": {
+          "normal": {
+            "% late": 1.6666666666666672,
+            "late days": 0.0913888888888889,
+            "% def pcs": 6.270944741532977,
+            "expected % def pcs": 6.276898395721924,
+            "max share": 38.71301247771835,
+            "cost": 110521.16666666667,
+            "mean days": 11.249417114718426
+          },
+          "shock": {
+            "% late": 2.0833333333333335,
+            "late days": 0.1075,
+            "% def pcs": 6.347593582887701,
+            "expected % def pcs": 6.274367201426023,
+            "max share": 37.853832442067734,
+            "cost": 110425.0,
+            "mean days": 11.46216801492057
+          },
+          "delta": {
+            "% late": 0.4166666666666663,
+            "late days": 0.016111111111111104
+          }
+        },
+        "defects_l0.1_b0": {
+          "normal": {
+            "% late": 38.583333333333336,
+            "late days": 7.455833333333333,
+            "% def pcs": 4.780748663101606,
+            "expected % def pcs": 4.462406417112298,
+            "max share": 39.6114081996435,
+            "cost": 114512.33333333333,
+            "mean days": 24.597608049630107
+          },
+          "shock": {
+            "% late": 39.916666666666664,
+            "late days": 7.80111111111111,
+            "% def pcs": 4.841354723707664,
+            "expected % def pcs": 4.473351158645276,
+            "max share": 39.47237076648841,
+            "cost": 114370.00000000001,
+            "mean days": 25.079463124435954
+          },
+          "delta": {
+            "% late": 1.3333333333333286,
+            "late days": 0.3452777777777776
+          }
+        },
+        "defects_l0.1_b5": {
+          "normal": {
+            "% late": 34.083333333333336,
+            "late days": 6.621388888888891,
+            "% def pcs": 4.855614973262033,
+            "expected % def pcs": 4.48800356506239,
+            "max share": 39.15508021390374,
+            "cost": 114162.99999999999,
+            "mean days": 23.249337769806917
+          },
+          "shock": {
+            "% late": 35.61111111111111,
+            "late days": 6.90388888888889,
+            "% def pcs": 4.852049910873441,
+            "expected % def pcs": 4.509554367201427,
+            "max share": 39.14795008912655,
+            "cost": 113986.66666666666,
+            "mean days": 23.69850374556177
+          },
+          "delta": {
+            "% late": 1.5277777777777715,
+            "late days": 0.28249999999999886
+          }
+        },
+        "defects_l0.15_b0": {
+          "normal": {
+            "% late": 36.41666666666667,
+            "late days": 5.566388888888889,
+            "% def pcs": 4.969696969696971,
+            "expected % def pcs": 4.608573975044564,
+            "max share": 40.9982174688057,
+            "cost": 113172.83333333334,
+            "mean days": 22.820631674910764
+          },
+          "shock": {
+            "% late": 37.69444444444445,
+            "late days": 5.767777777777778,
+            "% def pcs": 4.866310160427808,
+            "expected % def pcs": 4.636007130124777,
+            "max share": 40.70231729055258,
+            "cost": 112870.00000000001,
+            "mean days": 23.145188678453536
+          },
+          "delta": {
+            "% late": 1.2777777777777786,
+            "late days": 0.20138888888888928
+          }
+        },
+        "defects_l0.15_b5": {
+          "normal": {
+            "% late": 31.36111111111111,
+            "late days": 4.807777777777778,
+            "% def pcs": 4.926916221033869,
+            "expected % def pcs": 4.67926916221034,
+            "max share": 40.09625668449197,
+            "cost": 112530.5,
+            "mean days": 21.371297357711196
+          },
+          "shock": {
+            "% late": 32.22222222222222,
+            "late days": 4.972222222222223,
+            "% def pcs": 4.919786096256686,
+            "expected % def pcs": 4.709643493761142,
+            "max share": 39.57932263814617,
+            "cost": 112223.66666666669,
+            "mean days": 21.692281306892877
+          },
+          "delta": {
+            "% late": 0.8611111111111107,
+            "late days": 0.16444444444444528
+          }
+        },
+        "defects_l0.2_b0": {
+          "normal": {
+            "% late": 31.361111111111114,
+            "late days": 4.206944444444444,
+            "% def pcs": 4.91800356506239,
+            "expected % def pcs": 4.746007130124777,
+            "max share": 40.98395721925134,
+            "cost": 112081.16666666666,
+            "mean days": 21.961566697191703
+          },
+          "shock": {
+            "% late": 32.19444444444445,
+            "late days": 4.348888888888888,
+            "% def pcs": 4.8467023172905535,
+            "expected % def pcs": 4.784081996434938,
+            "max share": 40.32085561497326,
+            "cost": 111694.49999999999,
+            "mean days": 22.095103499175597
+          },
+          "delta": {
+            "% late": 0.8333333333333357,
+            "late days": 0.14194444444444443
+          }
+        },
+        "defects_l0.2_b5": {
+          "normal": {
+            "% late": 27.416666666666668,
+            "late days": 3.574722222222222,
+            "% def pcs": 4.928698752228165,
+            "expected % def pcs": 4.834741532976827,
+            "max share": 39.600713012477726,
+            "cost": 111097.49999999999,
+            "mean days": 20.337636013017246
+          },
+          "shock": {
+            "% late": 28.38888888888889,
+            "late days": 3.7088888888888887,
+            "% def pcs": 5.071301247771837,
+            "expected % def pcs": 4.881818181818183,
+            "max share": 38.994652406417124,
+            "cost": 110764.83333333333,
+            "mean days": 20.492024449690685
+          },
+          "delta": {
+            "% late": 0.9722222222222214,
+            "late days": 0.13416666666666677
+          }
+        },
+        "defects_l0.25_b0": {
+          "normal": {
+            "% late": 27.66666666666666,
+            "late days": 3.099166666666667,
+            "% def pcs": 5.069518716577541,
+            "expected % def pcs": 4.84295900178253,
+            "max share": 40.87344028520499,
+            "cost": 111137.0,
+            "mean days": 20.993988419224998
+          },
+          "shock": {
+            "% late": 28.416666666666664,
+            "late days": 3.2622222222222224,
+            "% def pcs": 5.169340463458111,
+            "expected % def pcs": 4.886541889483065,
+            "max share": 40.19607843137254,
+            "cost": 110786.33333333334,
+            "mean days": 21.19157480369517
+          },
+          "delta": {
+            "% late": 0.7500000000000036,
+            "late days": 0.1630555555555553
+          }
+        },
+        "defects_l0.25_b5": {
+          "normal": {
+            "% late": 21.138888888888893,
+            "late days": 2.3472222222222214,
+            "% def pcs": 5.340463458110517,
+            "expected % def pcs": 4.901016042780749,
+            "max share": 40.62032085561497,
+            "cost": 110586.99999999997,
+            "mean days": 19.24936756586693
+          },
+          "shock": {
+            "% late": 21.555555555555554,
+            "late days": 2.4724999999999997,
+            "% def pcs": 5.242424242424241,
+            "expected % def pcs": 4.952673796791443,
+            "max share": 39.882352941176464,
+            "cost": 110197.49999999996,
+            "mean days": 19.424216123136357
+          },
+          "delta": {
+            "% late": 0.41666666666666075,
+            "late days": 0.12527777777777827
+          }
+        },
+        "defects_l0.3_b0": {
+          "normal": {
+            "% late": 23.527777777777786,
+            "late days": 2.593055555555555,
+            "% def pcs": 5.231729055258467,
+            "expected % def pcs": 4.908039215686274,
+            "max share": 41.22638146167557,
+            "cost": 110634.83333333334,
+            "mean days": 20.636816188571302
+          },
+          "shock": {
+            "% late": 24.944444444444446,
+            "late days": 2.747777777777777,
+            "% def pcs": 5.313725490196077,
+            "expected % def pcs": 4.951479500891265,
+            "max share": 40.59536541889484,
+            "cost": 110320.0,
+            "mean days": 20.822029966250714
+          },
+          "delta": {
+            "% late": 1.4166666666666607,
+            "late days": 0.15472222222222198
+          }
+        },
+        "defects_l0.3_b5": {
+          "normal": {
+            "% late": 18.80555555555555,
+            "late days": 1.9674999999999998,
+            "% def pcs": 5.2495543672014255,
+            "expected % def pcs": 4.9811942959001785,
+            "max share": 40.409982174688054,
+            "cost": 109841.33333333333,
+            "mean days": 18.47430890569717
+          },
+          "shock": {
+            "% late": 19.583333333333332,
+            "late days": 2.0788888888888883,
+            "% def pcs": 5.210338680926916,
+            "expected % def pcs": 5.031390374331551,
+            "max share": 39.56149732620321,
+            "cost": 109604.0,
+            "mean days": 18.712890612395093
+          },
+          "delta": {
+            "% late": 0.7777777777777821,
+            "late days": 0.11138888888888854
+          }
+        },
+        "defects_l0.4_b0": {
+          "normal": {
+            "% late": 14.277777777777777,
+            "late days": 1.2075,
+            "% def pcs": 5.283422459893048,
+            "expected % def pcs": 4.978894830659535,
+            "max share": 41.821746880570416,
+            "cost": 109710.83333333334,
+            "mean days": 18.16638062331956
+          },
+          "shock": {
+            "% late": 14.583333333333332,
+            "late days": 1.2688888888888887,
+            "% def pcs": 5.262032085561497,
+            "expected % def pcs": 5.047611408199643,
+            "max share": 41.13012477718361,
+            "cost": 109471.83333333334,
+            "mean days": 18.2828223422405
+          },
+          "delta": {
+            "% late": 0.30555555555555536,
+            "late days": 0.061388888888888715
+          }
+        },
+        "defects_l0.4_b5": {
+          "normal": {
+            "% late": 12.11111111111111,
+            "late days": 0.9283333333333335,
+            "% def pcs": 5.340463458110518,
+            "expected % def pcs": 5.057379679144386,
+            "max share": 41.180035650623886,
+            "cost": 109037.66666666664,
+            "mean days": 17.010564665897945
+          },
+          "shock": {
+            "% late": 12.805555555555555,
+            "late days": 0.9925,
+            "% def pcs": 5.404634581105171,
+            "expected % def pcs": 5.129750445632798,
+            "max share": 40.467023172905535,
+            "cost": 108917.83333333333,
+            "mean days": 17.21711027954474
+          },
+          "delta": {
+            "% late": 0.6944444444444446,
+            "late days": 0.0641666666666666
+          }
+        },
+        "defects_l0.5_b0": {
+          "normal": {
+            "% late": 12.305555555555554,
+            "late days": 1.0583333333333333,
+            "% def pcs": 5.351158645276293,
+            "expected % def pcs": 5.0257040998217475,
+            "max share": 41.48663101604279,
+            "cost": 109309.49999999999,
+            "mean days": 17.919659469603527
+          },
+          "shock": {
+            "% late": 13.250000000000002,
+            "late days": 1.1622222222222223,
+            "% def pcs": 5.426024955436721,
+            "expected % def pcs": 5.082709447415331,
+            "max share": 40.748663101604286,
+            "cost": 109205.99999999997,
+            "mean days": 18.133243763642582
+          },
+          "delta": {
+            "% late": 0.9444444444444482,
+            "late days": 0.10388888888888892
+          }
+        },
+        "defects_l0.5_b5": {
+          "normal": {
+            "% late": 9.222222222222225,
+            "late days": 0.7633333333333333,
+            "% def pcs": 5.393939393939395,
+            "expected % def pcs": 5.059180035650624,
+            "max share": 40.72370766488414,
+            "cost": 109001.16666666666,
+            "mean days": 16.652531037359203
+          },
+          "shock": {
+            "% late": 10.305555555555557,
+            "late days": 0.8500000000000001,
+            "% def pcs": 5.458110516934048,
+            "expected % def pcs": 5.1168449197860975,
+            "max share": 40.071301247771835,
+            "cost": 108761.16666666667,
+            "mean days": 16.81270197102438
+          },
+          "delta": {
+            "% late": 1.0833333333333321,
+            "late days": 0.08666666666666678
+          }
+        },
+        "fairness_0.02": {
+          "normal": {
+            "% late": 1.7500000000000002,
+            "late days": 0.0991666666666667,
+            "% def pcs": 6.873440285204992,
+            "expected % def pcs": 7.07764705882353,
+            "max share": 21.96791443850267,
+            "cost": 111514.66666666664,
+            "mean days": 10.988539889292765
+          },
+          "shock": {
+            "% late": 2.277777777777778,
+            "late days": 0.12555555555555553,
+            "% def pcs": 7.019607843137255,
+            "expected % def pcs": 7.070160427807484,
+            "max share": 22.042780748663098,
+            "cost": 111437.16666666664,
+            "mean days": 11.665552131573547
+          },
+          "delta": {
+            "% late": 0.5277777777777779,
+            "late days": 0.026388888888888837
+          }
+        },
+        "fairness_0.05": {
+          "normal": {
+            "% late": 1.1111111111111112,
+            "late days": 0.061388888888888896,
+            "% def pcs": 6.823529411764706,
+            "expected % def pcs": 7.0609803921568615,
+            "max share": 21.96791443850267,
+            "cost": 111566.33333333331,
+            "mean days": 10.7195533203062
+          },
+          "shock": {
+            "% late": 1.6944444444444438,
+            "late days": 0.08749999999999998,
+            "% def pcs": 7.005347593582887,
+            "expected % def pcs": 7.051711229946524,
+            "max share": 22.042780748663098,
+            "cost": 111517.16666666664,
+            "mean days": 11.460486233419417
+          },
+          "delta": {
+            "% late": 0.5833333333333326,
+            "late days": 0.026111111111111085
+          }
+        },
+        "fairness_0.1": {
+          "normal": {
+            "% late": 1.7222222222222228,
+            "late days": 0.0888888888888889,
+            "% def pcs": 6.852049910873441,
+            "expected % def pcs": 7.0774688057040995,
+            "max share": 21.96791443850267,
+            "cost": 111432.99999999999,
+            "mean days": 10.20201740850558
+          },
+          "shock": {
+            "% late": 2.3055555555555554,
+            "late days": 0.11166666666666666,
+            "% def pcs": 7.055258467023173,
+            "expected % def pcs": 7.068270944741531,
+            "max share": 22.042780748663098,
+            "cost": 111383.49999999999,
+            "mean days": 10.961350181562779
+          },
+          "delta": {
+            "% late": 0.5833333333333326,
+            "late days": 0.022777777777777758
+          }
+        },
+        "fairness_0.2": {
+          "normal": {
+            "% late": 1.1111111111111112,
+            "late days": 0.060277777777777784,
+            "% def pcs": 6.7522281639928705,
+            "expected % def pcs": 7.078003565062388,
+            "max share": 21.96791443850267,
+            "cost": 111419.66666666669,
+            "mean days": 9.95212029581435
+          },
+          "shock": {
+            "% late": 1.6111111111111107,
+            "late days": 0.07861111111111112,
+            "% def pcs": 6.912655971479502,
+            "expected % def pcs": 7.068698752228162,
+            "max share": 22.042780748663098,
+            "cost": 111364.00000000001,
+            "mean days": 10.697506092645162
+          },
+          "delta": {
+            "% late": 0.49999999999999956,
+            "late days": 0.018333333333333333
+          }
+        },
+        "fairness_0.5": {
+          "normal": {
+            "% late": 1.8333333333333337,
+            "late days": 0.09500000000000003,
+            "% def pcs": 6.973262032085562,
+            "expected % def pcs": 6.851122994652407,
+            "max share": 20.491978609625658,
+            "cost": 111920.33333333331,
+            "mean days": 9.944593658301299
+          },
+          "shock": {
+            "% late": 2.222222222222222,
+            "late days": 0.11277777777777781,
+            "% def pcs": 6.784313725490195,
+            "expected % def pcs": 6.845098039215685,
+            "max share": 20.4313725490196,
+            "cost": 111859.66666666666,
+            "mean days": 10.619130200249927
+          },
+          "delta": {
+            "% late": 0.3888888888888882,
+            "late days": 0.01777777777777778
+          }
+        },
+        "fairness_1": {
+          "normal": {
+            "% late": 1.8888888888888895,
+            "late days": 0.14611111111111114,
+            "% def pcs": 6.998217468805704,
+            "expected % def pcs": 6.651978609625668,
+            "max share": 19.215686274509807,
+            "cost": 112177.33333333333,
+            "mean days": 10.470408502261922
+          },
+          "shock": {
+            "% late": 2.2499999999999996,
+            "late days": 0.16000000000000003,
+            "% def pcs": 6.782531194295899,
+            "expected % def pcs": 6.651729055258468,
+            "max share": 19.174688057041,
+            "cost": 112199.16666666664,
+            "mean days": 11.00980593347521
+          },
+          "delta": {
+            "% late": 0.36111111111111005,
+            "late days": 0.013888888888888895
+          }
+        },
+        "robustness_0.05": {
+          "normal": {
+            "% late": 1.7222222222222228,
+            "late days": 0.09166666666666667,
+            "% def pcs": 6.595365418894829,
+            "expected % def pcs": 7.070267379679143,
+            "max share": 28.431372549019617,
+            "cost": 115632.5,
+            "mean days": 8.84067513241826
+          },
+          "shock": {
+            "% late": 1.888888888888889,
+            "late days": 0.10055555555555556,
+            "% def pcs": 6.4616755793226375,
+            "expected % def pcs": 7.038770053475934,
+            "max share": 28.664884135472374,
+            "cost": 115142.83333333333,
+            "mean days": 9.05908412384835
+          },
+          "delta": {
+            "% late": 0.1666666666666663,
+            "late days": 0.00888888888888889
+          }
+        },
+        "robustness_0.1": {
+          "normal": {
+            "% late": 1.6666666666666672,
+            "late days": 0.08944444444444445,
+            "% def pcs": 6.516934046345809,
+            "expected % def pcs": 7.103761140819962,
+            "max share": 28.431372549019617,
+            "cost": 115018.00000000001,
+            "mean days": 8.424713773515723
+          },
+          "shock": {
+            "% late": 1.8333333333333335,
+            "late days": 0.09277777777777779,
+            "% def pcs": 6.393939393939393,
+            "expected % def pcs": 7.075329768270944,
+            "max share": 28.664884135472374,
+            "cost": 114517.33333333333,
+            "mean days": 8.620594035505322
+          },
+          "delta": {
+            "% late": 0.1666666666666663,
+            "late days": 0.003333333333333341
+          }
+        },
+        "robustness_0.2": {
+          "normal": {
+            "% late": 1.6666666666666672,
+            "late days": 0.11777777777777773,
+            "% def pcs": 6.5597147950089125,
+            "expected % def pcs": 7.122424242424242,
+            "max share": 28.431372549019617,
+            "cost": 114927.00000000001,
+            "mean days": 8.317682422513784
+          },
+          "shock": {
+            "% late": 1.8333333333333335,
+            "late days": 0.12111111111111106,
+            "% def pcs": 6.436720142602495,
+            "expected % def pcs": 7.094064171122994,
+            "max share": 28.664884135472374,
+            "cost": 114412.66666666667,
+            "mean days": 8.528469493380777
+          },
+          "delta": {
+            "% late": 0.1666666666666663,
+            "late days": 0.003333333333333327
+          }
+        },
+        "robustness_0.5": {
+          "normal": {
+            "% late": 1.6944444444444449,
+            "late days": 0.11888888888888884,
+            "% def pcs": 6.3654188948306585,
+            "expected % def pcs": 7.130588235294121,
+            "max share": 28.438502673796794,
+            "cost": 114700.16666666663,
+            "mean days": 8.12216346511663
+          },
+          "shock": {
+            "% late": 1.7500000000000002,
+            "late days": 0.1216666666666666,
+            "% def pcs": 6.4135472370766475,
+            "expected % def pcs": 7.103208556149731,
+            "max share": 28.639928698752232,
+            "cost": 114204.5,
+            "mean days": 8.359250229588305
+          },
+          "delta": {
+            "% late": 0.05555555555555536,
+            "late days": 0.002777777777777768
+          }
+        },
+        "robustness_1": {
+          "normal": {
+            "% late": 1.6944444444444449,
+            "late days": 0.11888888888888884,
+            "% def pcs": 6.502673796791442,
+            "expected % def pcs": 7.120926916221034,
+            "max share": 28.071301247771835,
+            "cost": 114822.8333333333,
+            "mean days": 8.162505395227582
+          },
+          "shock": {
+            "% late": 1.8055555555555558,
+            "late days": 0.12111111111111104,
+            "% def pcs": 6.483065953654188,
+            "expected % def pcs": 7.085204991087344,
+            "max share": 28.231729055258462,
+            "cost": 114371.33333333333,
+            "mean days": 8.385892233565665
+          },
+          "delta": {
+            "% late": 0.11111111111111094,
+            "late days": 0.0022222222222222088
+          }
+        }
+      }
+    }
+  },
+  "report": {
+    "seeds": [
+      5105,
+      5106,
+      5107,
+      5108,
+      5109,
+      5110,
+      5111,
+      5112,
+      5113,
+      5114
+    ],
+    "policies": {
+      "random": {
+        "normal": {
+          "% late": 34.166666666666664,
+          "late days": 6.1325,
+          "% def pcs": 5.598930481283421,
+          "expected % def pcs": 5.999999999999999,
+          "max share": 22.620320855614974,
+          "cost": 111780.0,
+          "mean days": 21.86567451534683
+        },
+        "shock": {
+          "% late": 38.166666666666664,
+          "late days": 7.165833333333333,
+          "% def pcs": 5.598930481283421,
+          "expected % def pcs": 5.999999999999999,
+          "max share": 22.620320855614974,
+          "cost": 111780.0,
+          "mean days": 23.275396737569046
+        },
+        "delta": {
+          "% late": 4.0,
+          "late days": 1.0333333333333323
+        }
+      },
+      "greedy_biggest": {
+        "normal": {
+          "% late": 84.25000000000003,
+          "late days": 26.528333333333332,
+          "% def pcs": 5.278074866310161,
+          "expected % def pcs": 5.1048128342246,
+          "max share": 70.16042780748663,
+          "cost": 108430.0,
+          "mean days": 50.302665441176465
+        },
+        "shock": {
+          "% late": 84.91666666666669,
+          "late days": 28.046666666666663,
+          "% def pcs": 5.278074866310161,
+          "expected % def pcs": 5.1048128342246,
+          "max share": 70.16042780748663,
+          "cost": 108430.0,
+          "mean days": 51.84266544117647
+        },
+        "delta": {
+          "% late": 0.6666666666666572,
+          "late days": 1.5183333333333309
+        }
+      },
+      "cheapest": {
+        "normal": {
+          "% late": 91.83333333333336,
+          "late days": 81.91583333333332,
+          "% def pcs": 8.240641711229946,
+          "expected % def pcs": 7.806417112299464,
+          "max share": 70.16042780748663,
+          "cost": 85960.0,
+          "mean days": 106.19995122630989
+        },
+        "shock": {
+          "% late": 91.83333333333336,
+          "late days": 84.11999999999999,
+          "% def pcs": 8.240641711229946,
+          "expected % def pcs": 7.806417112299464,
+          "max share": 70.16042780748663,
+          "cost": 85960.0,
+          "mean days": 108.4049512263099
+        },
+        "delta": {
+          "% late": 0.0,
+          "late days": 2.2041666666666657
+        }
+      },
+      "earliest_finish": {
+        "normal": {
+          "% late": 1.6666666666666672,
+          "late days": 0.17833333333333332,
+          "% def pcs": 7.181818181818182,
+          "expected % def pcs": 7.015721925133689,
+          "max share": 26.28342245989305,
+          "cost": 115566.5,
+          "mean days": 8.259823326627195
+        },
+        "shock": {
+          "% late": 1.916666666666667,
+          "late days": 0.19083333333333333,
+          "% def pcs": 7.11764705882353,
+          "expected % def pcs": 6.994919786096256,
+          "max share": 26.524064171122998,
+          "cost": 115459.5,
+          "mean days": 8.509129897081463
+        },
+        "delta": {
+          "% late": 0.24999999999999978,
+          "late days": 0.012500000000000011
+        }
+      },
+      "lateness": {
+        "normal": {
+          "% late": 1.916666666666667,
+          "late days": 0.10583333333333335,
+          "% def pcs": 7.823529411764705,
+          "expected % def pcs": 7.033262032085561,
+          "max share": 28.90909090909091,
+          "cost": 115656.0,
+          "mean days": 9.80074232131537
+        },
+        "shock": {
+          "% late": 2.166666666666667,
+          "late days": 0.13333333333333333,
+          "% def pcs": 7.909090909090908,
+          "expected % def pcs": 7.0308021390374345,
+          "max share": 28.97326203208556,
+          "cost": 115308.5,
+          "mean days": 9.854411615398668
+        },
+        "delta": {
+          "% late": 0.25,
+          "late days": 0.027499999999999983
+        }
+      },
+      "hybrid": {
+        "normal": {
+          "% late": 1.4166666666666667,
+          "late days": 0.057499999999999996,
+          "% def pcs": 6.443850267379679,
+          "expected % def pcs": 5.923208556149732,
+          "max share": 41.304812834224606,
+          "cost": 107209.0,
+          "mean days": 14.461685875576544
+        },
+        "shock": {
+          "% late": 2.0833333333333335,
+          "late days": 0.10249999999999998,
+          "% def pcs": 6.443850267379679,
+          "expected % def pcs": 5.981069518716576,
+          "max share": 40.727272727272734,
+          "cost": 107662.5,
+          "mean days": 14.496673852930247
+        },
+        "delta": {
+          "% late": 0.6666666666666667,
+          "late days": 0.044999999999999984
+        }
+      },
+      "defects": {
+        "normal": {
+          "% late": 27.5,
+          "late days": 3.5316666666666667,
+          "% def pcs": 4.903743315508022,
+          "expected % def pcs": 4.824866310160427,
+          "max share": 39.486631016042786,
+          "cost": 111116.0,
+          "mean days": 20.347320927953124
+        },
+        "shock": {
+          "% late": 27.833333333333336,
+          "late days": 3.6625,
+          "% def pcs": 4.86096256684492,
+          "expected % def pcs": 4.890855614973262,
+          "max share": 39.1336898395722,
+          "cost": 110706.5,
+          "mean days": 20.36371962622842
+        },
+        "delta": {
+          "% late": 0.3333333333333357,
+          "late days": 0.13083333333333336
+        }
+      },
+      "fairness": {
+        "normal": {
+          "% late": 1.8333333333333337,
+          "late days": 0.14666666666666667,
+          "% def pcs": 6.818181818181818,
+          "expected % def pcs": 6.651550802139037,
+          "max share": 19.22994652406417,
+          "cost": 112166.0,
+          "mean days": 10.32939651878031
+        },
+        "shock": {
+          "% late": 2.25,
+          "late days": 0.17083333333333334,
+          "% def pcs": 6.893048128342246,
+          "expected % def pcs": 6.655508021390375,
+          "max share": 19.197860962566846,
+          "cost": 112204.0,
+          "mean days": 10.837554564467926
+        },
+        "delta": {
+          "% late": 0.4166666666666663,
+          "late days": 0.02416666666666667
+        }
+      },
+      "robustness": {
+        "normal": {
+          "% late": 1.6666666666666672,
+          "late days": 0.13166666666666665,
+          "% def pcs": 8.197860962566844,
+          "expected % def pcs": 7.109518716577541,
+          "max share": 28.79144385026738,
+          "cost": 114578.5,
+          "mean days": 8.180168081864853
+        },
+        "shock": {
+          "% late": 1.7500000000000004,
+          "late days": 0.13583333333333333,
+          "% def pcs": 8.04812834224599,
+          "expected % def pcs": 7.102673796791445,
+          "max share": 28.77540106951872,
+          "cost": 114283.0,
+          "mean days": 8.389359644777644
+        },
+        "delta": {
+          "% late": 0.08333333333333326,
+          "late days": 0.00416666666666668
+        }
+      },
+      "sprint1_lateness": {
+        "normal": {
+          "% late": 1.6666666666666672,
+          "late days": 0.18000000000000002,
+          "% def pcs": 7.491978609625669,
+          "expected % def pcs": 7.01374331550802,
+          "max share": 26.208556149732622,
+          "cost": 115591.5,
+          "mean days": 8.235178088375818
+        },
+        "shock": {
+          "% late": 1.916666666666667,
+          "late days": 0.18083333333333335,
+          "% def pcs": 7.37433155080214,
+          "expected % def pcs": 6.9962566844919785,
+          "max share": 26.379679144385026,
+          "cost": 115283.5,
+          "mean days": 8.456065878832023
+        },
+        "delta": {
+          "% late": 0.24999999999999978,
+          "late days": 0.0008333333333333248
+        }
+      }
+    }
+  },
+  "course_checks": {
+    "guardrail_qualified_baselines": [
+      "random"
+    ],
+    "lateness": {
+      "lateness_beats_all_baselines": true,
+      "defects_beats_all_baselines": false,
+      "fairness_matches_random_share": false,
+      "robustness_steadier_than_all_baselines": false,
+      "robustness_steadier_than_qualified_baselines": true,
+      "normal_late_no_worse_than_random": true,
+      "beats_earliest_finish_on_late_days": true
+    },
+    "hybrid": {
+      "lateness_beats_all_baselines": true,
+      "defects_beats_all_baselines": false,
+      "fairness_matches_random_share": false,
+      "robustness_steadier_than_all_baselines": false,
+      "robustness_steadier_than_qualified_baselines": true,
+      "normal_late_no_worse_than_random": true,
+      "beats_earliest_finish_on_late_days": true
+    },
+    "defects": {
+      "lateness_beats_all_baselines": true,
+      "defects_beats_all_baselines": true,
+      "fairness_matches_random_share": false,
+      "robustness_steadier_than_all_baselines": false,
+      "robustness_steadier_than_qualified_baselines": true,
+      "normal_late_no_worse_than_random": true,
+      "beats_earliest_finish_on_late_days": false
+    },
+    "fairness": {
+      "lateness_beats_all_baselines": true,
+      "defects_beats_all_baselines": false,
+      "fairness_matches_random_share": true,
+      "robustness_steadier_than_all_baselines": false,
+      "robustness_steadier_than_qualified_baselines": true,
+      "normal_late_no_worse_than_random": true,
+      "beats_earliest_finish_on_late_days": true
+    },
+    "robustness": {
+      "lateness_beats_all_baselines": true,
+      "defects_beats_all_baselines": false,
+      "fairness_matches_random_share": false,
+      "robustness_steadier_than_all_baselines": false,
+      "robustness_steadier_than_qualified_baselines": true,
+      "normal_late_no_worse_than_random": true,
+      "beats_earliest_finish_on_late_days": true
+    },
+    "sprint1_lateness": {
+      "lateness_beats_all_baselines": true,
+      "defects_beats_all_baselines": false,
+      "fairness_matches_random_share": false,
+      "robustness_steadier_than_all_baselines": false,
+      "robustness_steadier_than_qualified_baselines": true,
+      "normal_late_no_worse_than_random": true,
+      "beats_earliest_finish_on_late_days": false
+    }
+  },
+  "source_sha256": {
+    "simulate.py": "b845804ad1229f593627b6ef1a6482258331178dbc4ec535274103fc3244593b",
+    "orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+    "workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+    "allocator.py": "d8ad8190ea1c41e30ba7ddee21bc20beda6fb9fc6390870ca72e2dbf0adabc6a",
+    "objective_study.py": "f40574ea12232b1e238da033715c8c5ffbb7a5c72933525486a09376f6780515"
+  }
+}

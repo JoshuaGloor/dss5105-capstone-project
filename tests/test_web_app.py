@@ -1,10 +1,12 @@
 import json
+from dataclasses import asdict
 
 import pytest
 from streamlit.testing.v1 import AppTest
 
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
+from dss5105.evaluate import DEFAULT_PRESET, PRESETS
 
 
 @pytest.fixture
@@ -20,7 +22,7 @@ def app(monkeypatch):
 
 def offline_app():
     """The page opens on the chat; these tests exercise the offline examples mode."""
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     assert "preview" not in app.session_state
     return app.radio(key="input_source").set_value("examples").run()
 
@@ -29,7 +31,7 @@ def test_page_opens_on_chat_without_calling_a_model(monkeypatch):
     from dss5105 import llm
 
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: pytest.fail("no model call on page load"))
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     assert not app.exception
     assert app.radio(key="input_source").value == "chat"
     assert app.button(key="interpret_inbox")
@@ -43,7 +45,7 @@ def test_page_uses_live_python_tools_not_bundled_html_results(app):
     assert app.button(key="review_confirmation").disabled is False
     envelope = next(item for item in read_inbox() if item["request_id"] == "R25")
     inputs = json.loads((ROOT / "examples" / "dispatch_inputs.json").read_text())
-    expected = DispatchDesk().preview(envelope, DispatchInput(**inputs["R25"]), ObjectiveWeights())
+    expected = DispatchDesk().preview(envelope, DispatchInput(**inputs["R25"]), PRESETS[DEFAULT_PRESET])
     assert app.session_state["preview"]["candidates"] == expected["candidates"]
     assert "W3" not in {row["estimate"]["workshop_id"] for row in expected["candidates"]}
 
@@ -52,10 +54,16 @@ def test_custom_weights_recompute_and_invalid_weights_fail_closed(app):
     app.radio(key="objective").set_value("custom").run()
     app.slider(key="weight_lateness").set_value(0.0)
     app.slider(key="weight_defects").set_value(1.0)
+    app.slider(key="weight_fairness").set_value(0.0)
+    app.slider(key="weight_robustness").set_value(0.0)
     app.slider(key="weight_cost").set_value(0.0).run()
     assert not app.exception
     result = app.session_state["preview"]
-    assert result["effective_weights"] == {"lateness": 0.0, "defects": 1.0, "cost": 0.0, "deadline_buffer_days": 0}
+    assert result["effective_weights"] == asdict(
+        ObjectiveWeights(
+            lateness=0.0, defects=1.0, deadline_buffer_days=2.0, capacity_reservation=1.0, deadline_miss_days=7.0
+        )
+    )
     assert result["recommendation"] == "W2"
     app.slider(key="weight_defects").set_value(0.0).run()
     assert not app.exception
@@ -104,7 +112,7 @@ def test_request_preference_overrides_global_preset(app):
     app.radio(key="request_id").set_value("R21").run()
     assert not app.exception
     result = app.session_state["preview"]
-    assert result["effective_weights"] == {"lateness": 0.0, "defects": 0.0, "cost": 1.0, "deadline_buffer_days": 0}
+    assert result["effective_weights"] == asdict(ObjectiveWeights(lateness=0, cost=1))
     app.radio(key="objective").set_value("hybrid").run()
     assert app.session_state["preview"]["effective_weights"] == result["effective_weights"]
     assert app.session_state["preview"]["recommendation"] == result["recommendation"]
@@ -125,7 +133,7 @@ def test_demo_confirmation_is_two_step_and_invalidated_by_settings(app):
     app.radio(key="objective").set_value("defects").run()
     assert "confirmed_preview" not in app.session_state
     assert "reviewing_preview" not in app.session_state
-    app.radio(key="objective").set_value("lateness").run()
+    app.radio(key="objective").set_value("fairness").run()
     assert "confirmed_preview" not in app.session_state
 
 

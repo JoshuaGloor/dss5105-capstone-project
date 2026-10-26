@@ -13,6 +13,7 @@ STATUS_LABELS = {
     "DECLINE": "Data unavailable",
     "RECORDED_STATUS": "Recorded status only",
     "ALREADY_ALLOCATED": "Allocation already saved",
+    "CAPACITY": "Capacity check",
 }
 PREFERENCES = {
     "fastest": "fastest turnaround (request preference)",
@@ -47,7 +48,13 @@ def _ranking(result: dict) -> str:
     if preference in PREFERENCES:
         return "Ranked by " + PREFERENCES[preference] + "."
     effective = result["effective_weights"]
-    labels = {"lateness": "delivery", "defects": "quality risk", "cost": "subcontracting cost"}
+    labels = {
+        "lateness": "delivery",
+        "defects": "quality risk",
+        "fairness": "fair share of work",
+        "robustness": "resilience to a stoppage",
+        "cost": "subcontracting cost",
+    }
     priorities = ", ".join(label for term, label in labels.items() if effective[term] > 0)
     return "Compared permitted workshops using the configured priorities for " + priorities + "."
 

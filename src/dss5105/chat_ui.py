@@ -9,7 +9,7 @@ from dss5105 import intake
 from dss5105.dispatch import DispatchDesk
 from dss5105.replies import build_reply
 
-TONES = {"RECOMMEND": "ok", "CLARIFY": "ask", "RECORDED_STATUS": "ask", "DECLINE": "ask"}
+TONES = {"RECOMMEND": "ok", "CLARIFY": "ask", "RECORDED_STATUS": "ask", "DECLINE": "ask", "CAPACITY": "ask"}
 
 
 def reset_preview():

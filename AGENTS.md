@@ -21,7 +21,8 @@ writing code, in this order:
 Course requirements come from Spec v5 and Tracks v4 (Data v3); implementation status comes from
 code and reproducible evidence. Keep team proposals distinct from requirements and
 results. The team has selected minimise lateness as the primary objective,
-measured by late fraction and mean late days. See
+measured by late fraction and mean late days, and minimise defects as the secondary
+objective. See
 [docs/ALLOCATION_ENGINE.md](docs/ALLOCATION_ENGINE.md) for the current offline allocator.
 
 Two rules that override convenience:
@@ -29,9 +30,10 @@ Two rules that override convenience:
 - **The LLM never does arithmetic.** Every numeral shown to a user must trace back to a
   tool output. A hallucinated delivery estimate is the worst failure in this track and we
   check compliance automatically.
-- **The objective is configuration, not a branch.** The current scorer takes lateness,
-  defects and cost weights. Future objective terms must also be configurable, never
-  policy-name `if` statements in allocation logic. Fairness scoring is not implemented yet.
+- **The objective is configuration, not a branch.** The scorer takes lateness, defects,
+  fairness, robustness and cost weights, plus a deadline buffer and capacity reservation.
+  Future objective terms must also be configurable, never policy-name `if` statements in
+  allocation logic. Presets are frozen by `objective_study.py`; see docs/OBJECTIVE_STUDY.md.
 
 ## Track 2 data and harness
 
@@ -52,6 +54,9 @@ Two rules that override convenience:
   automation for prototype review; the user opens the standalone HTML in Chrome.
 - The final web interface uses Streamlit. The HTML prototype is a design reference;
   do not introduce a separate frontend stack or API service without a concrete need.
+  The voice assistant is a Streamlit custom component (`src/dss5105/assets/assistant/`):
+  plain HTML, CSS and JS with no build step. It renders every value with textContent,
+  and all turn logic stays in Python (`assistant.py`).
 - Independent previews and simulator evaluation never use saved planning queues.
   Saved local allocations use `records.py` and the contract in
   `docs/ALLOCATION_RECORD_CONTRACT.md`; keep `runtime/` out of version control.

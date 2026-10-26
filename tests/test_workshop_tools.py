@@ -142,7 +142,7 @@ def test_workshop_workspace_never_calls_model_and_recomputes_on_mode_switch(monk
 
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: pytest.fail("Workshop tools must stay offline"))
     monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "ui.sqlite3")
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     app.radio(key="input_source").set_value("workshops").run()
     assert not app.exception
     app.button(key="check_capacity").click().run()

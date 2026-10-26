@@ -45,23 +45,28 @@ until due. It is not expected tardiness or late probability. All delivery estima
 in the current allocator come from this function; simulator outcomes are separate
 measurements produced by the course harness.
 
-### `rank_candidates(batch, workshops, queues, weights, scales)`
+### `rank_candidates(batch, workshops, queues, weights, scales, *, ledger, register)`
 
-- Input: resolved simulator data, `ObjectiveWeights`, and optional `ScoreScales`.
-- Output: sorted `CandidateScore` rows containing a delivery estimate, weighted
-  lateness/defects/cost components, and a total score.
+- Input: resolved simulator data, `ObjectiveWeights`, optional `ScoreScales`, an
+  optional `ledger` of pieces already allocated per workshop, and an optional full
+  `register` used for category capacity when `workshops` is a permitted subset.
+- Output: sorted `CandidateScore` rows: the delivery estimate, `reserved_days` (other
+  categories' capacity the batch would occupy), `projected_share` (share of allocated
+  pieces after this batch, or None without a ledger), `stress_lateness_days`, one
+  weighted component per objective (lateness, defects, cost, fairness, robustness)
+  and the total score.
 - Purpose: rank eligible workshops using the objective configuration.
 - Non-goals: chat constraints, eligibility explanations for excluded workshops,
-  fairness optimization, split plans, or committing an allocation.
-- Failure behavior: an empty candidate set returns an empty list. Weights must
-  be finite, nonnegative, and not all zero; the optional `deadline_buffer_days`
-  must be finite and nonnegative; scales must be finite and positive.
-  Invalid configurations raise `ValueError` when constructed.
+  split plans, or committing an allocation.
+- Failure behavior: an empty candidate set returns an empty list. Weights must be
+  finite, nonnegative, and not all zero; `deadline_buffer_days`,
+  `capacity_reservation` and `deadline_miss_days` must be finite and nonnegative; scales must be finite and
+  positive. Invalid configurations raise `ValueError` when constructed.
 - Tie-breaking: expected turnaround, then workshop ID, for every configuration.
 
-The score definition and scale assumptions are in
-[ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md). Changing a policy name does not
-change allocation logic; only configuration changes the objective.
+The score definition, scales and frozen presets are in
+[ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md) and [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md).
+Changing a policy name does not change allocation logic; only configuration does.
 
 ### `assess_split(batch, workshops, queues)`
 
@@ -82,9 +87,12 @@ change allocation logic; only configuration changes the objective.
 
 ### `make_allocator(weights, scales)` and `earliest_finish(...)`
 
-- Input: `make_allocator` binds weights and scales; its returned callback accepts
-  `(batch, workshops, queues)`. `earliest_finish` accepts that callback signature
-  directly and uses unadjusted turnaround as its criterion.
+- Input: `make_allocator` binds weights and scales; it returns an `Allocator` whose
+  call accepts `(batch, workshops, queues)`. `earliest_finish` accepts that callback
+  signature directly and uses unadjusted turnaround as its criterion.
+- State: the `Allocator` keeps a ledger of the pieces it placed in the current replay,
+  for fairness, and its last ranking for traces. The harness has no run-start hook, so
+  a repeated order ID starts a new ledger. It never reads future orders or outcomes.
 - Output: a workshop ID for the current batch.
 - Purpose: supply a decision to the course simulator.
 - Non-goals: language understanding, human confirmation, or modifying queue state.
@@ -115,6 +123,57 @@ not autonomously choose among registered tool calls or perform numerical work.
 The opt-in live evaluation boundary is defined in
 [CHAT_EVALUATION.md](CHAT_EVALUATION.md) and implemented by `evaluate_chat.py`.
 It checkpoints raw extraction and tool evidence without committing allocations.
+
+## Capacity questions
+
+`DispatchInput(intent="capacity", product, pieces, due_date)` asks who could take a
+quantity of a product by a date, with no order to book. `product` is a recorded
+product or a category word (tops, accessories). Missing product, quantity or date
+returns `CLARIFY` with the question. Otherwise the preview ranks the permitted
+workshops on the same estimates as an allocation and returns status `CAPACITY`, the
+best option under the configured weights, and `commit_allowed` false. The language
+intake extracts these fields with `intent=capacity`; it never computes them.
+
+## Standing rules in previews
+
+`DispatchDesk.preview(..., rules=[...])` and `AllocationStore.preview(..., rules=...)`
+accept remembered rules `{rule_id, workshop_id, customer, imposed_by, evidence,
+created_on}`. After the order resolves, a rule whose customer matches (or whose
+customer is null) excludes its workshop, with provenance "Remembered rule from ...".
+A constraint in the message itself keeps its own provenance. Applied rules are
+returned as `applied_rules`; the reviewed `standing_rules` are reused when a booking
+is confirmed, so the stale-preview check covers them. Malformed rules raise
+`ValueError`. Saved-plan previews also pass the plan's booked pieces as the fairness
+ledger.
+
+## Memory store
+
+`MemoryStore` (`src/dss5105/memory.py`, `runtime/memory.sqlite3`) holds:
+
+- `remember_rule(workshop_id, customer, imposed_by, evidence, created_on, created_by,
+  source_allocation_id)`: only for a recorded workshop and customer; an identical
+  active rule is returned instead of duplicated. `rule_suggestions(record, memory)`
+  offers rules only from the exclusions of a confirmed booking.
+- `set_rule_active(rule_id, active, changed_by)`: pause or resume, attributed.
+- `log_episode(payload)` and `episodes()`: an append-only log of answers and bookings.
+- `profile()` and `update_profile(dispatcher, preset, weights, speak_replies)`: weights
+  are validated through `ObjectiveWeights`.
+
+Invalid changes raise `MemoryUpdateError`. Memory never creates a rule from model
+output alone, never edits course data, and never changes a booking.
+
+## Assistant turn routing
+
+`assistant.handle_utterance(session, text, services, channel)` routes one message:
+whole-utterance control phrases (`book`, `cancel`, `new`, `repeat`, `help`), memory
+questions (bookings, rules) and workshop questions ("how busy is X") are answered by
+Python with no model call. Everything else goes to the language intake with
+`restart_new_requests=True`: a message about another order, or a switch between
+allocating and a capacity question, starts a fresh request from the same patch.
+`request_booking` only opens a confirmation; `confirm_booking(session, services,
+actor)` needs a nonempty dispatcher name and an unchanged preview fingerprint, then
+calls `commit_allocation`. Cards and spoken text are built by `card_for_result` from
+tool display strings. See [VOICE_ASSISTANT.md](VOICE_ASSISTANT.md).
 
 ## Proposed agent tools and later extensions
 

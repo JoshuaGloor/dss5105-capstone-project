@@ -43,14 +43,17 @@ covers only part of Track 2.
 |---|---|---|
 | Course simulator and eligibility rule | Official Data v3, imported byte-for-byte | `track2/harness/simulate.py` |
 | Queue-aware earliest-finish reference | Implemented | `src/dss5105/allocator.py` |
-| Weighted scorer and allocator callback | Implemented: lateness, defects, cost weights | `src/dss5105/allocator.py` |
+| Weighted scorer and allocator callback | Implemented: lateness, defects, fairness, robustness and cost weights; deadline buffer; capacity reservation; replay ledger | `src/dss5105/allocator.py` |
+| Objective presets | One per course objective plus our lateness-then-defects hybrid, frozen on development seeds | `src/dss5105/objective_study.py`, [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md) |
 | Baseline and preset experiments | Implemented: normal, ten-seed shock and paired controls, JSON traces | `src/dss5105/evaluate.py` |
 | Exploratory weight search | Implemented: fixed grid, frozen candidates, additional seed checks | `src/dss5105/tune.py` |
 | Model construction helper | Implemented; not used by allocation experiments | `src/dss5105/llm.py` |
 | Structured request resolution and constraints | Implemented read-only previews; hand-authored inputs | `src/dss5105/dispatch.py` |
 | Natural-language extraction and clarification conversation | Implemented; pre-v3 live evaluation historical, revised live run pending | `src/dss5105/intake.py`, `src/dss5105/chat_ui.py` |
-| Dispatcher UI | Streamlit with independent previews and saved local plan; HTML design reference retained | `streamlit_app.py`, `docs/prototype/index.html` |
-| Workshop lookup and extra-work scenarios | Implemented direct read-only tools and offline Streamlit controls; language-query routing pending | `dispatch.py`, `workshop_ui.py` |
+| Dispatcher UI | Streamlit: voice-first mobile assistant, desk (independent previews and saved plan), objective lab, memory page; HTML design reference retained | `streamlit_app.py`, `assistant_page.py`, `web_app.py`, `lab_page.py`, `memory_page.py` |
+| Voice assistant | Browser speech recognition, Python-routed commands and memory questions, tool-authored cards and speech, slide-to-confirm booking | `src/dss5105/assistant.py`, [VOICE_ASSISTANT.md](VOICE_ASSISTANT.md) |
+| Long-term memory | Standing rules learned from confirmed bookings, episode log, dispatcher profile (SQLite) | `src/dss5105/memory.py` |
+| Workshop lookup and extra-work scenarios | Implemented direct read-only tools and offline Streamlit controls; capacity questions reachable from chat and voice (`intent=capacity`) | `dispatch.py`, `workshop_ui.py` |
 | Confirmed allocation records and queue updates | Implemented in local saved-plan mode: SQLite transactions, retries, stale-state checks, audit export | `src/dss5105/records.py` |
 | Chat evaluation and faithfulness checker | Live inbox runner and partial tool-integrity checks implemented; independent gold/held-out/full faithfulness pending | See evaluation plan |
 
@@ -90,18 +93,19 @@ require bidding, negotiation, or a particular scorer formula. Our current design
 uses one deterministic weighted scorer. Objectives are parameters, never separate
 branches in allocation logic. Eligibility remains a hard constraint.
 
-The team has selected **minimise lateness** as its primary objective for Sprint 1.
-Evaluate both late fraction and mean late days. The pure-defects
-preset fails the new random-lateness guardrail and is a tradeoff diagnostic, not a
-successful defects policy. See [current evidence](V3_EVALUATION.md). The course candidates are:
+The team has selected **minimise lateness** as its primary objective for Sprint 1, and
+**minimise defects** as its secondary objective for Sprint 2.
+Evaluate both late fraction and mean late days. The course candidates are:
 minimise lateness, minimise defects, fair allocation, or robustness to workshop
 failure. Cost is an additional measured tradeoff, not one of these primary choices.
 
-Lateness, defects, and a lateness/defects hybrid are initial experiment presets.
-The hybrid is exploratory, not a validated business default. Fairness scoring and
-a dedicated robustness policy are not implemented. Justify the final comparison
-and hybrid weights after reviewing evidence; do not assume a
-cost/quality frontier or speculate about what other teams will select.
+The scorer now has a term for each candidate, and one preset per objective was frozen on
+development seeds before the course seeds ran. The default `hybrid` (lateness first, then
+defects) beats all three baselines and the earliest-finish rule on both lateness metrics
+in normal runs; the defects preset beats all three baselines on `% def pcs` within the
+random-lateness guardrail; the fairness preset matches random's spread while on time.
+See [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md) for the protocol and where baselines still
+win. The earlier Sprint 1 presets and evidence are kept in [V3_EVALUATION.md](V3_EVALUATION.md).
 
 ## Milestones and final submission
 

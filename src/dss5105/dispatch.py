@@ -5,7 +5,7 @@ import csv
 import hashlib
 import json
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime, time, timedelta
 from math import ceil, isfinite
 from pathlib import Path
@@ -18,7 +18,7 @@ from dss5105.allocator import (
     estimate_delivery,
     rank_candidates,
 )
-from dss5105.evaluate import PRESETS
+from dss5105.evaluate import DEFAULT_PRESET, PRESETS
 from dss5105.harness import HARNESS_PATH, Simulator, cheapest, eligible_workshops, greedy_biggest, random_choice
 
 ROOT = HARNESS_PATH.parents[2]
@@ -34,6 +34,12 @@ BASELINES = {
     "cheapest": ("Cheapest eligible", cheapest),
     "greedy_biggest": ("Biggest capacity", greedy_biggest),
     "random_choice": ("Random eligible (seeded)", random_choice),
+}
+RULE_FIELDS = {"rule_id", "workshop_id", "customer", "imposed_by", "evidence", "created_on"}
+CAPACITY_QUESTIONS = {
+    "product": "Which product is it? Name it as orders do, for example hoodies or scarves.",
+    "quantity": "Please confirm the quantity using digits.",
+    "deadline": "Please confirm the delivery deadline using an explicit date, preferably YYYY-MM-DD.",
 }
 # Metric, its formatting as shown in display_fields (defect risk in percent), and its superlative.
 SHOWN = {
@@ -83,6 +89,9 @@ def decision_basis(result: dict) -> dict | None:
                 found = True
         if found:
             break
+    reservation = result.get("reservation_note")
+    if reservation and chosen is candidates[0] and reservation["workshop_id"] == chosen_id:
+        reasons.append(reservation["text"])
     slack = mine["available_days"] - _shown(mine, "expected_turnaround_days")
     if chosen["meets_deadline"]:
         reasons.append(f"Expected {slack:.2f} days before the deadline.")
@@ -141,7 +150,7 @@ class DispatchInput:
             if type(getattr(self, key)) is not bool:
                 raise ValueError(f"{key} must be a boolean")
         for key, choices in {
-            "intent": ("allocate", "quote", "history", "status"),
+            "intent": ("allocate", "quote", "history", "status", "capacity"),
             "date_kind": ("delivery", "shipping"),
             "preference": ("configured", *PREFERENCES),
         }.items():
@@ -229,6 +238,9 @@ class DispatchDesk:
             self.orders = list(csv.DictReader(file))
         self.workshops = Simulator().workshops
         self.queues = {key: workshop.queue0 for key, workshop in self.workshops.items()}
+        # Pieces already allocated per workshop in this plan; fairness reads it. Empty for
+        # independent previews, so fairness has no effect there.
+        self.ledger: dict[str, float] = {}
         self.as_of = AS_OF
         self.source_hashes = {
             path.name: hashlib.sha256(path.read_bytes()).hexdigest()
@@ -477,9 +489,127 @@ class DispatchDesk:
         status = "NOT_FOUND" if not matches else "RESOLVED" if len(matches) == 1 else "AMBIGUOUS"
         return {"status": status, "matches": matches}
 
-    def preview(self, envelope: dict, request: DispatchInput, weights: ObjectiveWeights) -> dict:
+    @staticmethod
+    def validate_rules(rules) -> list[dict]:
+        """Standing rules come from dispatcher-confirmed memory; malformed ones fail closed."""
+        checked = []
+        for rule in rules:
+            if not isinstance(rule, dict) or not RULE_FIELDS <= set(rule):
+                raise ValueError("Each standing rule needs " + ", ".join(sorted(RULE_FIELDS)))
+            if any(not isinstance(rule[key], str) or not rule[key].strip() for key in RULE_FIELDS - {"customer"}):
+                raise ValueError("Standing rule fields must be nonempty strings")
+            if rule["customer"] is not None and (
+                not isinstance(rule["customer"], str) or not rule["customer"].strip()
+            ):
+                raise ValueError("A standing rule customer must be a nonempty string or null")
+            checked.append({key: rule[key] for key in sorted(RULE_FIELDS)})
+        return checked
+
+    def rank(self, result: dict, batch: dict, constraints: dict, effective: ObjectiveWeights):
+        """Eligibility, exclusions with provenance, ranked candidates and reference policies."""
+        eligible = {w.workshop_id for w in eligible_workshops(batch, self.workshops)}
+        permitted = {key: w for key, w in self.workshops.items() if key in eligible and key not in constraints}
+        for key, workshop in self.workshops.items():
+            reasons = []
+            if key not in eligible:
+                reasons.extend(self.eligibility_reasons(batch, workshop))
+            if key in constraints:
+                constraint = constraints[key]
+                if "rule_id" in constraint:
+                    reasons.append(
+                        f"Remembered rule from {constraint['imposed_by']} ({constraint['created_on']}): "
+                        f"{constraint['evidence']}"
+                    )
+                else:
+                    reasons.append(f"Excluded by {constraint['imposed_by']}: {constraint['evidence']}")
+            if reasons:
+                result["excluded"].append({"workshop_id": key, "name": workshop.name, "reasons": reasons})
+        ranked = rank_candidates(batch, permitted, self.queues, effective, ledger=self.ledger, register=self.workshops)
+        for candidate in ranked:
+            estimate = candidate.estimate
+            result["candidates"].append(
+                {
+                    **asdict(candidate),
+                    "name": self.workshops[estimate.workshop_id].name,
+                    "makes": sorted(self.workshops[estimate.workshop_id].makes),
+                    "meets_deadline": estimate.lateness_days == 0,
+                    "display": self.display_fields(estimate, candidate.score),
+                }
+            )
+        if eligible:
+            for policy, (label, choose) in BASELINES.items():
+                workshop_id = choose(batch, self.workshops, self.queues)
+                reference = estimate_delivery(batch, self.workshops[workshop_id], self.queues)
+                result["baselines"].append(
+                    {
+                        "policy": policy,
+                        "label": label,
+                        "workshop_id": workshop_id,
+                        "name": self.workshops[workshop_id].name,
+                        "meets_deadline": reference.lateness_days == 0,
+                        "respects_exclusions": workshop_id not in constraints,
+                        "estimate": asdict(reference),
+                        "display": self.display_fields(reference),
+                    }
+                )
+        candidates = result["candidates"]
+        if candidates:
+            result["earliest_option"] = min(
+                candidates,
+                key=lambda row: (row["estimate"]["expected_turnaround_days"], row["estimate"]["workshop_id"]),
+            )
+        result["has_on_time_option"] = any(row["meets_deadline"] for row in candidates)
+        result["reservation_note"] = self.reservation_note(batch, permitted, effective, ranked)
+        return permitted
+
+    def reservation_note(self, batch, permitted, effective, ranked) -> dict | None:
+        """Say so only when reserving shared capacity decided the ranking: without it, a shared shop wins."""
+        if not ranked or not effective.capacity_reservation or ranked[0].estimate.lateness_days > 0:
+            return None
+        plain = rank_candidates(
+            batch,
+            permitted,
+            self.queues,
+            replace(effective, capacity_reservation=0.0),
+            ledger=self.ledger,
+            register=self.workshops,
+        )
+        held = plain[0]
+        if held.estimate.workshop_id == ranked[0].estimate.workshop_id or not held.reserved_days:
+            return None
+        workshop = self.workshops[held.estimate.workshop_id]
+        other = sorted(workshop.makes - {batch["category"]})
+        makers = {
+            category: sum(1 for w in self.workshops.values() if w.status == "ACTIVE" and category in w.makes)
+            for category in other
+        }
+        scarce = " and ".join(
+            f"{category.lower()} ({count} active workshops make it)" for category, count in makers.items()
+        )
+        return {
+            "workshop_id": ranked[0].estimate.workshop_id,
+            "held_workshop_id": workshop.workshop_id,
+            "text": f"Leaves {workshop.name} free for {scarce}; the chosen workshop still meets the date.",
+        }
+
+    def capacity_category(self, product: str | None) -> str | None:
+        """A category word, or a recorded product that belongs to exactly one category."""
+        if product is None:
+            return None
+        categories = {category for workshop in self.workshops.values() for category in workshop.makes}
+        if product.upper() in categories:
+            return product.upper()
+        matches = {row["category"] for row in self.orders if row["product"].casefold() == product.casefold()}
+        return matches.pop() if len(matches) == 1 else None
+
+    def preview(self, envelope: dict, request: DispatchInput, weights: ObjectiveWeights, *, rules=()) -> dict:
         snapshot = self.snapshot()
-        for workshop_id in [request.suggested_workshop, *(item["workshop_id"] for item in request.exclusions)]:
+        rules = self.validate_rules(rules)
+        for workshop_id in [
+            request.suggested_workshop,
+            *(item["workshop_id"] for item in request.exclusions),
+            *(rule["workshop_id"] for rule in rules),
+        ]:
             if workshop_id is not None and workshop_id not in self.workshops:
                 raise ValueError(f"Unknown workshop: {workshop_id}")
         for constraint in request.exclusions:
@@ -502,6 +632,9 @@ class DispatchDesk:
             "earliest_option": None,
             "split_option": None,
             "review_options": [],
+            "standing_rules": rules,
+            "applied_rules": [],
+            "ledger": dict(sorted(self.ledger.items())),
             "commit_allowed": False,
             "tool_sources": {
                 name: hashlib.sha256((ROOT / "src" / "dss5105" / name).read_bytes()).hexdigest()
@@ -521,6 +654,8 @@ class DispatchDesk:
             return finish(
                 "DECLINE", "The supplied data contains neither customer quotes nor past workshop allocations."
             )
+        if request.intent == "capacity":
+            return self.capacity_preview(result, request, effective, finish)
         resolution = self.resolve_order(request)
         result["resolution"] = resolution
         if request.intent == "status" and resolution["status"] == "NOT_FOUND":
@@ -577,53 +712,19 @@ class DispatchDesk:
                 "The stated ship date equals the recorded due date in orders.csv, so it is used as the "
                 "delivery deadline."
             )
-        eligible = {w.workshop_id for w in eligible_workshops(batch, self.workshops)}
         constraints = {item["workshop_id"]: item for item in request.exclusions}
-        permitted = {key: w for key, w in self.workshops.items() if key in eligible and key not in constraints}
-        for key, workshop in self.workshops.items():
-            reasons = []
-            if key not in eligible:
-                reasons.extend(self.eligibility_reasons(batch, workshop))
-            if key in constraints:
-                reasons.append(f"Excluded by {constraints[key]['imposed_by']}: {constraints[key]['evidence']}")
-            if reasons:
-                result["excluded"].append({"workshop_id": key, "name": workshop.name, "reasons": reasons})
-        for candidate in rank_candidates(batch, permitted, self.queues, effective):
-            estimate = candidate.estimate
-            result["candidates"].append(
-                {
-                    **asdict(candidate),
-                    "name": self.workshops[estimate.workshop_id].name,
-                    "meets_deadline": estimate.lateness_days == 0,
-                    "display": self.display_fields(estimate, candidate.score),
-                }
-            )
-        if eligible:
-            for policy, (label, choose) in BASELINES.items():
-                workshop_id = choose(batch, self.workshops, self.queues)
-                reference = estimate_delivery(batch, self.workshops[workshop_id], self.queues)
-                result["baselines"].append(
-                    {
-                        "policy": policy,
-                        "label": label,
-                        "workshop_id": workshop_id,
-                        "name": self.workshops[workshop_id].name,
-                        "meets_deadline": reference.lateness_days == 0,
-                        "respects_exclusions": workshop_id not in constraints,
-                        "estimate": asdict(reference),
-                        "display": self.display_fields(reference),
-                    }
-                )
+        for rule in rules:
+            if rule["customer"] is not None and rule["customer"].casefold() != order["customer"].casefold():
+                continue
+            # A message constraint already excludes the workshop; keep its own provenance.
+            if rule["workshop_id"] not in constraints:
+                constraints[rule["workshop_id"]] = rule
+                result["applied_rules"].append(rule)
+        permitted = self.rank(result, batch, constraints, effective)
         candidates = result["candidates"]
-        if candidates:
-            result["earliest_option"] = min(
-                candidates,
-                key=lambda row: (row["estimate"]["expected_turnaround_days"], row["estimate"]["workshop_id"]),
-            )
         selectable = candidates
         if request.preference == "cheapest_on_time":
             selectable = [row for row in candidates if row["meets_deadline"]]
-        result["has_on_time_option"] = any(row["meets_deadline"] for row in candidates)
         if due < self.as_of:
             result["flags"].append("PAST_DEADLINE")
         if candidates and (request.split_requested or not result["has_on_time_option"]):
@@ -679,12 +780,63 @@ class DispatchDesk:
             "RECOMMEND", "Eligible whole-batch preview ready for review. Delivery is an estimate, not a guarantee."
         )
 
+    def capacity_preview(self, result: dict, request: DispatchInput, effective: ObjectiveWeights, finish) -> dict:
+        """Who can take a quantity of a product by a date: the same estimates, with no order to book."""
+        category = self.capacity_category(request.product)
+        issues = []
+        if category is None:
+            issues.append(CAPACITY_QUESTIONS["product"])
+        if request.pieces is None:
+            issues.append(CAPACITY_QUESTIONS["quantity"])
+        if request.due_date is None or request.date_uncertain:
+            issues.append(CAPACITY_QUESTIONS["deadline"])
+        known = request.clarification or ""
+        issues = [issue for issue in issues if issue not in known]
+        if request.clarification:
+            issues.append(request.clarification)
+        if issues:
+            return finish("CLARIFY", " ".join(issues))
+        due = date.fromisoformat(request.due_date)
+        batch = {
+            "order_id": "CAPACITY_CHECK",
+            "category": category,
+            "pieces": request.pieces,
+            "sent_date": self.as_of,
+            "due_date": due,
+        }
+        result["batch"] = {**batch, "sent_date": self.as_of.isoformat(), "due_date": due.isoformat()}
+        result["deadline_source"] = "request"
+        result["capacity_query"] = {"product": request.product, "category": category}
+        self.rank(result, batch, {item["workshop_id"]: item for item in request.exclusions}, effective)
+        candidates = result["candidates"]
+        on_time = [row for row in candidates if row["meets_deadline"]]
+        if due < self.as_of:
+            result["flags"].append("PAST_DEADLINE")
+        if not on_time:
+            result["flags"].append("NO_ON_TIME_OPTION")
+        if candidates:
+            result["recommendation"] = (on_time or candidates)[0]["estimate"]["workshop_id"]
+        quantity = f"{request.pieces:,} pieces of {request.product.lower()}"
+        if not candidates:
+            message = f"No active workshop can take {quantity} as one batch."
+        elif on_time:
+            message = (
+                f"{len(on_time)} of {len(candidates)} permitted workshops can deliver {quantity} by {due.isoformat()}."
+            )
+        else:
+            earliest = result["earliest_option"]
+            message = (
+                f"No permitted workshop can deliver {quantity} by {due.isoformat()}. Earliest: "
+                f"{earliest['name']} on {earliest['display']['eta']}, {earliest['display']['lateness']} late."
+            )
+        return finish("CAPACITY", message + " Nothing is reserved until an order is booked.")
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--request", help="Inbox ID; uses a draft structured fixture unless --input is supplied")
     parser.add_argument("--input", type=Path, help="Reviewed structured JSON for the chosen inbox request")
-    parser.add_argument("--preset", choices=PRESETS, default="lateness")
+    parser.add_argument("--preset", choices=PRESETS, default=DEFAULT_PRESET)
     parser.add_argument("--weights", type=Path, help="JSON object of lateness/defects/cost weights")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
