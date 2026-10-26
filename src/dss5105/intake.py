@@ -196,6 +196,22 @@ def _product(value: str, desk: DispatchDesk) -> str:
     return aliases.get(value.casefold(), value)
 
 
+MENTIONS = {
+    "quantity": r"quantit(?:y|ies)|qty|pieces|pcs|units|amount|how\s+many|usual",
+    "deadline": r"deadline|due|dates?|deliver(?:y|ed)?|ship(?:ping)?|week|month|today|tomorrow|soon|asap|"
+    r"moved|revised|earlier|later|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec",
+}
+UNCERTAIN = r"confirm|unsure|not\s+sure|unknown|maybe|perhaps|tbc|tbd|to\s+follow|will\s+let"
+
+
+def _mentions(code: str, text: str, order_id: str | None) -> bool:
+    """Whether the message itself talks about this field; only then is the model's question kept."""
+    if re.search(rf"\b(?:{MENTIONS[code]}|{UNCERTAIN})", text, re.IGNORECASE):
+        return True
+    remainder = re.sub(re.escape(order_id), " ", text, flags=re.IGNORECASE) if order_id else text
+    return bool(re.search(r"\d", remainder))
+
+
 def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDesk, speaker: str) -> Conversation:
     """Validate before advancing the conversation; omission cannot remove a constraint."""
     if not isinstance(patch, dict) or set(patch) != {"updates", "exclusions", "needs"}:
@@ -211,7 +227,7 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
     provenance = list(previous.provenance)
     seen = set()
     changed = set()
-    unclear_quantity = False
+    unclear_quantity = unclear_date = False
     for update in patch["updates"]:
         _quoted(update, {"field", "value", "evidence"}, text)
         name, value = update["field"], update["value"].strip()
@@ -246,6 +262,7 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
             elif name == "due_date":
                 parsed = parse_date_phrase(value, desk.as_of)
                 if parsed is None:
+                    unclear_date = True
                     values["date_uncertain"] = True
                     needs.add("deadline")
                     continue
@@ -255,11 +272,14 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         provenance.append({**update, "normalized": normalized, "speaker": speaker, "turn": len(previous.turns)})
     for name in changed:
         needs.discard(RESOLVES.get(name))
-    unprompted = "quantity" in patch["needs"] and "quantity" not in previous.needs and not unclear_quantity
-    if unprompted and values["order_id"] is not None and values["intent"] != "capacity":
-        # A recorded order carries its own quantity, so the model's own quantity question is dropped.
-        # A stated but unclear quantity still asks; the dispatch tool checks any stated amendment.
-        needs.discard("quantity")
+    # A recorded order carries its own quantity and due date, so a question the model raises on its
+    # own about either is dropped. A stated but unclear value, or a date said to be changing, still asks.
+    recorded = values["order_id"] is not None and values["intent"] != "capacity"
+    unclear = {"quantity": unclear_quantity, "deadline": unclear_date or values["date_uncertain"]}
+    for code, is_unclear in unclear.items():
+        mentioned = _mentions(code, text, values["order_id"])
+        if recorded and code in patch["needs"] and code not in previous.needs and not is_unclear and not mentioned:
+            needs.discard(code)
     if "due_date" in changed and "date_uncertain" not in changed:
         values["date_uncertain"] = False
     if values["date_uncertain"]:

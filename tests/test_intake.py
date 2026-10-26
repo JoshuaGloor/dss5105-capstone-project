@@ -294,3 +294,19 @@ def test_a_recorded_order_needs_no_quantity_question_so_a_refusal_is_not_blocked
     assert result["status"] == "REFUSE_SUGGESTION"
     unknown = turn("Send the scarves for Harbor Knits", patch(("product", "scarves", "scarves"), needs=["quantity"]))
     assert "quantity" in unknown.needs
+
+
+def test_a_recorded_order_needs_no_unprompted_deadline_question_either():
+    # Live variant of R14: the model asked for a deadline that orders.csv records.
+    text = "QuickStitch for the scarves on ORD-103?"
+    conversation = turn(
+        text,
+        patch(("order_id", "ORD-103", text), ("suggested_workshop", "QuickStitch", text), needs=["deadline"]),
+    )
+    assert conversation.needs == ()
+    assert preview_conversation(conversation, DispatchDesk(), ObjectiveWeights())["status"] == "REFUSE_SUGGESTION"
+    moved = "ORD-066 due date just moved up, will confirm the new date"
+    changing = turn(
+        moved, patch(("order_id", "ORD-066", moved), ("date_uncertain", "true", moved), needs=["deadline"])
+    )
+    assert "deadline" in changing.needs
