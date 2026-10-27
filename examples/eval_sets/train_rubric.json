@@ -1,0 +1,1072 @@
+{
+ "version": "generated-v1",
+ "split": "train",
+ "seed": 5105,
+ "status": "Generated: fields are labelled by construction, states by the deterministic preview. Not human gold.",
+ "course_kind_counts": {
+  "complete_meetable": 10,
+  "complete_impossible": 10,
+  "constraint": 10,
+  "ambiguous": 10,
+  "missing_number_or_date": 10,
+  "ineligible_suggestion": 10,
+  "unanswerable": 10
+ },
+ "cases": {
+  "TR001": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-0",
+   "fields": {
+    "order_id": "ORD-040",
+    "pieces": 1200,
+    "product": "Hoodie",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-28"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR002": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-1",
+   "fields": {
+    "order_id": "ORD-040",
+    "pieces": 1200,
+    "product": "Hoodie",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-21"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR003": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-2",
+   "fields": {
+    "order_id": "ORD-095",
+    "pieces": 800,
+    "product": "Hoodie",
+    "customer": "Bright Basics",
+    "due_date": "2026-05-03"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR004": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-0",
+   "fields": {
+    "order_id": "ORD-066",
+    "pieces": 1000,
+    "product": "Polo shirt",
+    "customer": "Northwind Apparel",
+    "due_date": "2026-04-26"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR005": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-0",
+   "fields": {
+    "order_id": "ORD-035",
+    "pieces": 300,
+    "product": "Beanie",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-05-02"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR006": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-2",
+   "fields": {
+    "order_id": "ORD-040",
+    "pieces": 1200,
+    "product": "Hoodie",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-21"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR007": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-2",
+   "fields": {
+    "order_id": "ORD-040",
+    "pieces": 1200,
+    "product": "Hoodie",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-24"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR008": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-3",
+   "fields": {
+    "order_id": "ORD-008",
+    "pieces": 600,
+    "product": "Polo shirt",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-12"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR009": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-0",
+   "fields": {
+    "order_id": "ORD-096",
+    "pieces": 1000,
+    "product": "Beanie",
+    "customer": "TrendCart",
+    "due_date": "2026-04-24"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR010": {
+   "course_kind": "complete_meetable",
+   "category": "complete",
+   "template": "complete-1",
+   "fields": {
+    "order_id": "ORD-008",
+    "pieces": 600,
+    "product": "Polo shirt",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-16"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR011": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-0",
+   "fields": {
+    "order_id": "ORD-109",
+    "pieces": 500,
+    "product": "Vest",
+    "customer": "Harbor Knits",
+    "due_date": "2026-04-02"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR012": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-1",
+   "fields": {
+    "order_id": "ORD-103",
+    "pieces": 2000,
+    "product": "Scarf",
+    "customer": "Bright Basics",
+    "due_date": "2026-04-04"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR013": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-2",
+   "fields": {
+    "order_id": "ORD-020",
+    "pieces": 1200,
+    "product": "Vest",
+    "customer": "TrendCart",
+    "due_date": "2026-03-31"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION",
+    "PAST_DEADLINE"
+   ]
+  },
+  "TR014": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-3",
+   "fields": {
+    "order_id": "ORD-045",
+    "pieces": 150,
+    "product": "Vest",
+    "customer": "Cotton Club",
+    "due_date": "2026-04-02"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR015": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-1",
+   "fields": {
+    "order_id": "ORD-103",
+    "pieces": 2000,
+    "product": "Scarf",
+    "customer": "Bright Basics",
+    "due_date": "2026-04-04"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR016": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-2",
+   "fields": {
+    "order_id": "ORD-107",
+    "pieces": 2000,
+    "product": "Cardigan",
+    "customer": "Northwind Apparel",
+    "due_date": "2026-03-16"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION",
+    "PAST_DEADLINE"
+   ]
+  },
+  "TR017": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-0",
+   "fields": {
+    "order_id": "ORD-108",
+    "pieces": 2000,
+    "product": "Scarf",
+    "customer": "Harbor Knits",
+    "due_date": "2026-04-03"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR018": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-3",
+   "fields": {
+    "order_id": "ORD-024",
+    "pieces": 300,
+    "product": "Vest",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-02"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR019": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-2",
+   "fields": {
+    "order_id": "ORD-103",
+    "pieces": 2000,
+    "product": "Scarf",
+    "customer": "Bright Basics",
+    "due_date": "2026-04-04"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR020": {
+   "course_kind": "complete_impossible",
+   "category": "deadline_exception",
+   "template": "complete-1",
+   "fields": {
+    "order_id": "ORD-096",
+    "pieces": 1000,
+    "product": "Beanie",
+    "customer": "TrendCart",
+    "due_date": "2026-04-02"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ],
+   "flags": [
+    "NO_ON_TIME_OPTION"
+   ]
+  },
+  "TR021": {
+   "course_kind": "constraint",
+   "category": "exclusion",
+   "template": "constraint-train-0",
+   "fields": {
+    "order_id": "ORD-035",
+    "pieces": 300,
+    "product": "Beanie",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-29"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ],
+   "exclusions": {
+    "W6": "Mei"
+   }
+  },
+  "TR022": {
+   "course_kind": "constraint",
+   "category": "exclusion",
+   "template": "constraint-train-1",
+   "fields": {
+    "order_id": "ORD-005",
+    "pieces": 500,
+    "product": "Scarf",
+    "customer": "TrendCart",
+    "due_date": "2026-04-20"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ],
+   "exclusions": {
+    "W4": "Ravi"
+   }
+  },
+  "TR023": {
+   "course_kind": "constraint",
+   "category": "preference",
+   "template": "constraint-train-2",
+   "fields": {
+    "order_id": "ORD-095",
+    "pieces": 800,
+    "product": "Hoodie",
+    "customer": "Bright Basics",
+    "due_date": "2026-04-26",
+    "preference": "fastest"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR024": {
+   "course_kind": "constraint",
+   "category": "preference",
+   "template": "constraint-train-3",
+   "fields": {
+    "order_id": "ORD-066",
+    "pieces": 1000,
+    "product": "Polo shirt",
+    "customer": "Northwind Apparel",
+    "due_date": "2026-04-26",
+    "preference": "cheapest_on_time"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR025": {
+   "course_kind": "constraint",
+   "category": "preference",
+   "template": "constraint-train-4",
+   "fields": {
+    "order_id": "ORD-024",
+    "pieces": 300,
+    "product": "Vest",
+    "customer": "Loom & Leaf",
+    "due_date": "2026-04-15",
+    "preference": "lowest_defects"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR026": {
+   "course_kind": "constraint",
+   "category": "exclusion",
+   "template": "constraint-train-0",
+   "fields": {
+    "order_id": "ORD-017",
+    "pieces": 800,
+    "product": "Cardigan",
+    "customer": "TrendCart",
+    "due_date": "2026-04-10"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ],
+   "exclusions": {
+    "W1": "Priya"
+   }
+  },
+  "TR027": {
+   "course_kind": "constraint",
+   "category": "exclusion",
+   "template": "constraint-train-1",
+   "fields": {
+    "order_id": "ORD-017",
+    "pieces": 800,
+    "product": "Cardigan",
+    "customer": "TrendCart",
+    "due_date": "2026-04-10"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ],
+   "exclusions": {
+    "W1": "Priya"
+   }
+  },
+  "TR028": {
+   "course_kind": "constraint",
+   "category": "preference",
+   "template": "constraint-train-2",
+   "fields": {
+    "order_id": "ORD-045",
+    "pieces": 150,
+    "product": "Vest",
+    "customer": "Cotton Club",
+    "due_date": "2026-04-09",
+    "preference": "fastest"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR029": {
+   "course_kind": "constraint",
+   "category": "preference",
+   "template": "constraint-train-3",
+   "fields": {
+    "order_id": "ORD-095",
+    "pieces": 800,
+    "product": "Hoodie",
+    "customer": "Bright Basics",
+    "due_date": "2026-04-26",
+    "preference": "cheapest_on_time"
+   },
+   "statuses": [
+    "RECOMMEND"
+   ]
+  },
+  "TR030": {
+   "course_kind": "constraint",
+   "category": "preference",
+   "template": "constraint-train-4",
+   "fields": {
+    "order_id": "ORD-081",
+    "pieces": 1500,
+    "product": "Crewneck sweater",
+    "customer": "Harbor Knits",
+    "due_date": "2026-04-13",
+    "preference": "lowest_defects"
+   },
+   "statuses": [
+    "NEEDS_REVIEW"
+   ]
+  },
+  "TR031": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "Loom & Leaf",
+    "product": "Beanie"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR032": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-1",
+   "fields": {
+    "order_id": null,
+    "customer": "Bright Basics",
+    "product": "Hoodie"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR033": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-2",
+   "fields": {
+    "order_id": null,
+    "customer": "Cotton Club",
+    "product": "Hoodie",
+    "preference": "fastest"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR034": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "Cotton Club",
+    "product": "Hoodie"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR035": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-1",
+   "fields": {
+    "order_id": null,
+    "customer": "Harbor Knits",
+    "product": "Hoodie"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR036": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-2",
+   "fields": {
+    "order_id": null,
+    "customer": "Maple & Co",
+    "product": "Cardigan",
+    "preference": "fastest"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR037": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "Bright Basics",
+    "product": "Hoodie"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR038": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-1",
+   "fields": {
+    "order_id": null,
+    "customer": "TrendCart",
+    "product": "Vest"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR039": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-2",
+   "fields": {
+    "order_id": null,
+    "customer": "Maple & Co",
+    "product": "Crewneck sweater",
+    "preference": "fastest"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR040": {
+   "course_kind": "ambiguous",
+   "category": "clarification",
+   "template": "ambiguous-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "TrendCart",
+    "product": "Beanie"
+   },
+   "statuses": [
+    "CLARIFY"
+   ]
+  },
+  "TR041": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "Harbor Knits",
+    "product": "Crewneck sweater",
+    "pieces": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "quantity"
+   ]
+  },
+  "TR042": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-1",
+   "fields": {
+    "order_id": "ORD-053",
+    "date_uncertain": true,
+    "due_date": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "deadline"
+   ]
+  },
+  "TR043": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-2",
+   "fields": {
+    "order_id": null,
+    "customer": "Loom & Leaf",
+    "product": "Beanie",
+    "pieces": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "quantity"
+   ]
+  },
+  "TR044": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "Bright Basics",
+    "product": "Hoodie",
+    "pieces": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "quantity"
+   ]
+  },
+  "TR045": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-1",
+   "fields": {
+    "order_id": "ORD-096",
+    "date_uncertain": true,
+    "due_date": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "deadline"
+   ]
+  },
+  "TR046": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-2",
+   "fields": {
+    "order_id": null,
+    "customer": "Cotton Club",
+    "product": "Vest",
+    "pieces": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "quantity"
+   ]
+  },
+  "TR047": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "UrbanThread",
+    "product": "Vest",
+    "pieces": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "quantity"
+   ]
+  },
+  "TR048": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-1",
+   "fields": {
+    "order_id": "ORD-041",
+    "date_uncertain": true,
+    "due_date": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "deadline"
+   ]
+  },
+  "TR049": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-2",
+   "fields": {
+    "order_id": null,
+    "customer": "Harbor Knits",
+    "product": "Crewneck sweater",
+    "pieces": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "quantity"
+   ]
+  },
+  "TR050": {
+   "course_kind": "missing_number_or_date",
+   "category": "clarification",
+   "template": "missing-train-0",
+   "fields": {
+    "order_id": null,
+    "customer": "Loom & Leaf",
+    "product": "Beanie",
+    "pieces": null
+   },
+   "statuses": [
+    "CLARIFY"
+   ],
+   "needs": [
+    "quantity"
+   ]
+  },
+  "TR051": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-0",
+   "fields": {
+    "order_id": "ORD-066",
+    "suggested_workshop": "W7",
+    "pieces": 1000,
+    "product": "Polo shirt"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR052": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-1",
+   "fields": {
+    "order_id": "ORD-063",
+    "suggested_workshop": "W4"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR053": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-2",
+   "fields": {
+    "order_id": "ORD-017",
+    "suggested_workshop": "W7",
+    "product": "Cardigan"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR054": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-0",
+   "fields": {
+    "order_id": "ORD-109",
+    "suggested_workshop": "W4",
+    "pieces": 500,
+    "product": "Vest"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR055": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-1",
+   "fields": {
+    "order_id": "ORD-017",
+    "suggested_workshop": "W4"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR056": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-2",
+   "fields": {
+    "order_id": "ORD-036",
+    "suggested_workshop": "W1",
+    "product": "Scarf"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR057": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-0",
+   "fields": {
+    "order_id": "ORD-017",
+    "suggested_workshop": "W7",
+    "pieces": 800,
+    "product": "Cardigan"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR058": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-1",
+   "fields": {
+    "order_id": "ORD-008",
+    "suggested_workshop": "W4"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR059": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-2",
+   "fields": {
+    "order_id": "ORD-063",
+    "suggested_workshop": "W4",
+    "product": "Cardigan"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR060": {
+   "course_kind": "ineligible_suggestion",
+   "category": "refusal",
+   "template": "suggestion-train-0",
+   "fields": {
+    "order_id": "ORD-045",
+    "suggested_workshop": "W4",
+    "pieces": 150,
+    "product": "Vest"
+   },
+   "statuses": [
+    "REFUSE_SUGGESTION"
+   ]
+  },
+  "TR061": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-0",
+   "fields": {
+    "order_id": null,
+    "intent": "history",
+    "customer": "Harbor Knits"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR062": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-1",
+   "fields": {
+    "order_id": "ORD-007",
+    "intent": "quote"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR063": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-2",
+   "fields": {
+    "order_id": "ORD-983",
+    "intent": "status"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR064": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-0",
+   "fields": {
+    "order_id": null,
+    "intent": "history",
+    "customer": "TrendCart"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR065": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-1",
+   "fields": {
+    "order_id": "ORD-033",
+    "intent": "quote"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR066": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-2",
+   "fields": {
+    "order_id": "ORD-463",
+    "intent": "status"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR067": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-0",
+   "fields": {
+    "order_id": null,
+    "intent": "history",
+    "customer": "UrbanThread"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR068": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-1",
+   "fields": {
+    "order_id": "ORD-035",
+    "intent": "quote"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR069": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-2",
+   "fields": {
+    "order_id": "ORD-920",
+    "intent": "status"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  },
+  "TR070": {
+   "course_kind": "unanswerable",
+   "category": "missing_data",
+   "template": "unanswerable-train-0",
+   "fields": {
+    "order_id": null,
+    "intent": "history",
+    "customer": "Loom & Leaf"
+   },
+   "statuses": [
+    "DECLINE"
+   ]
+  }
+ }
+}
