@@ -94,7 +94,7 @@ def read_inbox(path: Path = DATA / "dispatch_requests.txt") -> list[dict]:
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line or line.startswith("#"):
             continue
-        match = re.fullmatch(r"(R\d+) \[([^]]+)\] ([^:]+): (.+)", line)
+        match = re.fullmatch(r"([A-Z]+\d+) \[([^]]+)\] ([^:]+): (.+)", line)
         if not match:
             raise ValueError(f"Invalid inbox envelope: {line}")
         requests.append(dict(zip(("request_id", "time", "requester", "text"), match.groups(), strict=True)))

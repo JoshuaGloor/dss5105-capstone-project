@@ -20,7 +20,7 @@ already been evaluated.
 | Explain metrics, evaluation-set construction, per-category results, and limitations | Initial simulator method documented; full report pending |
 | Analyze at least 10 failure cases individually | Pending; collect cases as features are built |
 | State what would be measured with more time | Planned in final report |
-| If development used the evaluation set, disclose it and provide a held-out result | Supplied data has already been inspected and used in development; held-out evaluation pending |
+| If development used the evaluation set, disclose it and provide a held-out result | Supplied data has already been inspected and used in development; generated 70/35 train/test sets in [EVAL_SETS.md](EVAL_SETS.md), live test run pending |
 
 A tool specification, usable interface, and auditable output are also core Track 2
 capabilities. Completing the simulator rows does not complete the project.

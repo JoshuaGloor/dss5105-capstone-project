@@ -56,6 +56,7 @@ UV_CACHE_DIR="$PWD/.cache/uv" TMPDIR="$PWD/.cache/tmp" XDG_CACHE_HOME="$PWD/.cac
   --live --output results/chat-first
 ```
 
+Add `--set train` or `--set test` to run the [generated sets](EVAL_SETS.md).
 Choose a fresh output directory for another paid run. Raw artifacts are Git-ignored
 under `results/`; retain them for the final evidence package. The committed draft
 rubric and report are review aids, not independent gold annotations.
