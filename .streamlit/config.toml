@@ -6,6 +6,9 @@ fileWatcherType = "auto"
 runOnSave = true
 folderWatchBlacklist = [".git", ".venv", ".cache", "results", "runtime"]
 
+[client]
+toolbarMode = "minimal"
+
 [browser]
 gatherUsageStats = false
 

@@ -34,7 +34,7 @@ def patch(*updates, exclusions=None, needs=None):
 def ui(monkeypatch):
     fake = FakeModel([])
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     assert fake.calls == 0
     assert "history" not in app.session_state
     return app, fake
@@ -54,7 +54,7 @@ def test_validated_chat_can_be_saved_without_another_provider_call(tmp_path, mon
     monkeypatch.setattr(records, "DEFAULT_STORE_PATH", tmp_path / "chat-plan.sqlite3")
     fake = FakeModel([patch(("order_id", "ORD-109"))])
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: fake)
-    app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    app = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     app.radio(key="workspace_mode").set_value("saved").run()
     say(app, "Please allocate ORD-109.")
     assert not app.exception
@@ -183,4 +183,4 @@ def test_earlier_answer_keeps_its_objective_when_settings_change(ui):
     app.radio(key="objective").set_value("defects").run()
     assert fake.calls == 1
     assert requests(app)[0]["result"] == before
-    assert requests(app)[0]["objective"] == "lateness"
+    assert requests(app)[0]["objective"] == "hybrid"

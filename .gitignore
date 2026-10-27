@@ -27,3 +27,6 @@ build/
 crash.log
 crash.*.log
 # .terraform.lock.hcl is committed on purpose: it pins provider versions.
+
+# macOS
+.DS_Store

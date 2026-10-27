@@ -1,7 +1,7 @@
 import pytest
 
 from dss5105 import margin_study
-from dss5105.evaluate import PRESETS
+from dss5105.evaluate import SPRINT1_PRESETS as PRESETS
 from dss5105.harness import Simulator, eligible_workshops
 
 

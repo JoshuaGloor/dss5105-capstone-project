@@ -170,3 +170,125 @@ def test_all_policies_run_reproducibly_and_only_choose_eligible_workshops(shock)
             assert decision["choice"] == decision["outcome"]["workshop"]
             if name in PRESETS:
                 assert decision["choice"] == decision["candidates"][0]["estimate"]["workshop_id"]
+
+
+@pytest.fixture
+def shared():
+    """A tops-only shop and a slightly faster shop that also makes scarce accessories."""
+    tops = Workshop("TOPS_ONLY", "Tops only", 200, 1, 0.05, 1.0, {"TOPS"}, "ACTIVE", None, 0.0, "")
+    both = replace(tops, workshop_id="SHARED", capacity=210, makes={"TOPS", "ACCESSORIES"})
+    return {tops.workshop_id: tops, both.workshop_id: both}
+
+
+def test_reservation_keeps_shared_capacity_free_when_both_meet_the_date(batch, shared):
+    batch["due_date"] = date(2026, 4, 20)
+    queues = dict.fromkeys(shared, 0.0)
+    assert make_allocator(ObjectiveWeights())(batch, shared, queues) == "SHARED"
+    reserving = ObjectiveWeights(capacity_reservation=1.0)
+    ranked = rank_candidates(batch, shared, queues, reserving)
+    assert ranked[0].estimate.workshop_id == "TOPS_ONLY"
+    reserved = {row.estimate.workshop_id: row.reserved_days for row in ranked}
+    # 200 tops pieces at the shared shop take 200 / 210 days of all accessory capacity.
+    assert reserved == {"TOPS_ONLY": 0.0, "SHARED": pytest.approx(200 / 210)}
+    assert [row.estimate for row in ranked] == sorted(
+        (row.estimate for row in rank_candidates(batch, shared, queues, ObjectiveWeights())),
+        key=lambda estimate: estimate.workshop_id != "TOPS_ONLY",
+    )
+
+
+def test_reservation_uses_the_full_register_not_the_permitted_subset(batch, shared):
+    accessories = Workshop("ACC", "Accessories", 90, 1, 0.02, 1.0, {"ACCESSORIES"}, "ACTIVE", None, 0.0, "")
+    register = {**shared, "ACC": accessories}
+    queues = dict.fromkeys(register, 0.0)
+    weights = ObjectiveWeights(capacity_reservation=1.0)
+    subset = rank_candidates(batch, shared, queues, weights)
+    full = rank_candidates(batch, shared, queues, weights, register=register)
+    shared_row = {row.estimate.workshop_id: row for row in full}["SHARED"]
+    assert shared_row.reserved_days == pytest.approx(200 / 300)
+    assert {row.estimate.workshop_id: row.reserved_days for row in subset}["SHARED"] == pytest.approx(200 / 210)
+
+
+def test_reservation_never_overrides_a_real_deadline_gain(batch, shared):
+    queues = {"TOPS_ONLY": 3.0, "SHARED": 0.0}
+    weights = ObjectiveWeights(capacity_reservation=1.0)
+    assert make_allocator(weights)(batch, shared, queues) == "SHARED"
+
+
+def test_fairness_uses_the_ledger_and_has_no_effect_without_one(batch, shared):
+    batch["due_date"] = date(2026, 4, 20)
+    queues = dict.fromkeys(shared, 0.0)
+    weights = ObjectiveWeights(fairness=1.0)
+    empty = rank_candidates(batch, shared, queues, weights)
+    assert all(row.projected_share is None and row.fairness_component == 0 for row in empty)
+    assert empty[0].estimate.workshop_id == "SHARED"
+    ranked = rank_candidates(batch, shared, queues, weights, ledger={"SHARED": 800})
+    assert ranked[0].estimate.workshop_id == "TOPS_ONLY"
+    shares = {row.estimate.workshop_id: row.projected_share for row in ranked}
+    assert shares == {"TOPS_ONLY": pytest.approx(200 / 1000), "SHARED": pytest.approx(1.0)}
+
+
+def test_allocator_remembers_its_own_choices_and_restarts_on_a_new_replay(batch, shared):
+    batch["due_date"] = date(2026, 4, 20)
+    queues = dict.fromkeys(shared, 0.0)
+    policy = make_allocator(ObjectiveWeights(fairness=1.0))
+    first = policy(batch, shared, queues)
+    second = policy({**batch, "order_id": "NEXT"}, shared, queues)
+    assert first != second
+    assert policy.ledger == {first: 200, second: 200}
+    assert policy.last_ranking[0].estimate.workshop_id == second
+    assert policy(batch, shared, queues) == first  # the first order again: a new replay
+    assert policy.ledger == {first: 200}
+
+
+def test_robustness_prefers_slack_that_absorbs_a_stoppage(batch, shared):
+    batch["due_date"] = date(2026, 4, 20)
+    shared["SHARED"] = replace(shared["SHARED"], cost=1.5)
+    queues = {"TOPS_ONLY": 6.0, "SHARED": 0.0}
+    # Both meet the date; only the busy shop would miss it after a two-week stoppage.
+    assert make_allocator(ObjectiveWeights(lateness=1, cost=1))(batch, shared, queues) == "TOPS_ONLY"
+    ranked = rank_candidates(batch, shared, queues, ObjectiveWeights(lateness=1, cost=1, robustness=2))
+    stress = {row.estimate.workshop_id: row.stress_lateness_days for row in ranked}
+    assert stress["SHARED"] == 0.0 and stress["TOPS_ONLY"] == pytest.approx(3.025)
+    assert all(row.estimate.lateness_days == 0 for row in ranked)
+    assert ranked[0].estimate.workshop_id == "SHARED"
+
+
+def test_defect_term_is_weighted_by_batch_pieces(batch, workshops):
+    queues = dict.fromkeys(workshops, 0.0)
+    weights = ObjectiveWeights(lateness=0, defects=1)
+    small = {
+        row.estimate.workshop_id: row.defects_component for row in rank_candidates(batch, workshops, queues, weights)
+    }
+    batch["pieces"] = 750
+    typical = {
+        row.estimate.workshop_id: row.defects_component for row in rank_candidates(batch, workshops, queues, weights)
+    }
+    assert typical["FAST"] == pytest.approx(1.0)  # 10% risk on a 750-piece batch is one unit
+    assert small["FAST"] == pytest.approx(200 / 750)
+
+
+@pytest.mark.parametrize("field", ["capacity_reservation", "fairness", "robustness"])
+def test_new_terms_validate_like_the_others(field):
+    with pytest.raises(ValueError):
+        ObjectiveWeights(**{field: -1.0})
+    with pytest.raises(ValueError):
+        ObjectiveWeights(**{field: float("nan")})
+    if field != "capacity_reservation":
+        assert getattr(ObjectiveWeights(lateness=0, **{field: 1.0}), field) == 1.0
+    else:
+        with pytest.raises(ValueError, match="not all zero"):
+            ObjectiveWeights(lateness=0, capacity_reservation=1.0)
+
+
+def test_deadline_miss_charge_puts_an_on_time_shop_ahead_of_capacity_reservation(batch, shared):
+    # The tops-only shop misses the date by a little; the shared shop meets it.
+    batch["due_date"] = date(2026, 4, 4)
+    queues = {"TOPS_ONLY": 1.2, "SHARED": 0.0}
+    reserving = ObjectiveWeights(capacity_reservation=1.0)
+    assert make_allocator(reserving)(batch, shared, queues) == "TOPS_ONLY"
+    on_time_first = ObjectiveWeights(capacity_reservation=1.0, deadline_miss_days=7.0)
+    ranked = rank_candidates(batch, shared, queues, on_time_first)
+    assert ranked[0].estimate.workshop_id == "SHARED" and ranked[0].estimate.lateness_days == 0
+    assert ranked[1].estimate.lateness_days > 0
+    with pytest.raises(ValueError, match="miss"):
+        ObjectiveWeights(deadline_miss_days=-1)

@@ -1,0 +1,74 @@
+Speaker script, Group 11, Sprint 1 (16 Oct 2026)
+Hard stop at 5:00. About 670 words: 4:28 at 150 words a minute, 4:51 at 138.
+scripts/build_sprint1_deck.mjs copies each section into that slide's speaker notes.
+Numbers come from docs/evidence/*.json; if the evidence changes, update both.
+
+SLIDE 1 - Opening (CHEN ZEPENG, 0:25)
+Good evening, we're Group 11, Track 2. SweaterCo, a knitwear factory, lives on quick
+reorders. When it's full, the next batch must go to one of these eight workshops as soon as possible.
+We built the agent that makes that call, shows its workflow and keeps the audit
+trail. Primary objective is to minimise lateness.
+
+SLIDE 2 - Problem (CHEN ZEPENG, 0:35)
+Today, that decision is one line in a group chat: send it to QuickStitch. Behind it, three
+checks are ongoing from memory. First is Capability: four of the eight workshops only make tops. Second is Capacity: QuickStitch,
+the fastest, has four days queued. Third is Compliance: OldMill is suspended, and FreshStart is
+capped at 300 pieces. Alos, only 7 of the 30 messages are clean; the rest need a
+question, a refusal or bad news. So the hard part is language, and the dangerous part is
+numbers.
+
+SLIDE 3 - Solution and architecture (CHEN ZEPENG, 0:50)
+So we split the job. It's a single-agent workflow, not ReAct or multi-agent: every request
+needs the same checks in the same order, so control flow lives in code. One: the LLM, via
+LangChain, returns structured output, a typed patch against a JSON schema. Every field
+must quote the message exactly, or the system will reject the turn: a grounding guardrail that
+fails closed. Two: deterministic tools, eligibility from the course harness, queues,
+delivery estimates, a weighted ranking. All the arithmetic is wrapped in tool calls, so
+the model will only gather the results from tools and make the response. Three: human in the loop. Confirm recomputes the
+preview in one SQLite transaction, then writes the audit record. Session state is the
+short-term memory, SQLite is the long-term memory, and only the model call crosses this trust boundary.
+
+SLIDE 4 - Primary objective (0:35)
+We declare one objective: minimise lateness. In quick response, speed is the product: a
+defect can be reworked, a missed reorder date loses the sale. We count late batches and
+late days. Here is the scoreboard, wins and losses. Lateness: we beat all three baselines.
+Defects: biggest-capacity still beats us. A surprise closure moves us a quarter of a
+point; random moves four. Fairness: random spreads work more evenly, but it is late a
+third of the time.
+
+SLIDE 5 - Business value (0:30)
+What does that buy? Out of 120 batches, 2 arrive late instead of 41: ninety-five percent
+fewer than random. That's the course simulator, not a factory. And no batch goes where it
+can't be made, every decision is on record, and an impossible date is flagged on day one,
+with options. The price: about a third more than the cheapest rule, which is late nine
+times in ten.
+
+SLIDE 6 - Progress (0:35)
+The shipped baselines run a third to nine-tenths late; we're under two percent. The
+honest part: a ten-second earliest-finish rule ties us, because two batches of 2,000
+pieces simply can't be made in their window. So what we add isn't a better formula, it's
+configuration. The same code, re-weighted, buys 7.7 percent lower cost and 23 percent
+fewer late days for one more late batch per ten runs. And it's deployed: every merge
+builds an image to ECR, and one workflow deploys it to AWS.
+
+SLIDE 7 - The desk today (0:25)
+This is the desk on request R25: five hundred vests, keep it away from BudgetWorks. The
+exclusion is recorded against Mei, who asked. Under the pick, the desk says why, in lines
+Python writes, not the model. All thirty inbox requests reach the right outcome from
+hand-checked inputs; testing the live model on them is our first Sprint 2 task.
+
+SLIDE 8 - Risks and assumptions (0:30)
+The worst failure in this track is an invented delivery estimate; our design prevents it
+and we check it automatically. The likeliest is a misread request: in our first live run,
+a needless question blocked a refusal. And no message can talk past the rules: eligibility
+is Python, not the model. Our key assumption: a person confirms every allocation.
+
+SLIDE 9 - Sprint 2 roadmap (0:25)
+Sprint 2 makes the desk AI-native, while tools keep every number. The evaluation set comes
+first, with injection and hallucination bait. Then the model takes on three jobs: choosing
+a read-only tool for questions, explaining decisions, and drafting replies, with Python
+filling in every number. Our bar: the right behaviour on at least twenty-seven of thirty,
+with no untraceable number, while still beating every baseline. Thank you.
+
+SLIDE 10 - Questions
+Q&A crib notes are in this slide's speaker notes.

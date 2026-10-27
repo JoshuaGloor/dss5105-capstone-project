@@ -45,23 +45,28 @@ until due. It is not expected tardiness or late probability. All delivery estima
 in the current allocator come from this function; simulator outcomes are separate
 measurements produced by the course harness.
 
-### `rank_candidates(batch, workshops, queues, weights, scales)`
+### `rank_candidates(batch, workshops, queues, weights, scales, *, ledger, register)`
 
-- Input: resolved simulator data, `ObjectiveWeights`, and optional `ScoreScales`.
-- Output: sorted `CandidateScore` rows containing a delivery estimate, weighted
-  lateness/defects/cost components, and a total score.
+- Input: resolved simulator data, `ObjectiveWeights`, optional `ScoreScales`, an
+  optional `ledger` of pieces already allocated per workshop, and an optional full
+  `register` used for category capacity when `workshops` is a permitted subset.
+- Output: sorted `CandidateScore` rows: the delivery estimate, `reserved_days` (other
+  categories' capacity the batch would occupy), `projected_share` (share of allocated
+  pieces after this batch, or None without a ledger), `stress_lateness_days`, one
+  weighted component per objective (lateness, defects, cost, fairness, robustness)
+  and the total score.
 - Purpose: rank eligible workshops using the objective configuration.
 - Non-goals: chat constraints, eligibility explanations for excluded workshops,
-  fairness optimization, split plans, or committing an allocation.
-- Failure behavior: an empty candidate set returns an empty list. Weights must
-  be finite, nonnegative, and not all zero; the optional `deadline_buffer_days`
-  must be finite and nonnegative; scales must be finite and positive.
-  Invalid configurations raise `ValueError` when constructed.
+  split plans, or committing an allocation.
+- Failure behavior: an empty candidate set returns an empty list. Weights must be
+  finite, nonnegative, and not all zero; `deadline_buffer_days`,
+  `capacity_reservation` and `deadline_miss_days` must be finite and nonnegative; scales must be finite and
+  positive. Invalid configurations raise `ValueError` when constructed.
 - Tie-breaking: expected turnaround, then workshop ID, for every configuration.
 
-The score definition and scale assumptions are in
-[ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md). Changing a policy name does not
-change allocation logic; only configuration changes the objective.
+The score definition, scales and frozen presets are in
+[ALLOCATION_ENGINE.md](ALLOCATION_ENGINE.md) and [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md).
+Changing a policy name does not change allocation logic; only configuration does.
 
 ### `assess_split(batch, workshops, queues)`
 
@@ -82,9 +87,12 @@ change allocation logic; only configuration changes the objective.
 
 ### `make_allocator(weights, scales)` and `earliest_finish(...)`
 
-- Input: `make_allocator` binds weights and scales; its returned callback accepts
-  `(batch, workshops, queues)`. `earliest_finish` accepts that callback signature
-  directly and uses unadjusted turnaround as its criterion.
+- Input: `make_allocator` binds weights and scales; it returns an `Allocator` whose
+  call accepts `(batch, workshops, queues)`. `earliest_finish` accepts that callback
+  signature directly and uses unadjusted turnaround as its criterion.
+- State: the `Allocator` keeps a ledger of the pieces it placed in the current replay,
+  for fairness, and its last ranking for traces. The harness has no run-start hook, so
+  a repeated order ID starts a new ledger. It never reads future orders or outcomes.
 - Output: a workshop ID for the current batch.
 - Purpose: supply a decision to the course simulator.
 - Non-goals: language understanding, human confirmation, or modifying queue state.
@@ -116,7 +124,89 @@ The opt-in live evaluation boundary is defined in
 [CHAT_EVALUATION.md](CHAT_EVALUATION.md) and implemented by `evaluate_chat.py`.
 It checkpoints raw extraction and tool evidence without committing allocations.
 
+## Capacity questions
+
+`DispatchInput(intent="capacity", product, pieces, due_date)` asks who could take a
+quantity of a product by a date, with no order to book. `product` is a recorded
+product or a category word (tops, accessories). Missing product, quantity or date
+returns `CLARIFY` with the question. Otherwise the preview ranks the permitted
+workshops on the same estimates as an allocation and returns status `CAPACITY`, the
+best option under the configured weights, and `commit_allowed` false. The language
+intake extracts these fields with `intent=capacity`; it never computes them.
+
+## Standing rules in previews
+
+`DispatchDesk.preview(..., rules=[...])` and `AllocationStore.preview(..., rules=...)`
+accept remembered rules `{rule_id, workshop_id, customer, imposed_by, evidence,
+created_on}`. After the order resolves, a rule whose customer matches (or whose
+customer is null) excludes its workshop, with provenance "Remembered rule from ...".
+A constraint in the message itself keeps its own provenance. Applied rules are
+returned as `applied_rules`; the reviewed `standing_rules` are reused when a booking
+is confirmed, so the stale-preview check covers them. Malformed rules raise
+`ValueError`. Saved-plan previews also pass the plan's booked pieces as the fairness
+ledger.
+
+## Memory store
+
+`MemoryStore` (`src/dss5105/memory.py`, `runtime/memory.sqlite3`) holds:
+
+- `remember_rule(workshop_id, customer, imposed_by, evidence, created_on, created_by,
+  source_allocation_id)`: only for a recorded workshop and customer; an identical
+  active rule is returned instead of duplicated. `rule_suggestions(record, memory)`
+  offers rules only from the exclusions of a confirmed booking.
+- `set_rule_active(rule_id, active, changed_by)`: pause or resume, attributed.
+- `log_episode(payload)` and `episodes()`: an append-only log of answers and bookings.
+- `profile()` and `update_profile(dispatcher, preset, weights, speak_replies)`: weights
+  are validated through `ObjectiveWeights`.
+
+Invalid changes raise `MemoryUpdateError`. Memory never creates a rule from model
+output alone, never edits course data, and never changes a booking.
+
+## Assistant turn routing
+
+`assistant.handle_utterance(session, text, services, channel)` routes one message:
+whole-utterance control phrases (`book`, `cancel`, `new`, `repeat`, `help`), memory
+questions (bookings, rules) and workshop questions ("how busy is X") are answered by
+Python with no model call. Everything else goes to the language intake with
+`restart_new_requests=True`: a message about another order, or a switch between
+allocating and a capacity question, starts a fresh request from the same patch.
+`request_booking` only opens a confirmation; `confirm_booking(session, services,
+actor)` needs a nonempty dispatcher name and an unchanged preview fingerprint, then
+calls `commit_allocation`. Cards and spoken text are built by `card_for_result` from
+tool display strings. See [VOICE_ASSISTANT.md](VOICE_ASSISTANT.md).
+
 ## Proposed agent tools and later extensions
+
+### Workshop lookup and workload scenario contract
+
+These deterministic Python contracts are finalized for the Sprint 1 refinement.
+They are called directly by the Streamlit workshop workspace, not registered with
+the language model. They never write records or change queue state.
+
+- `DispatchDesk.query_register(WorkshopQuery)`: optional category and status filters,
+  plus positive integer pieces and an ISO delivery deadline when estimating a batch.
+  A quantity requires a category; a deadline requires a quantity. Return matching
+  profiles, capability, status, batch limit, current queue, course-helper eligibility,
+  and per-candidate delivery evidence when a deadline is provided. Membership comes
+  from `eligible_workshops()`. Return an empty match normally; reject invalid filters
+  and missing/nonfinite/negative queue state. ACTIVE never guarantees delivery.
+- `DispatchDesk.probe_load(LoadScenario)`: workshop ID, category, positive integer
+  reference-batch pieces, additional pieces, and ISO delivery deadline. Model the
+  additional batch ahead of the reference batch at the same planning date. Both
+  batches must pass the course helper at the selected workshop. Return before/after
+  delivery estimates, expected additional processing occupancy, a fresh comparison
+  across eligible workshops, and the fastest alternative if one exists. Invalid
+  inputs raise `ValueError`; ineligible scenarios return `UNSUPPORTED` with reasons.
+  This is a hypothetical workload check, not closure prediction or authorization
+  to send extra work. Occupancy includes expected rework and excludes transport.
+- `AllocationStore.query_register` and `probe_load` wrap those methods in a read
+  transaction using saved planning queues and include the database revision.
+  Independent queries use the untouched course snapshot.
+
+No tool infers what "this week" means. The UI requires an explicit delivery date.
+Outputs include source hashes, a queue-snapshot ID, raw quantities and tool-formatted
+display fields. The workload probe does not model queue drainage or other jobs'
+deadlines and therefore does not establish network-wide effects.
 
 These contracts are design proposals for the next increment. Finalize their schemas
 and write relevant tests before implementation. Shared inputs should carry a resolved
@@ -127,12 +217,12 @@ and an explicit state snapshot. Do not infer these from simulator replay outcome
 |---|---|---|---|---|---|
 | `resolve_order` | Reference text and optional filters | RESOLVED, AMBIGUOUS, or NOT_FOUND with candidate IDs and supporting fields | Identify the intended order | Choosing an arbitrary match | Return ambiguity or absence for the agent to explain or clarify |
 | `get_order` | Order ID | Order fields with source reference, or NOT_FOUND | Retrieve recorded facts | Inventing quotes or past allocations | Distinguish an unknown order from an absent field |
-| `query_register` | Capability/status/batch filters and state reference | Matching workshop profiles and queue snapshot | Answer workshop lookup questions | Ranking or interpreting ACTIVE as a delivery guarantee | Empty match is a valid answer; missing state is an explicit failure |
+| `query_register` (Python implemented, chat adapter proposed) | Capability/status/batch filters and state reference | Matching workshop profiles and queue snapshot | Answer workshop lookup questions | Ranking or interpreting ACTIVE as a delivery guarantee | Empty match is a valid answer; missing state is an explicit failure |
 | `check_eligibility` | Resolved batch, workshops, optional workshop ID | Eligibility and reason per workshop | Explain the course helper's exclusions | Soft objective tradeoffs | Reject unresolved inputs; preserve no-eligible as a normal result |
 | `estimate_delivery` adapter | Resolved request, workshop ID, as-of date and queue state | Internal estimate plus calendar dates, source references and assumptions | Expose Python estimates to the agent | Silent use of stale state or an unconditional promise | Surface missing state, invalid inputs, and ineligible candidate handling explicitly |
 | `check_feasibility` | Resolved request, effective deadline, exclusions, queue state | Whether any permitted candidate meets the estimate criterion, with candidate dates and slips | Explain whether the request can be met under stated assumptions | Automatically committing a late order | Unknown deadline requires clarification; no feasible candidate returns options |
 | `rank_candidates` adapter | Resolved request, weights/scales, hard constraints and provenance | Full considered-candidate record, exclusions, ranked scores, and tie-break details | Recommend within the permitted set | Relaxing a hard constraint or committing | All candidates excluded returns a reason and escalation options |
-| `evaluate_options` | Resolved request and state, explicitly allowed alternatives | Compared whole-batch/split/load scenarios with assumptions | Examine overload and no-good-option cases. The two-workshop split part is implemented as `assess_split`; the overload probe is still proposed | Assuming a split is commercially permitted or simulator-supported | Unsupported scenarios or no improvement must be reported explicitly |
+| `evaluate_options` (chat adapter proposed) | Resolved request and state, explicitly allowed alternatives | Compared whole-batch/split/load scenarios with assumptions | Examine no-good-option cases. Python implements `assess_split` and the read-only `probe_load` scenario | Assuming a split is commercially permitted or simulator-supported | Unsupported scenarios or no improvement must be reported explicitly |
 | `commit_allocation` (implemented local subset) | Reviewed preview, dispatcher, idempotency key, explicit confirmation | Persisted allocation ID, timestamp, queue change and audit record | Save a local planning decision | Workshop contact, source edits, cancellations, authentication | Reject stale/unconfirmed/duplicate requests; exact retries return the existing record; see record contract |
 
 The course requires explicit handling of awkward cases; it does not require a
