@@ -22,3 +22,15 @@ def get_model(**kwargs) -> BaseChatModel:
             "LLM_MODEL is not set. Copy .env.example to .env and set it, e.g. LLM_MODEL=anthropic:claude-sonnet-5"
         )
     return init_chat_model(spec, **kwargs)
+
+
+def model_configured() -> bool:
+    """Whether LLM_MODEL names a model; says nothing about keys or reachability, and calls nothing."""
+    load_dotenv(override=False)
+    return bool(os.getenv("LLM_MODEL"))
+
+
+def model_label() -> str:
+    """The configured model name for display, e.g. 'openai:gpt-4.1'; never a key."""
+    load_dotenv(override=False)
+    return os.getenv("LLM_MODEL") or "not configured"

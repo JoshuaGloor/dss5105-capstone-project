@@ -1,5 +1,10 @@
 # What the allocator adds over earliest finish
 
+> Sprint 2 note: the scorer now weights the defect term by batch pieces. The lateness
+> and cost-buffer rows still reproduce; the defects-buffer candidates and the 0.7/0.3
+> hybrid do not, so run this study from commit e8c40a5 to reproduce the evidence
+> exactly. Current presets and results: [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md).
+
 Tracks v4 asks what the full system adds over the best simple rule, such as
 "earliest estimated finish". This study answers that for the allocation policy.
 The language layer's value is a separate question, measured on the chat inbox.
@@ -84,9 +89,11 @@ queues grow, and lateness rose to 3-18% in development.
 - What the allocator adds is configuration: the same code expresses the lateness
   preset, the buffered cost tradeoff and the other objectives, and the dispatcher
   sees why each option won. A single fixed rule cannot move along this tradeoff.
-- `cost_buffer10` is a strong candidate for the required "other objective" or
-  hybrid comparison. Whether to prefer it is a team decision about how many extra
-  late batches a lower cost is worth.
+- `cost_buffer10` is a useful tradeoff to report, but cost is not one of the four course
+  objectives, so it is unlikely to count as the required hybrid on its own. See
+  [DEFECTS_FRONTIER.md](DEFECTS_FRONTIER.md) for the lateness + defects frontier.
+  Whether to prefer it is a team decision about how many extra late batches a lower
+  cost is worth.
 
 ## Limits
 

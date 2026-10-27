@@ -1,5 +1,10 @@
 # Data v3 offline evaluation
 
+> Sprint 2 note: the scorer now weights the defect term by batch pieces. The Sprint 1
+> lateness and defects rows below reproduce unchanged; the 0.7/0.3 hybrid rows were
+> produced before that change and reproduce exactly from commit e8c40a5. Current
+> presets and results: [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md).
+
 Generated with `uv run python scripts/refresh_v3_evidence.py`. No provider calls.
 Source hashes, configurations and per-seed metrics: [retained evidence](evidence/data-v3.json).
 Full per-order traces are regenerated in `results/allocation-v3-*.json` (Git-ignored).

@@ -1,0 +1,600 @@
+{
+  "register": {
+    "status": "MATCHES",
+    "query": {
+      "category": "TOPS",
+      "status": null,
+      "pieces": 1500,
+      "due_date": "2026-04-15"
+    },
+    "snapshot": {
+      "as_of": "2026-04-01",
+      "queues": {
+        "W1": 4.0,
+        "W2": 2.5,
+        "W3": 5.0,
+        "W4": 0.5,
+        "W5": 3.0,
+        "W6": 1.0,
+        "W7": 0.0,
+        "W8": 0.0
+      },
+      "sources": {
+        "orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+        "workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+        "dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+        "simulate.py": "b845804ad1229f593627b6ef1a6482258331178dbc4ec535274103fc3244593b"
+      },
+      "id": "62cc53a8ecc1cd9d69dcdc769d421f1512091f2485799511e7391085fa14f976"
+    },
+    "tool_sources": {
+      "allocator.py": "cae34aeb11d46a36ca7721d7f4386d6d82525ffa8d78f0269e8fe956ccda161d",
+      "dispatch.py": "6a7e01497449dc6b102b34938d93f58f0006a0b75a429b62e902507f716b2c51"
+    },
+    "matches": [
+      {
+        "workshop_id": "W1",
+        "name": "QuickStitch",
+        "status": "ACTIVE",
+        "makes": [
+          "TOPS"
+        ],
+        "capacity": 300,
+        "max_batch": null,
+        "queue_days": 4.0,
+        "eligible": true,
+        "reasons": [],
+        "estimate": {
+          "workshop_id": "W1",
+          "queue_days": 4.0,
+          "process_days": 5.0,
+          "transport_days": 1,
+          "turnaround_days": 10.0,
+          "expected_turnaround_days": 10.3,
+          "available_days": 14.0,
+          "lateness_days": 0.0,
+          "defect_risk": 0.12,
+          "cost": 2250.0
+        },
+        "meets_deadline": true,
+        "display": {
+          "capacity": "300 pieces/day",
+          "max_batch": "No batch cap",
+          "queue": "4.00 days",
+          "eta": "2026-04-11 07:13",
+          "turnaround": "10.30 days",
+          "lateness": "0.00 days",
+          "cost": "2,250.00",
+          "defects": "12.0%",
+          "processing": "5.00 days",
+          "transport": "1.00 days",
+          "expected_rework": "0.30 days"
+        }
+      },
+      {
+        "workshop_id": "W2",
+        "name": "SteadyHands",
+        "status": "ACTIVE",
+        "makes": [
+          "ACCESSORIES",
+          "TOPS"
+        ],
+        "capacity": 170,
+        "max_batch": null,
+        "queue_days": 2.5,
+        "eligible": true,
+        "reasons": [],
+        "estimate": {
+          "workshop_id": "W2",
+          "queue_days": 2.5,
+          "process_days": 8.823529411764707,
+          "transport_days": 2,
+          "turnaround_days": 13.323529411764707,
+          "expected_turnaround_days": 13.455882352941178,
+          "available_days": 14.0,
+          "lateness_days": 0.0,
+          "defect_risk": 0.03,
+          "cost": 1950.0
+        },
+        "meets_deadline": true,
+        "display": {
+          "capacity": "170 pieces/day",
+          "max_batch": "No batch cap",
+          "queue": "2.50 days",
+          "eta": "2026-04-14 10:57",
+          "turnaround": "13.46 days",
+          "lateness": "0.00 days",
+          "cost": "1,950.00",
+          "defects": "3.0%",
+          "processing": "8.82 days",
+          "transport": "2.00 days",
+          "expected_rework": "0.13 days"
+        }
+      },
+      {
+        "workshop_id": "W3",
+        "name": "BudgetWorks",
+        "status": "ACTIVE",
+        "makes": [
+          "TOPS"
+        ],
+        "capacity": 230,
+        "max_batch": null,
+        "queue_days": 5.0,
+        "eligible": true,
+        "reasons": [],
+        "estimate": {
+          "workshop_id": "W3",
+          "queue_days": 5.0,
+          "process_days": 6.521739130434782,
+          "transport_days": 3,
+          "turnaround_days": 14.521739130434781,
+          "expected_turnaround_days": 14.815217391304346,
+          "available_days": 14.0,
+          "lateness_days": 0.8152173913043459,
+          "defect_risk": 0.09,
+          "cost": 1200.0
+        },
+        "meets_deadline": false,
+        "display": {
+          "capacity": "230 pieces/day",
+          "max_batch": "No batch cap",
+          "queue": "5.00 days",
+          "eta": "2026-04-15 19:34",
+          "turnaround": "14.82 days",
+          "lateness": "0.82 days",
+          "cost": "1,200.00",
+          "defects": "9.0%",
+          "processing": "6.52 days",
+          "transport": "3.00 days",
+          "expected_rework": "0.29 days"
+        }
+      },
+      {
+        "workshop_id": "W5",
+        "name": "GiantWeave",
+        "status": "ACTIVE",
+        "makes": [
+          "TOPS"
+        ],
+        "capacity": 400,
+        "max_batch": null,
+        "queue_days": 3.0,
+        "eligible": true,
+        "reasons": [],
+        "estimate": {
+          "workshop_id": "W5",
+          "queue_days": 3.0,
+          "process_days": 3.75,
+          "transport_days": 4,
+          "turnaround_days": 10.75,
+          "expected_turnaround_days": 10.8625,
+          "available_days": 14.0,
+          "lateness_days": 0.0,
+          "defect_risk": 0.06,
+          "cost": 1650.0000000000002
+        },
+        "meets_deadline": true,
+        "display": {
+          "capacity": "400 pieces/day",
+          "max_batch": "No batch cap",
+          "queue": "3.00 days",
+          "eta": "2026-04-11 20:43",
+          "turnaround": "10.86 days",
+          "lateness": "0.00 days",
+          "cost": "1,650.00",
+          "defects": "6.0%",
+          "processing": "3.75 days",
+          "transport": "4.00 days",
+          "expected_rework": "0.11 days"
+        }
+      },
+      {
+        "workshop_id": "W6",
+        "name": "Nimble Needle",
+        "status": "ACTIVE",
+        "makes": [
+          "ACCESSORIES",
+          "TOPS"
+        ],
+        "capacity": 130,
+        "max_batch": null,
+        "queue_days": 1.0,
+        "eligible": true,
+        "reasons": [],
+        "estimate": {
+          "workshop_id": "W6",
+          "queue_days": 1.0,
+          "process_days": 11.538461538461538,
+          "transport_days": 1,
+          "turnaround_days": 13.538461538461538,
+          "expected_turnaround_days": 13.826923076923077,
+          "available_days": 14.0,
+          "lateness_days": 0.0,
+          "defect_risk": 0.05,
+          "cost": 1800.0
+        },
+        "meets_deadline": true,
+        "display": {
+          "capacity": "130 pieces/day",
+          "max_batch": "No batch cap",
+          "queue": "1.00 days",
+          "eta": "2026-04-14 19:51",
+          "turnaround": "13.83 days",
+          "lateness": "0.00 days",
+          "cost": "1,800.00",
+          "defects": "5.0%",
+          "processing": "11.54 days",
+          "transport": "1.00 days",
+          "expected_rework": "0.29 days"
+        }
+      },
+      {
+        "workshop_id": "W7",
+        "name": "OldMill",
+        "status": "SUSPENDED",
+        "makes": [
+          "ACCESSORIES",
+          "TOPS"
+        ],
+        "capacity": 200,
+        "max_batch": null,
+        "queue_days": 0.0,
+        "eligible": false,
+        "reasons": [
+          "Status is SUSPENDED."
+        ],
+        "estimate": null,
+        "meets_deadline": null,
+        "display": {
+          "capacity": "200 pieces/day",
+          "max_batch": "No batch cap",
+          "queue": "0.00 days"
+        }
+      },
+      {
+        "workshop_id": "W8",
+        "name": "FreshStart",
+        "status": "ACTIVE",
+        "makes": [
+          "TOPS"
+        ],
+        "capacity": 100,
+        "max_batch": 300,
+        "queue_days": 0.0,
+        "eligible": false,
+        "reasons": [
+          "Batch exceeds the 300-piece limit."
+        ],
+        "estimate": null,
+        "meets_deadline": null,
+        "display": {
+          "capacity": "100 pieces/day",
+          "max_batch": "300 pieces",
+          "queue": "0.00 days"
+        }
+      }
+    ],
+    "display": {
+      "pieces": "1,500 pieces"
+    },
+    "assumption": "Current queue snapshot. Delivery includes expected rework and is an estimate."
+  },
+  "extra_work": {
+    "scenario": {
+      "workshop_id": "W1",
+      "category": "TOPS",
+      "pieces": 1500,
+      "additional_pieces": 1500,
+      "due_date": "2026-04-15"
+    },
+    "snapshot": {
+      "as_of": "2026-04-01",
+      "queues": {
+        "W1": 4.0,
+        "W2": 2.5,
+        "W3": 5.0,
+        "W4": 0.5,
+        "W5": 3.0,
+        "W6": 1.0,
+        "W7": 0.0,
+        "W8": 0.0
+      },
+      "sources": {
+        "orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+        "workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+        "dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+        "simulate.py": "b845804ad1229f593627b6ef1a6482258331178dbc4ec535274103fc3244593b"
+      },
+      "id": "62cc53a8ecc1cd9d69dcdc769d421f1512091f2485799511e7391085fa14f976"
+    },
+    "tool_sources": {
+      "allocator.py": "cae34aeb11d46a36ca7721d7f4386d6d82525ffa8d78f0269e8fe956ccda161d",
+      "dispatch.py": "6a7e01497449dc6b102b34938d93f58f0006a0b75a429b62e902507f716b2c51"
+    },
+    "workshop_name": "QuickStitch",
+    "status": "ASSESSED",
+    "reasons": [],
+    "before": {
+      "estimate": {
+        "workshop_id": "W1",
+        "queue_days": 4.0,
+        "process_days": 5.0,
+        "transport_days": 1,
+        "turnaround_days": 10.0,
+        "expected_turnaround_days": 10.3,
+        "available_days": 14.0,
+        "lateness_days": 0.0,
+        "defect_risk": 0.12,
+        "cost": 2250.0
+      },
+      "display": {
+        "eta": "2026-04-11 07:13",
+        "turnaround": "10.30 days",
+        "lateness": "0.00 days",
+        "cost": "2,250.00",
+        "defects": "12.0%",
+        "queue": "4.00 days",
+        "processing": "5.00 days",
+        "transport": "1.00 days",
+        "expected_rework": "0.30 days"
+      },
+      "meets_deadline": true
+    },
+    "after": {
+      "estimate": {
+        "workshop_id": "W1",
+        "queue_days": 9.3,
+        "process_days": 5.0,
+        "transport_days": 1,
+        "turnaround_days": 15.3,
+        "expected_turnaround_days": 15.600000000000001,
+        "available_days": 14.0,
+        "lateness_days": 1.6000000000000014,
+        "defect_risk": 0.12,
+        "cost": 2250.0
+      },
+      "display": {
+        "eta": "2026-04-16 14:25",
+        "turnaround": "15.60 days",
+        "lateness": "1.60 days",
+        "cost": "2,250.00",
+        "defects": "12.0%",
+        "queue": "9.30 days",
+        "processing": "5.00 days",
+        "transport": "1.00 days",
+        "expected_rework": "0.30 days"
+      },
+      "meets_deadline": false
+    },
+    "candidates_after": [
+      {
+        "workshop_id": "W5",
+        "name": "GiantWeave",
+        "estimate": {
+          "workshop_id": "W5",
+          "queue_days": 3.0,
+          "process_days": 3.75,
+          "transport_days": 4,
+          "turnaround_days": 10.75,
+          "expected_turnaround_days": 10.8625,
+          "available_days": 14.0,
+          "lateness_days": 0.0,
+          "defect_risk": 0.06,
+          "cost": 1650.0000000000002
+        },
+        "display": {
+          "eta": "2026-04-11 20:43",
+          "turnaround": "10.86 days",
+          "lateness": "0.00 days",
+          "cost": "1,650.00",
+          "defects": "6.0%",
+          "queue": "3.00 days",
+          "processing": "3.75 days",
+          "transport": "4.00 days",
+          "expected_rework": "0.11 days"
+        },
+        "meets_deadline": true
+      },
+      {
+        "workshop_id": "W2",
+        "name": "SteadyHands",
+        "estimate": {
+          "workshop_id": "W2",
+          "queue_days": 2.5,
+          "process_days": 8.823529411764707,
+          "transport_days": 2,
+          "turnaround_days": 13.323529411764707,
+          "expected_turnaround_days": 13.455882352941178,
+          "available_days": 14.0,
+          "lateness_days": 0.0,
+          "defect_risk": 0.03,
+          "cost": 1950.0
+        },
+        "display": {
+          "eta": "2026-04-14 10:57",
+          "turnaround": "13.46 days",
+          "lateness": "0.00 days",
+          "cost": "1,950.00",
+          "defects": "3.0%",
+          "queue": "2.50 days",
+          "processing": "8.82 days",
+          "transport": "2.00 days",
+          "expected_rework": "0.13 days"
+        },
+        "meets_deadline": true
+      },
+      {
+        "workshop_id": "W6",
+        "name": "Nimble Needle",
+        "estimate": {
+          "workshop_id": "W6",
+          "queue_days": 1.0,
+          "process_days": 11.538461538461538,
+          "transport_days": 1,
+          "turnaround_days": 13.538461538461538,
+          "expected_turnaround_days": 13.826923076923077,
+          "available_days": 14.0,
+          "lateness_days": 0.0,
+          "defect_risk": 0.05,
+          "cost": 1800.0
+        },
+        "display": {
+          "eta": "2026-04-14 19:51",
+          "turnaround": "13.83 days",
+          "lateness": "0.00 days",
+          "cost": "1,800.00",
+          "defects": "5.0%",
+          "queue": "1.00 days",
+          "processing": "11.54 days",
+          "transport": "1.00 days",
+          "expected_rework": "0.29 days"
+        },
+        "meets_deadline": true
+      },
+      {
+        "workshop_id": "W3",
+        "name": "BudgetWorks",
+        "estimate": {
+          "workshop_id": "W3",
+          "queue_days": 5.0,
+          "process_days": 6.521739130434782,
+          "transport_days": 3,
+          "turnaround_days": 14.521739130434781,
+          "expected_turnaround_days": 14.815217391304346,
+          "available_days": 14.0,
+          "lateness_days": 0.8152173913043459,
+          "defect_risk": 0.09,
+          "cost": 1200.0
+        },
+        "display": {
+          "eta": "2026-04-15 19:34",
+          "turnaround": "14.82 days",
+          "lateness": "0.82 days",
+          "cost": "1,200.00",
+          "defects": "9.0%",
+          "queue": "5.00 days",
+          "processing": "6.52 days",
+          "transport": "3.00 days",
+          "expected_rework": "0.29 days"
+        },
+        "meets_deadline": false
+      },
+      {
+        "workshop_id": "W1",
+        "name": "QuickStitch",
+        "estimate": {
+          "workshop_id": "W1",
+          "queue_days": 9.3,
+          "process_days": 5.0,
+          "transport_days": 1,
+          "turnaround_days": 15.3,
+          "expected_turnaround_days": 15.600000000000001,
+          "available_days": 14.0,
+          "lateness_days": 1.6000000000000014,
+          "defect_risk": 0.12,
+          "cost": 2250.0
+        },
+        "display": {
+          "eta": "2026-04-16 14:25",
+          "turnaround": "15.60 days",
+          "lateness": "1.60 days",
+          "cost": "2,250.00",
+          "defects": "12.0%",
+          "queue": "9.30 days",
+          "processing": "5.00 days",
+          "transport": "1.00 days",
+          "expected_rework": "0.30 days"
+        },
+        "meets_deadline": false
+      }
+    ],
+    "fastest_alternative": {
+      "workshop_id": "W5",
+      "name": "GiantWeave",
+      "estimate": {
+        "workshop_id": "W5",
+        "queue_days": 3.0,
+        "process_days": 3.75,
+        "transport_days": 4,
+        "turnaround_days": 10.75,
+        "expected_turnaround_days": 10.8625,
+        "available_days": 14.0,
+        "lateness_days": 0.0,
+        "defect_risk": 0.06,
+        "cost": 1650.0000000000002
+      },
+      "display": {
+        "eta": "2026-04-11 20:43",
+        "turnaround": "10.86 days",
+        "lateness": "0.00 days",
+        "cost": "1,650.00",
+        "defects": "6.0%",
+        "queue": "3.00 days",
+        "processing": "3.75 days",
+        "transport": "4.00 days",
+        "expected_rework": "0.11 days"
+      },
+      "meets_deadline": true
+    },
+    "assumption": "Additional work waits ahead of the reference batch at the same planning date. Expected rework occupies capacity; transport does not. No planning queues change.",
+    "queues_after": {
+      "W1": 9.3,
+      "W2": 2.5,
+      "W3": 5.0,
+      "W4": 0.5,
+      "W5": 3.0,
+      "W6": 1.0,
+      "W7": 0.0,
+      "W8": 0.0
+    },
+    "additional_processing_days": 5.300000000000001,
+    "display": {
+      "additional_pieces": "1,500 pieces",
+      "additional_processing": "5.30 days"
+    }
+  },
+  "capped_workshop": {
+    "scenario": {
+      "workshop_id": "W8",
+      "category": "TOPS",
+      "pieces": 100,
+      "additional_pieces": 301,
+      "due_date": "2026-04-15"
+    },
+    "snapshot": {
+      "as_of": "2026-04-01",
+      "queues": {
+        "W1": 4.0,
+        "W2": 2.5,
+        "W3": 5.0,
+        "W4": 0.5,
+        "W5": 3.0,
+        "W6": 1.0,
+        "W7": 0.0,
+        "W8": 0.0
+      },
+      "sources": {
+        "orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+        "workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
+        "dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+        "simulate.py": "b845804ad1229f593627b6ef1a6482258331178dbc4ec535274103fc3244593b"
+      },
+      "id": "62cc53a8ecc1cd9d69dcdc769d421f1512091f2485799511e7391085fa14f976"
+    },
+    "tool_sources": {
+      "allocator.py": "cae34aeb11d46a36ca7721d7f4386d6d82525ffa8d78f0269e8fe956ccda161d",
+      "dispatch.py": "6a7e01497449dc6b102b34938d93f58f0006a0b75a429b62e902507f716b2c51"
+    },
+    "workshop_name": "FreshStart",
+    "status": "UNSUPPORTED",
+    "reasons": [
+      "Additional batch: Batch exceeds the 300-piece limit."
+    ],
+    "before": null,
+    "after": null,
+    "candidates_after": [],
+    "fastest_alternative": null,
+    "assumption": "Additional work waits ahead of the reference batch at the same planning date. Expected rework occupies capacity; transport does not. No planning queues change."
+  }
+}

@@ -1,5 +1,20 @@
 # Streamlit dispatch desk
 
+The app has five pages in the top bar: **Assistant** (the voice-first phone experience,
+[VOICE_ASSISTANT.md](VOICE_ASSISTANT.md)), **Desk** (this guide), **Workshops** (the
+register and workload checks), **Objective lab** (sliders for the four objectives,
+replaying the course simulator), and **Memory** (standing rules, bookings, log, profile
+and plan). The desk's Custom objective offers
+sliders for lateness, defects, fairness, robustness and cost, a safety buffer, and the
+capacity-reservation and on-time-first switches; the default preset is the
+lateness-then-defects hybrid ("Recommended").
+Desk tests run it through `tests/desk_page.py`, because `streamlit_app.py` now opens on
+the assistant.
+
+To rehearse a demo without touching the real local plan, point saved state at another
+folder inside the project: `DSS5105_RUNTIME=$PWD/.cache/rehearsal sh scripts/run_app.sh`.
+Plans and memory then live there instead of `runtime/`.
+
 Data v3 is now loaded. Candidate tables show the April queue values; the Streamlit
 estimate breakdown also shows processing, transport and expected rework. Impossible
 requests show the earliest permitted estimated delivery and review options, with
@@ -51,8 +66,8 @@ scenario** cards, one per request kind in the course data dictionary, and the **
 the page send supplied examples to the desk offline, with no model call. The page shows the newest
 request and its answer; sending another replaces it. The example on screen is the one marked with a check, and sending scrolls the page back to the answer.
 
-The gold **Objective** button in the banner opens the objective choice (Lateness, Defect, Hybrid,
-Custom) and the **Preview only / Saved local plan** workspace switch. A change applies to the next
+The gold **Objective** button in the banner opens the objective choice (Recommended, Lateness, Defect, Fairness,
+Robustness, Custom) and the **Preview only / Saved local plan** workspace switch. A change applies to the next
 request you send; each answer shows the objective it was produced with. The **Saved plan** button
 lists saved allocations. **Show working** on an answer opens a column to the right of the answer
 (the answer text shrinks to make room) with the comparison, exclusions, estimate breakdown, reference policies, weights, tool trace and the
@@ -96,6 +111,25 @@ and review again. Source changes require a separate workspace migration and fail
 explicitly. Concurrent saves cannot silently reuse an old state. The same order
 cannot be saved again under a new chat message. This version has no cancellation
 or reset workflow. See [the record contract](ALLOCATION_RECORD_CONTRACT.md).
+
+## Workshop capacity and additional work
+
+Choose **Workshop register (offline)** in the sidebar. The initial table
+shows recorded capabilities, status, batch limits and queues. Enter a category,
+quantity and explicit delivery deadline, then select **Check delivery capacity**.
+The table explains suspended/capped workshops and shows estimates for eligible ones.
+
+Under **What if we send more work here?**, choose a workshop and extra pieces.
+**Compare before and after** places that additional same-category batch ahead of
+the reference batch at the fixed planning date. The tools show delivery changes
+and the fastest eligible alternative. Both batches must satisfy the course helper.
+The scenario adds expected processing/rework, excluding transport. It never changes
+the stored plan and does not assess other jobs' deadlines or predict closures.
+
+Both tables recompute from the selected independent or saved-plan queues. Exports
+retain source/code hashes and snapshot identity; saved mode includes state revision.
+Model calls are never needed in this workspace. Chat routing for these tools is
+still planned. See [TOOL_SPEC.md](TOOL_SPEC.md) for the finalized contracts.
 
 ## Current boundaries
 

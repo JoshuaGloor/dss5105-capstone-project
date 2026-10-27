@@ -1,11 +1,13 @@
 import copy
 import json
+from dataclasses import asdict, replace
 from datetime import date
 
 import pytest
 
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
+from dss5105.evaluate import PRESETS
 
 
 @pytest.fixture
@@ -139,7 +141,7 @@ def test_cheapest_on_time_enforces_deadline_before_cost(desk):
     eligible = [item for item in result["candidates"] if item["meets_deadline"]]
     chosen = next(item for item in eligible if item["estimate"]["workshop_id"] == result["recommendation"])
     assert chosen["estimate"]["cost"] == min(item["estimate"]["cost"] for item in eligible)
-    assert result["effective_weights"] == {"lateness": 0, "defects": 0, "cost": 1, "deadline_buffer_days": 0}
+    assert result["effective_weights"] == asdict(ObjectiveWeights(lateness=0, cost=1))
     infeasible = preview(desk, due_date="2026-04-01", preference="cheapest_on_time")
     assert infeasible["status"] == "NO_FEASIBLE_OPTION"
     assert infeasible["recommendation"] is None
@@ -302,3 +304,88 @@ def test_impossible_hard_date_keeps_earliest_evidence(desk):
     assert result["earliest_option"]
     assert result["review_options"]
     assert result["recommendation"] is None
+
+
+def _shown_days(row):
+    return float(row["display"]["turnaround"].split()[0])
+
+
+def test_decision_basis_differences_agree_with_the_displayed_table(desk):
+    result = preview(desk, pieces=500, due_date="2026-04-13")
+    basis = result["decision_basis"]
+    chosen, other = result["candidates"][0], result["candidates"][1]
+    assert basis["workshop_id"] == result["recommendation"] == chosen["estimate"]["workshop_id"]
+    assert basis["compared_with"] == other["estimate"]["workshop_id"]
+    gap = _shown_days(other) - _shown_days(chosen)
+    assert f"Next ranked: {other['name']}, {gap:.2f} days slower" in basis["reasons"][-1]
+    slack = chosen["estimate"]["available_days"] - _shown_days(chosen)
+    assert f"Expected {slack:.2f} days before the deadline." in basis["reasons"]
+    assert f"Earliest delivery of the {len(result['candidates'])} permitted workshops." in basis["reasons"]
+
+
+def test_decision_basis_scopes_a_hard_date_preference_to_on_time_options(desk):
+    item = next(item for item in read_inbox() if item["request_id"] == "R21")
+    fields = json.loads((ROOT / "examples" / "dispatch_inputs.json").read_text())["R21"]
+    assert fields["preference"] == "cheapest_on_time"
+    result = desk.preview(item, DispatchInput(**fields), ObjectiveWeights())
+    on_time = [row for row in result["candidates"] if row["meets_deadline"]]
+    assert 1 < len(on_time) < len(result["candidates"])
+    chosen = next(row for row in on_time if row["estimate"]["workshop_id"] == result["recommendation"])
+    assert chosen["estimate"]["cost"] == min(row["estimate"]["cost"] for row in on_time)
+    reasons = result["decision_basis"]["reasons"]
+    assert f"Lowest cost of the {len(on_time)} that meet the deadline." in reasons
+    assert reasons[-1].startswith(f"Ranked first: {result['candidates'][0]['name']}, ")
+    assert reasons[-1].endswith("misses the deadline.")
+
+
+def test_decision_basis_is_absent_without_a_chosen_workshop(desk):
+    result = desk.preview(envelope(), DispatchInput(customer="Harbor Knits"), ObjectiveWeights())
+    assert result["status"] == "CLARIFY"
+    assert result["decision_basis"] is None
+
+
+CAPACITY_ENVELOPE = {"request_id": "CHAT", "time": "now", "requester": "Ravi", "text": "Who can take crewnecks?"}
+
+
+def test_capacity_question_ranks_without_an_order_and_never_books(desk):
+    request = DispatchInput(intent="capacity", product="Crewneck sweater", pieces=1500, due_date="2026-04-15")
+    result = desk.preview(CAPACITY_ENVELOPE, request, PRESETS["hybrid"])
+    assert result["status"] == "CAPACITY" and result["commit_allowed"] is False
+    assert result["batch"]["category"] == "TOPS" and "order" not in result
+    on_time = [row for row in result["candidates"] if row["meets_deadline"]]
+    assert result["message"].startswith(f"{len(on_time)} of {len(result['candidates'])} permitted workshops")
+    assert result["recommendation"] == on_time[0]["estimate"]["workshop_id"]
+    assert {row["workshop_id"] for row in result["excluded"]} >= {"W4", "W7"}
+
+
+@pytest.mark.parametrize(
+    "fields,question",
+    [
+        ({"product": "Widget", "pieces": 100, "due_date": "2026-04-15"}, "Which product"),
+        ({"product": "Scarf", "due_date": "2026-04-15"}, "quantity"),
+        ({"product": "accessories", "pieces": 100}, "deadline"),
+    ],
+)
+def test_capacity_question_asks_for_what_it_needs(desk, fields, question):
+    result = desk.preview(CAPACITY_ENVELOPE, DispatchInput(intent="capacity", **fields), PRESETS["hybrid"])
+    assert result["status"] == "CLARIFY" and question in result["message"]
+    assert result["candidates"] == []
+
+
+def test_capacity_question_reports_the_earliest_option_when_none_is_on_time(desk):
+    request = DispatchInput(intent="capacity", product="Scarf", pieces=2000, due_date="2026-04-04")
+    result = desk.preview(CAPACITY_ENVELOPE, request, PRESETS["hybrid"])
+    assert "NO_ON_TIME_OPTION" in result["flags"]
+    assert result["earliest_option"]["name"] in result["message"]
+
+
+def test_reservation_reason_appears_only_when_it_decided_the_ranking(desk):
+    envelope = next(item for item in read_inbox() if item["request_id"] == "R07")
+    request = DispatchInput(order_id="ORD-063", pieces=100, due_date="2026-04-29")
+    reserving = desk.preview(envelope, request, PRESETS["hybrid"])
+    plain = desk.preview(envelope, request, replace(PRESETS["hybrid"], capacity_reservation=0.0))
+    assert reserving["recommendation"] != plain["recommendation"]
+    note = reserving["reservation_note"]
+    assert note["held_workshop_id"] == plain["recommendation"]
+    assert note["text"] in reserving["decision_basis"]["reasons"]
+    assert plain["reservation_note"] is None

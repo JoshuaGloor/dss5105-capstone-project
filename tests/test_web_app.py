@@ -1,10 +1,12 @@
 import json
+from dataclasses import asdict
 
 import pytest
 from streamlit.testing.v1 import AppTest
 
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
+from dss5105.evaluate import DEFAULT_PRESET, PRESETS
 from dss5105.web_app import SCENARIOS
 
 
@@ -13,7 +15,7 @@ def app(monkeypatch):
     from dss5105 import llm
 
     monkeypatch.setattr(llm, "get_model", lambda **kwargs: pytest.fail("the examples must not construct a model"))
-    return AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    return AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
 
 
 def send(app, request_id):
@@ -48,7 +50,7 @@ def test_example_runs_live_python_tools_not_bundled_html_results(app):
     assert result["status"] == "RECOMMEND"
     envelope = next(item for item in read_inbox() if item["request_id"] == "R25")
     inputs = json.loads((ROOT / "examples" / "dispatch_inputs.json").read_text())
-    expected = DispatchDesk().preview(envelope, DispatchInput(**inputs["R25"]), ObjectiveWeights())
+    expected = DispatchDesk().preview(envelope, DispatchInput(**inputs["R25"]), PRESETS[DEFAULT_PRESET])
     assert result["candidates"] == expected["candidates"]
     assert "W3" not in {row["estimate"]["workshop_id"] for row in result["candidates"]}
 
@@ -74,7 +76,7 @@ def test_sending_scrolls_back_to_the_top_once(app):
     assert "scrollTo" not in markup(app)
     send(app, "R25")
     assert "scrollTo" in markup(app)
-    app.radio(key="objective").set_value("hybrid").run()
+    app.radio(key="objective").set_value("lateness").run()
     assert "scrollTo" not in markup(app)
     send(app, "R08")
     assert "scrollTo" in markup(app)
@@ -113,7 +115,11 @@ def test_custom_weights_apply_to_the_next_request_and_zero_weights_fail_closed(a
     app.slider(key="weight_cost").set_value(0.0).run()
     send(app, "R25")
     result = latest(app)["result"]
-    assert result["effective_weights"] == {"lateness": 0.0, "defects": 1.0, "cost": 0.0, "deadline_buffer_days": 0}
+    assert result["effective_weights"] == asdict(
+        ObjectiveWeights(
+            lateness=0.0, defects=1.0, deadline_buffer_days=2.0, capacity_reservation=1.0, deadline_miss_days=7.0
+        )
+    )
     assert result["recommendation"] == "W2"
     app.slider(key="weight_defects").set_value(0.0).run()
     assert any("every weight is zero" in error.value.lower() for error in app.error)
@@ -132,25 +138,25 @@ def test_each_answer_keeps_the_objective_it_was_produced_with(app):
     first = latest(app)
     app.radio(key="objective").set_value("defects").run()
     send(app, "R25")
-    assert [row["objective"] for row in requests(app)] == ["lateness", "defects"]
+    assert [row["objective"] for row in requests(app)] == ["hybrid", "defects"]
     assert requests(app)[0]["result"] == first["result"]
     assert requests(app)[1]["result"]["effective_weights"] != first["result"]["effective_weights"]
     assert "Objective: <b>Defect</b>" in markup(app)
 
 
 def test_objective_can_be_chosen_before_the_first_request(app):
-    app.radio(key="objective").set_value("hybrid").run()
+    app.radio(key="objective").set_value("fairness").run()
     assert not app.exception
     app.button(key="scenario_R07").click().run()
-    assert latest(app)["objective"] == "hybrid"
-    assert app.radio(key="objective").value == "hybrid"
+    assert latest(app)["objective"] == "fairness"
+    assert app.radio(key="objective").value == "fairness"
 
 
 def test_request_preference_overrides_global_preset(app):
     app.radio(key="objective").set_value("defects").run()
     send(app, "R21")
     result = latest(app)["result"]
-    assert result["effective_weights"] == {"lateness": 0.0, "defects": 0.0, "cost": 1.0, "deadline_buffer_days": 0}
+    assert result["effective_weights"] == asdict(ObjectiveWeights(lateness=0, cost=1))
     chosen = next(row for row in result["candidates"] if row["estimate"]["workshop_id"] == result["recommendation"])
     assert chosen["meets_deadline"]
     assert "Request asks for: <b>cheapest on time</b>" in markup(app)
@@ -303,7 +309,7 @@ def test_saved_plan_requires_identity_and_persists_across_sessions(app, tmp_path
     assert saved[0]["confirmed_by"] == "Test dispatcher"
     send(app, "R25")
     assert latest(app)["result"]["status"] == "ALREADY_ALLOCATED"
-    separate = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15).run()
+    separate = AppTest.from_file(ROOT / "tests" / "desk_page.py", default_timeout=15).run()
     separate.button(key="example_R25").click().run()
     assert latest(separate)["result"]["snapshot"]["queues"] == initial_queues
     separate.radio(key="workspace_mode").set_value("saved").run()
