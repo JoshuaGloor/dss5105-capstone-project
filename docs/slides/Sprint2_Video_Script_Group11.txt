@@ -24,11 +24,12 @@ Before the meeting
 Recording
 1. Cameras off (cleaner), everyone muted except the speaker. Host clicks Record > Record on this
    computer.
-2. Slides 1-7: one person shares Presentation_Group11_Sprint2.pptx in Keynote or PowerPoint,
-   playing full screen, and advances; each speaker unmutes only for their slides.
-3. Stop sharing after slide 7. Pause the recording if you need a moment, then resume.
-4. Demo: Charles shares the Chrome window with the app and ticks "Share sound", so the app's voice
-   is recorded directly. Start on slide 8 for two seconds ("Now the demo."), then the app. Only
+2. Slides 1-8: one person shares Presentation_Group11_Sprint2.pptx in Keynote or PowerPoint,
+   playing full screen, and advances; each speaker unmutes only for their slides. End on slide
+   8 for two seconds, with Niyanthri: "Now, the demo."
+3. Stop sharing after slide 8. Pause the recording if you need a moment, then resume.
+4. Demo: Charles shares only the Chrome window with the app (not the desktop, not a PDF) and
+   ticks "Share sound", so the app's voice is recorded directly. Start straight in the app. Only
    Charles talks. No cuts inside the demo; if it goes wrong, stop, restart the app with a new
    runtime folder and record the demo again. If a rehearsal runs past 2:00, drop the
    (optional) steps.
@@ -86,9 +87,9 @@ impossible date, a workshop that can't take it, and a misheard order. We give op
 with a reason, and read the order back."
 
 SLIDE 8 - Demo (2:55-4:50)  Charles
-Take B starts on this slide for two seconds:
-  Charles: "Now the demo."
-Then the app. Times are from the start of the app part. Speak only when the app is quiet.
+The slides recording ends on this slide for two seconds:
+  Niyanthri: "Now, the demo."
+Charles's recording starts straight in the app. Times are from the start of the app part. Speak only when the app is quiet.
 [0:00] Charles: "I'm Chen Zepeng, Charles in the app, playing the dispatcher. The rings show how
        busy each workshop is, and OldMill is grey because it's suspended."
 [0:08] Hold the mic and say: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away
