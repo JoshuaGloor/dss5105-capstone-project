@@ -48,6 +48,11 @@ COMMANDS = {
     "new": r"(start (a )?new( request)?|new (request|order|one)|start over|start again|reset|clear( (it|that))?)",
     "repeat": r"(repeat( that)?|say (that|it) again|what was that|come again|pardon)",
     "help": r"(help|what can (you|i) (do|say|ask)|how does this work)",
+    # Voice for the two taps on a card: the remember offer and the list of other workshops.
+    "remember": r"((yes|yeah|ok|okay|sure)[,.!]?\s*)?(please\s+)?(remember|save|keep)\s+"
+    r"(that|it|this|that rule|the rule)(\s+(please|for next time|too))*",
+    "options": r"((ok|okay|so)[,.!]?\s*)?(can you\s+)?(show|tell|give)( me)? (the |all (the )?)?(other )?"
+    r"(options|workshops|alternatives|choices)(\s+please)?|what (are|were) the (other )?options|why not (the )?others",
 }
 EXAMPLES = (
     "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away from BudgetWorks.",
@@ -441,6 +446,28 @@ def info_card(headline: str, *, label: str = "Assistant", tone: str = "info", no
     return card
 
 
+def _options_card(session: Session) -> dict:
+    """The last answer's permitted workshops, ranked, and why the rest cannot take it: its own tool result."""
+    result = session.result
+    if not result or not result.get("candidates"):
+        return info_card("There is nothing to compare yet. Name an order first.")
+    rows = _options(result, _chosen(result))
+    notes = [
+        f"{row['rank']}. {row['name']}: {row['eta_day']}, "
+        + ("on time" if row["on_time"] else f"{row['lateness']} late")
+        + f", cost {row['cost']}, defect risk {row['defects']}"
+        for row in rows
+    ]
+    notes += [f"{row['name']} cannot take it: {' '.join(row['reasons'])}" for row in result["excluded"]]
+    permitted, blocked = len(rows), len(result["excluded"])
+    return info_card(
+        f"{permitted} workshops can take it; {blocked} cannot",
+        label="Options",
+        notes=notes,
+        speak=f"Here are the {permitted} workshops that can take it, ranked, and why the other {blocked} cannot.",
+    )
+
+
 def help_card() -> dict:
     return info_card(
         "Tell me what needs to go out, in your own words.",
@@ -449,7 +476,9 @@ def help_card() -> dict:
             "Name an order and its date: I check every workshop and recommend one.",
             "Add constraints like 'keep it away from BudgetWorks': I honour them and record who asked.",
             "Ask 'who can take 1,500 crewnecks by April 15?' to check capacity without booking.",
+            "Say 'show me the other options' to compare every workshop, and why the rest cannot take it.",
             "Say 'book it' to open the confirmation; booking always needs your slide to confirm.",
+            "After a booking, say 'remember that' to keep its constraint for the customer's next orders.",
             "Ask 'what did we book today?' or 'what rules do you remember?' for memory.",
         ],
         suggestions=list(EXAMPLES),
@@ -635,6 +664,13 @@ def handle_utterance(session: Session, text: str, services: Services, *, channel
         return _append(session, said, _message("assistant", card=last or help_card()))
     if command == "help":
         return _append(session, said, _message("assistant", card=help_card()))
+    if command == "remember":
+        if not session.rule_offers:
+            return _append(session, said, _message("assistant", card=info_card("There is nothing new to remember.")))
+        actor = services.memory.profile()["dispatcher"] or services.speaker or "Dispatcher"
+        return remember_offer(_append(session, said), 0, services, actor)
+    if command == "options":
+        return _append(session, said, _message("assistant", card=_options_card(session)))
     recall = parse_recall(text)
     if recall:
         card = _rules_card(services) if recall == "rules" else _bookings_card(services)
