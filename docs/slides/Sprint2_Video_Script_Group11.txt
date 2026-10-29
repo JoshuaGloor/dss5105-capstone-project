@@ -121,7 +121,7 @@ The video ends on the demo, so this slide stays in the deck for the Q&A only.
 
 AFTER RECORDING
 - Upload the .mp4 to YouTube as unlisted, then open the link in a private window.
-- Put the link on slides 1 and 9:
+- The recorded deck has no demo link line. The submitted deck must have it, so add it to slides 1 and 9:
     DEMO_LINK=https://youtu.be/... node scripts/build_sprint2_deck.mjs
   then export the PDF again, and open the GitHub link in a private window too.
 - One member uploads the .mp4 and the .pptx (or .pdf) to Canvas by 15:00.

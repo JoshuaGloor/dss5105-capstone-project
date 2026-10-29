@@ -20,7 +20,8 @@ const asset = (name) => path.join(root, 'docs', 'slides', 'assets', 'sprint2', n
 
 // ---- Team facts to confirm before submitting ------------------------------------------------
 const GITHUB = 'github.com/JoshuaGloor/dss5105-capstone-project';
-const DEMO_LINK = process.env.DEMO_LINK || '[YouTube link: add after upload]';
+// Empty while recording, so the video shows no placeholder; set it for the deck you submit.
+const DEMO_LINK = process.env.DEMO_LINK || '';
 const ATTENDANCE = 'Present (in person)'; // per member below if anyone differs
 // An absence needs a reason on this slide and an email to the instructors before the session.
 const MEMBERS = [
@@ -145,8 +146,10 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   });
   T(s, [{ text: 'GITHUB  ', options: { bold: true, color: C.camel } }, { text: GITHUB, options: { color: C.onInk } }],
     { x: 0.6, y: 4.6, w: 6.2, h: 0.2, fontSize: 8.5, charSpacing: 0.5 });
-  T(s, [{ text: 'DEMO VIDEO  ', options: { bold: true, color: C.camel } }, { text: DEMO_LINK, options: { color: C.onInk } }],
-    { x: 0.6, y: 4.84, w: 6.2, h: 0.2, fontSize: 8.5, charSpacing: 0.5 });
+  if (DEMO_LINK) {
+    T(s, [{ text: 'DEMO VIDEO  ', options: { bold: true, color: C.camel } }, { text: DEMO_LINK, options: { color: C.onInk } }],
+      { x: 0.6, y: 4.84, w: 6.2, h: 0.2, fontSize: 8.5, charSpacing: 0.5 });
+  }
   T(s, 'DSS5105 CAPSTONE  /  30 OCTOBER 2026', { x: 0.6, y: 5.2, w: 6, h: 0.2, fontSize: 7, color: C.onInkMuted, charSpacing: 2 });
   const [pw, ph] = pngSize(asset('phone-welcome.png'));
   image(s, asset('phone-welcome.png'), 9.45 - 4.75 * pw / ph, 0.45, 4.75, 'The dispatch assistant on a phone: a greeting, the eight workshops with their queue rings, and example requests');
@@ -341,8 +344,10 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   T(s, 'Questions are welcome.', { x: 0.6, y: 2.5, w: 8.8, h: 0.5, fontFace: HEAD, fontSize: 18, italic: true, color: C.onInkMuted });
   T(s, [{ text: 'GITHUB  ', options: { bold: true, color: C.camel } }, { text: GITHUB, options: { color: C.onInk } }],
     { x: 0.6, y: 3.55, w: 8.8, h: 0.22, fontSize: 10 });
-  T(s, [{ text: 'DEMO VIDEO  ', options: { bold: true, color: C.camel } }, { text: DEMO_LINK, options: { color: C.onInk } }],
-    { x: 0.6, y: 3.85, w: 8.8, h: 0.22, fontSize: 10 });
+  if (DEMO_LINK) {
+    T(s, [{ text: 'DEMO VIDEO  ', options: { bold: true, color: C.camel } }, { text: DEMO_LINK, options: { color: C.onInk } }],
+      { x: 0.6, y: 3.85, w: 8.8, h: 0.22, fontSize: 10 });
+  }
   T(s, 'SAY THE ORDER  /  PYTHON CHECKS  /  A PERSON COMMITS', { x: 0.6, y: 4.5, w: 8.8, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
   T(s, 'GROUP 11  /  DSS5105 CAPSTONE  /  30 OCTOBER 2026', { x: 0.6, y: 5.15, w: 8.8, h: 0.2, fontSize: 7.5, color: C.onInkMuted, charSpacing: 2 });
   notes(s, 9, ['Q&A PREPARATION' + qa.replace(/\n+$/, '')]);
