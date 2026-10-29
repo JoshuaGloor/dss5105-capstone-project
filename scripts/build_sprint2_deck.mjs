@@ -157,7 +157,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   kicker(s, 'A REAL REQUEST FROM THE INBOX', 0.6, 2.68, 3.85);
   T(s, '"ORD-109, 500 vests for Harbor Knits, due Apr 13. ...and keep it away from BudgetWorks, the last batch came back rough."',
     { x: 0.6, y: 2.9, w: 3.85, h: 0.65, fontFace: HEAD, fontSize: 12, italic: true });
-  kicker(s, 'WHAT HE NEEDS', 0.6, 3.68, 3.85);
+  kicker(s, 'WHAT RAVI NEEDS', 0.6, 3.68, 3.85);
   ['A safe workshop, its arrival date and why, in seconds', 'The constraint honoured, and who asked recorded', 'One deliberate step to commit; a record afterwards'].forEach((t, i) =>
     T(s, `${i + 1}   ${t}`, { x: 0.6, y: 3.9 + i * 0.27, w: 3.85, h: 0.25, fontSize: 9.5, color: C.ink }));
   kicker(s, 'WHAT CHANGED SINCE SPRINT 1', 4.85, 1.35, 4.55);
@@ -180,10 +180,10 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   const s = pres.addSlide({ masterName: 'CONTENT' });
   frame(s, 'THE USER JOURNEY  /  THINK LIKE THE USER', 'Say it, check it, slide to book, and it remembers');
   const steps = [
-    ['phone-welcome.png', 'Ask', 'Hold the mic: order, date and any constraint, in his words.'],
+    ['phone-welcome.png', 'Ask', 'Hold the mic: order, date and any constraint, in plain words.'],
     ['phone-answer.png', 'Answer', 'Best workshop, arrival and spare days, and why. Read aloud.'],
-    ['phone-confirm.png', 'Confirm', '"Book it" opens one sheet. He slides, with his name on it.'],
-    ['phone-receipt.png', 'Remember', 'It offers to keep his constraint for this customer.'],
+    ['phone-confirm.png', 'Confirm', '"Book it" opens one sheet. One slide books it, with a name on it.'],
+    ['phone-receipt.png', 'Remember', 'It offers to keep the constraint for this customer.'],
     ['phone-memory.png', 'Reuse', 'Next order: the rule is applied, and the card says so.'],
   ];
   const h = 3.0, w = h * (336 / 692), gap = (8.8 - 5 * w) / 4;
@@ -229,7 +229,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   kicker(s, 'KEY CHOICES, AGAINST THE ALTERNATIVE WE CONSIDERED', 0.6, 3.15, 8.8);
   const choices = [
     ['One workflow', 'A ReAct agent loop', 'Every request needs the same checks in order: testable, cheaper, no tool-choice errors'],
-    ['Browser speech recognition', 'Server speech-to-text', 'Free, live words as he speaks, no extra key; typing always works'],
+    ['Browser speech recognition', 'Server speech-to-text', 'Free, live words while speaking, no extra key; typing always works'],
     ['Python templates for replies', 'Model-written replies', 'No model arithmetic: dates and costs are copied from tools'],
     ['Exact rules in SQLite', 'A vector-store memory', 'A constraint must apply exactly, with who said it, and be auditable'],
     ['Slide to confirm', 'Book on a spoken "yes"', 'A misheard "yes" on a noisy floor cannot send work out'],

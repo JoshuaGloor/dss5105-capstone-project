@@ -1,84 +1,189 @@
-Recording script, Group 11, Sprint 2 video (due Fri 30 Oct 2026, 15:00)
-Hard stop at 5:00. Target 4:40: project about 2:40, demo about 2:00.
-Timed at 138 words a minute. Saadhvika presents slide 5 and Niyanthri slide 6, as the owners
-of the evaluation set; assign the other slides and the demo voice before recording. scripts/build_sprint2_deck.mjs copies each SLIDE section into
-that slide's speaker notes. Numbers come from docs/evidence/objective-study.json and the
-live app; if either changes, update both.
+Recording script, Group 11, Sprint 2 film: "Introducing Dispatch"
+Due Fri 30 Oct 2026, 15:00, on Canvas as Presentation_Group11_Sprint2.mp4. Hard stop at 5:00.
+Target 4:46: project 0:00-3:02, demo 3:02-4:37, end card to 4:46.
+scripts/build_sprint2_deck.mjs copies each SLIDE section into that slide's speaker notes, and the
+Q&A section into slide 8. Numbers come from docs/evidence/objective-study.json and the live app;
+if either changes, update both. Spoken lines are timed at 135 words a minute.
 
-BEFORE RECORDING
-- Start a clean rehearsal plan so the demo numbers match this script:
-    DSS5105_RUNTIME=$PWD/.cache/rehearsal-video sh scripts/run_app.sh
-- Chrome on http://localhost:8501, window about 1440 x 900, zoom 100%.
-  Allow the microphone when Chrome asks (localhost counts as secure).
-- In the app, tap the avatar, enter "Ravi", turn "Read answers aloud" on, Save.
-- Record slides and the screen with QuickTime or OBS at 1080p. Export as
-  Presentation_Group11_Sprint2.mp4 and upload it to YouTube (unlisted), then put the
-  link on slide 1 and slide 8.
+THE IDEA
+A product launch film, not a lecture. Open on the product working, name it, walk the scored parts
+(user, journey, architecture, progress, validation) in short, confident lines, then let the real
+app handle real inbox requests. One idea per shot. Real screens only: no stock footage, no mock UI.
 
-SLIDE 1 - Cover (0:12)
-Hi, we are Group 11, Track 2: the Quick-Response Subcontracting Desk for SweaterCo.
-Our primary objective is to minimise lateness. Our secondary objective is to minimise defects.
+VOICES (suggested; confirm before recording)
+  NARRATOR   Joshua Wesley Gloor       cold open, slides 1 and 2, end card
+  BUILDER    Chen Zepeng               slides 3 and 4, the demo journey, the voice at the microphone
+  SAADHVIKA  Sundara Rajan Saadhvika   slide 5, progress
+  NIYANTHRI  Sridhar Niyanthri Rajeswari  slide 6, validation
+  LYNN       Tang Zheling              the demo hard case and "Behind the answer"
+  Ruby (Duong Thanh Nhan) is absent, as slide 1 shows.
 
-SLIDE 2 - The user, and what changed since Sprint 1 (0:24)
-Our user is Ravi, the production dispatcher. He is on the factory floor, and requests arrive in
-a group chat. He needs a safe answer in seconds, with a record of why.
-Since Sprint 1, we beat the earliest-finish rule that tied us, our defects and fairness settings
-beat their baselines, and Ravi can now talk to the desk, which remembers what he confirms.
+LOOK AND SOUND
+- Same palette and type as the deck: ink 1D1B18 background, ivory F4EFE6 text, camel A3804C
+  accent; Georgia for titles, Arial for captions.
+- Title cards TC1 to TC6: one line of ivory Georgia, centred on ink, nothing else on screen. Fade in
+  over 6 frames, hold, hard cut out. Make them as text on a solid ink clip in the editor.
+- Every shot moves. Slides: a slow push-in from 100% to 106% across the shot. When the voice names a
+  part of a slide, PUNCH IN: cut to a 150-180% crop of that part. App: record the whole window,
+  crop to the phone in the edit, and keyframe slow zooms. No aimless pointer movement.
+- Hard cuts on the music beat. No wipes, spins or star effects. One dissolve, into the end card.
+- Captions for every spoken line, bottom centre, Arial, white with a soft shadow. Numbers in
+  captions must match this script exactly.
+- Music: one instrumental track from the YouTube Audio Library (no attribution needed, so no
+  copyright claim on upload). Minimal electronic or piano, about 100-110 BPM. It enters on TC3,
+  sits about -22 dB under voices, rises to -14 dB on title cards, and drops out under the app's
+  own spoken answers.
+- App voice: full level only where this script says LET IT PLAY; elsewhere mute it in the edit.
+- Voices: each speaker records alone in a quiet room, phone about 15 cm from the mouth (Voice Memos
+  is fine). Read slower than feels natural, and pause half a beat after every number.
+- Honesty: you may trim the model's wait, but keep at least one second of "Checking every
+  workshop", and show the caption "Wait shortened" the first time you trim. Never speed up or
+  change the app's answers.
 
-SLIDE 3 - The user journey (0:25)
-Here is his journey. He holds the microphone and says the order, the date and any constraint.
-The assistant answers on screen and out loud: the best workshop, when it arrives, and why.
-He says "book it" and slides to confirm. It offers to remember his constraint, and applies it
-to that customer's next order. Voice can propose. Only the slide commits.
+BEFORE RECORDING THE APP
+- A fresh plan for every take, so the numbers match this script (a new folder per take, inside
+  the project):
+    DSS5105_RUNTIME=$PWD/.cache/take1 sh scripts/run_app.sh     (then take2, take3, ...)
+- Chrome on http://localhost:8501, window about 1440 x 900, zoom 100%. Hide the bookmarks bar
+  (Cmd+Shift+B), close other tabs, turn on Do Not Disturb. Stay online: Chrome's speech
+  recognition and the model both need the network.
+- Allow the microphone when Chrome asks (localhost counts as secure).
+- In the app, tap the avatar, enter "Ravi", turn "Read answers aloud" on, Save. Leave Priorities
+  on Recommended.
+- Record with OBS (free): a macOS Screen Capture source for Chrome, application audio from Chrome
+  (the app's voice) and the microphone. 1920 x 1080, 30 fps. QuickTime cannot record the app's
+  voice.
+- Export the deck as 1920 x 1080 images (Keynote: File > Export To > Images) for the slide shots.
+- Time the real model wait on one take and note it in the Q&A section.
 
-SLIDE 4 - Architecture and key choices (0:36)
-It is one workflow, not a ReAct loop, because every request needs the same checks in order.
-Speech becomes text in the browser. Python handles commands like "book it" itself. Everything
-else is one structured-output call, and every field must quote the message or Python rejects it.
-Deterministic tools then find the order, apply remembered rules, check eligibility, estimate and
-rank. Replies are Python templates, so the model never does arithmetic. A person confirms, and
-SQLite keeps the record and the memory, as exact rules rather than a vector store.
+SLIDE 1 - Cold open and cover (0:00-0:22)  VOICE: NARRATOR, plus the app
+[0:00] TC1 on black, no music, faint room tone: "07:53. The first request arrives."
+[0:02] TC2: "By 10:18, there are thirty."
+       (Both times are R01 and R30 in track2/data/dispatch_requests.txt.)
+[0:04] APP, tight on the phone's microphone button. The thumb holds it; the live transcript writes
+       itself across the screen.
+       AT THE MIC (BUILDER, natural, not performed): "ORD-109, 500 vests for Harbor Knits, due
+       April 13. Keep it away from BudgetWorks."
+[0:10] The answer card lands. LET IT PLAY: "GiantWeave can deliver order 109..." Cut out
+       mid-sentence.
+[0:12] Hard cut to black on the first beat of the music.
+       TC3: "Introducing Dispatch." Second line, smaller, camel: "The Quick-Response Subcontracting
+       Desk, by voice."
+[0:15] SLIDE 1. Slow push-in. Hold at least 6 seconds so every name and status can be read.
+       NARRATOR: "We're Group 11, Track 2. Our primary objective: minimise lateness. Our
+       secondary objective: minimise defects."
 
-SLIDE 5 - Progress (Saadhvika, 0:18)
-Here is every feature with its owner. The assistant, memory, the four-objective scorer, the desk
-redesign and the AWS deployment are done. In progress: clarification reliability, and our
-evaluation set of 50 new requests with independent labels. Next: Lynn's live run on the full
-set, and a usability test.
+SLIDE 2 - Objective and focus (0:22-0:51)  VOICE: NARRATOR
+[0:22] SLIDE 2. Push in on THE USER and the inbox quote.
+       NARRATOR: "Our user is Ravi, a dispatcher at SweaterCo, on the floor with a phone. Requests
+       land in a group chat, and most are messy. Ravi needs a safe answer in seconds, and a record
+       of why."
+[0:38] PUNCH IN on WHAT CHANGED SINCE SPRINT 1. Step down the rows as they are named.
+       NARRATOR: "Since Sprint 1, we beat the earliest-finish rule that tied us. Our defects and
+       fairness settings beat their baselines. And Ravi can now talk to the desk, which remembers."
 
-SLIDE 6 - Validation plan (Niyanthri, 0:35)
-For allocation we measure late batches and late days in the course simulator, normal and with a
-closure, against the three baselines and earliest finish, choosing settings on separate seeds
-first. Our default is 1.4 percent late against 1.7, with 68 percent fewer late days. For
-language: all 30 inbox requests by kind, plus 50 new held-out requests that we are writing and
-labelling separately. Hard cases: impossible dates, ineligible workshops, misheard orders. We give
-options, refuse with a reason, and read the order back before booking.
+SLIDE 3 - The user journey (0:51-1:13)  VOICE: BUILDER
+[0:51] TC4: "Say it. See why. Slide to book."
+[0:53] SLIDE 3. Track left to right across the five phones; punch in on each one as it is named.
+       BUILDER: "Ravi holds the mic and says it. The desk answers out loud: the best workshop, when
+       it arrives, and why. 'Book it' opens one sheet; one slide commits. It offers to remember
+       the constraint, and applies it next time. Voice proposes. Only the slide commits."
 
-SLIDE 7 - Demo (2:00)
-[0:00] Show slide 7 for two seconds, then switch to the app.
-Now the demo. This is Ravi's phone. The rings show how busy each workshop is, and OldMill is
-greyed out because it is suspended.
-[0:10] Hold the microphone and say: "ORD-109, 500 vests for Harbor Knits, due April 13.
-Keep it away from BudgetWorks." Let the reply play.
-He just says it. GiantWeave delivers on Thursday, 9 April, 3.71 days early. BudgetWorks is
-excluded, and the card says Ravi asked.
-[0:35] Open "Compare 4 workshops", then "Can't take it". Close them.
-[0:45] Say "book it". On the sheet, slide to confirm. Tap "Remember" on the offer.
-One slide, and the booking is saved with his name. The rule goes into memory.
-[1:05] Say: "ORD-081 for Harbor Knits needs to go out, due April 20."
-A new order for the same customer: the rule is applied, and the card says it came from memory.
-[1:20] Hard case. Say: "QuickStitch for the scarves on ORD-103?"
-QuickStitch cannot make scarves, and no workshop can meet the 4 April date. The desk says so,
-gives the earliest option, 13.44 days late, and a two-shop split. Nothing is booked.
-[1:40] Point at the "Behind the answer" panel.
-Every answer shows what the model extracted, with its quotes, and what Python computed.
+SLIDE 4 - Architecture and key choices (1:13-1:58)  VOICE: BUILDER
+[1:13] SLIDE 4. Wide on the six boxes, then a slow track left to right with the voice.
+       BUILDER: "Under the hood: one fixed workflow, not a ReAct agent, because every request
+       needs the same checks, in order. Speech becomes text in the browser. Python handles 'book
+       it' on its own. Everything else is one structured-output call, and every field must quote
+       the message, or Python rejects it."
+[1:35] PUNCH IN on the dark TOOLS box.
+       BUILDER: "Then deterministic tools: exact order lookup, remembered rules, the course's own
+       eligibility check, estimates and ranking. Replies are templates, so the model never does
+       arithmetic."
+[1:46] Tilt down to the KEY CHOICES table.
+       BUILDER: "Memory is exact rules in SQLite, not a vector store: a constraint must match
+       exactly, with who said it. And only a slide books, never a spoken yes."
 
-SLIDE 8 - Thank you (0:05)
-Thank you. The code and the video link are on the first slide.
+SLIDE 5 - Progress (1:58-2:17)  VOICE: SAADHVIKA
+[1:58] SLIDE 5. Slow push-in. Light the green Done rows, then amber, then grey, as they are named.
+       SAADHVIKA: "Here's every feature with its owner. Done: the voice assistant, memory, capacity
+       questions, the four-objective scorer, the desk redesign and the AWS deployment. In
+       progress: clarification reliability, and our evaluation set. Planned: Lynn's live run on
+       the full set, and a usability test."
+
+SLIDE 6 - Validation plan (2:17-3:02)  VOICE: NIYANTHRI
+[2:17] SLIDE 6. Push in on the left column.
+       NIYANTHRI: "For allocation we measure our objective: late batches and late days, in the
+       course simulator, with and without a closure. Baselines: random, biggest capacity and
+       cheapest, plus earliest finish, with settings chosen on separate seeds first. The minimum:
+       beat all three, and handle all 30 inbox requests."
+[2:38] PUNCH IN on the TODAY table, first row.
+       NIYANTHRI: "Today: 1.4 percent late against 1.7, and 68 percent fewer late days. For
+       language: the 30 inbox requests, plus 50 new held-out ones, labelled separately, then
+       agreed."
+[2:51] PUNCH IN on HARD CASES.
+       NIYANTHRI: "Hard cases: an impossible date, a workshop that can't take it, a misheard order.
+       We give options, refuse with a reason, and read the order back."
+
+SLIDE 7 - Demo (3:02-4:37)  VOICES: BUILDER (journey), LYNN (hard case)
+[3:02] SLIDE 7 for two seconds, then hard cut to the app.
+       Small caption, top left, for the next minute: "The journey".
+[3:04] Phone, full height. The welcome card: "Hi Ravi, what needs to go out today?"
+       BUILDER: "This is Ravi's phone. The rings show how busy each workshop is. OldMill is
+       greyed out: it's suspended."
+[3:12] Hold the microphone. Caption: "Based on request R25 in the course inbox".
+       AT THE MIC: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away from
+       BudgetWorks."
+[3:19] The answer lands; slow zoom to the delivery timeline. LET IT PLAY: "GiantWeave can deliver
+       order 109 by Thursday 9 April, 3.71 days early. Cost 550, defect risk 6.0%. Say book it,
+       or tap book, to confirm."
+[3:28] Zoom to the excluded list.
+       BUILDER: "BudgetWorks is out, and the card says Ravi asked."
+[3:32] Tap "Compare 4 workshops", then "Can't take it". Close them.
+       BUILDER: "Every other option, and why the rest can't take it."
+[3:38] AT THE MIC: "Book it." The sheet rises. Slide to confirm.
+       BUILDER: "'Book it' only opens the sheet. One slide saves it, with Ravi's name."
+[3:46] Tap "Remember" on the offer.
+       BUILDER: "And it offers to keep that rule."
+[3:49] AT THE MIC: "ORD-081 for Harbor Knits needs to go out, due April 20."
+[3:54] The card lands; zoom to the memory chip.
+       BUILDER: "A new order, same customer. The rule is applied, and the card says it came from
+       memory."
+[4:02] TC5: "Now, a hard one." Caption, top left, from here: "Hard case".
+[4:04] AT THE MIC: "QuickStitch for the scarves on ORD-103?" Caption: "Request R14 in the course
+       inbox, word for word".
+[4:08] The refusal lands. LET IT PLAY through the reason, then fade it under LYNN. Zoom to the
+       reason, then to the alternatives.
+[4:13] LYNN: "QuickStitch can't make scarves, and no workshop can meet the date. So the desk
+       refuses, gives the earliest option and a two-shop split, and books nothing."
+[4:25] Open the "Behind the answer" panel. Slow zoom to the quotes, then to the computed numbers.
+       LYNN: "And every answer shows its working: what the model read, with its quotes, and what
+       Python computed."
+[4:33] Hard cut to black. TC6: "Dispatch." Second line, camel: "Ravi talks. Python checks. A
+       person commits."
+
+SLIDE 8 - Thank you (4:37-4:46)  VOICE: NARRATOR
+[4:37] Dissolve to SLIDE 8. The music resolves.
+       NARRATOR: "Thank you. The code and the video link are on the first slide."
+[4:43] Hold in silence, then end. Check the export runs under 4:55.
+
+AFTER RECORDING
+- Export H.264, 1920 x 1080, as Presentation_Group11_Sprint2.mp4. Watch it once end to end.
+- Upload to YouTube as unlisted, then open the link in a private window.
+- Put the link on slides 1 and 8:
+    DEMO_LINK=https://youtu.be/... node scripts/build_sprint2_deck.mjs
+  then export the PDF again, and open the GitHub link in a private window too.
+- One member uploads the .mp4 and the .pptx (or .pdf) to Canvas by 15:00.
 
 Q&A PREPARATION (not read aloud)
-- Ruby (Duong Thanh Nhan) cannot attend: she emails Salman and Jack with her reason before the
-  session, and slide 1 shows "Absent" with that reason. Any member may be asked about her desk
+- Ruby (Duong Thanh Nhan) cannot attend: Ruby emails Salman and Jack with the reason before the
+  session, and slide 1 shows "Absent" with that reason. Any member may be asked about Ruby's desk
   redesign: one answer at a time, objective panel, saved plan, Show working.
+- Who is Ravi? One of the five people in the course's dispatch chat (R02, R07, R12, R17, R22,
+  R27). We made the person who posts requests our user and gave them the phone, as the bonus
+  suggests. In the demo, Ravi says other people's requests out loud too: Mei's R25 and the boss's
+  R14.
+- Is the film sped up? Only the model's wait is trimmed, and the film says so on screen. Our
+  real wait on the take: [time it on the take]. No answer was edited.
 - Why voice? The track's bonus asks how a dispatcher would really use it: on the floor, on a
   phone. Typing still works everywhere, and the course inbox is still evaluated as text.
 - Can a misheard "yes" book something? No. "Book it" only opens the sheet. Saving needs a
