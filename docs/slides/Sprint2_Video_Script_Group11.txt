@@ -47,9 +47,10 @@ Since Sprint 1, we beat earliest finish, which tied us, our defects and fairness
 their baselines, and the dispatcher can now talk to the desk."
 
 SLIDE 3 - The user journey (0:45-1:08)  Charles
-"We designed the journey for the floor. The dispatcher holds the mic and says the order. The desk answers
-on screen and out loud: the best workshop, when it arrives, and why. 'Book it' opens a sheet, and
-a slide confirms. It offers to remember the constraint, and uses it on the next order."
+"We designed the journey for the floor. The dispatcher holds the mic and says the order. The
+desk answers on screen and out loud: the best workshop, when it arrives, and why. 'Book it' opens
+a sheet, and a slide confirms. It offers to remember the constraint, and uses it on the next
+order."
 
 SLIDE 4 - Architecture (1:08-1:35)  Charles
 "This is what we built. Speech becomes text in the browser, and Python answers commands like
@@ -71,10 +72,9 @@ usability test."
 
 SLIDE 7 - Validation plan (2:13-2:55)  Niyanthri
 "We measure late batches and late days, our primary objective, in the course simulator, with and
-without a closure. Baselines are random, biggest capacity and cheapest, plus earliest
-finish. The minimum is to beat all three
-baselines, and handle all 30 inbox requests. Today: 1.4 percent late against 1.7, and 68 percent
-fewer late days. For language, the 30 inbox requests plus 50 new held-out ones, labelled
+without a closure. Baselines are random, biggest capacity and cheapest, plus earliest finish.
+The minimum is to beat all three baselines, and handle all 30 inbox requests. Today: 1.4 percent
+late against 1.7, and 68 percent fewer late days. For language, the 30 inbox requests plus 50 new held-out ones, labelled
 separately, then agreed. Hard cases: an impossible date, a workshop that can't take it, and a
 misheard order. We give options, refuse with a reason, and read the order back."
 
