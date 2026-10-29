@@ -90,8 +90,9 @@ SLIDE 8 - Demo (2:55-4:50)  Charles
 The slides recording ends on this slide for two seconds:
   Niyanthri: "Now, the demo."
 Charles's recording starts straight in the app. Times are from the start of the app part. Speak only when the app is quiet.
-[0:00] Charles: "I'm Chen Zepeng, Charles in the app, playing the dispatcher. The rings show how
-       busy each workshop is, and OldMill is grey because it's suspended."
+[0:00] Charles: "Hi everyone, I'm Charles, that's Chen Zepeng. In this demo I'll play the
+       dispatcher, using our app, StitchFlow. The rings show how busy each workshop is, and
+       OldMill is grey because it's suspended."
 [0:08] Hold the mic and say: "Hi, I've got order 109 for Harbor Knits, 500 vests, due April
        13th. And keep it away from BudgetWorks, their last batch came back rough."
        Let the answer play: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days
