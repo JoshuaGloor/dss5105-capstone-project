@@ -89,46 +89,36 @@ with a reason, and read the order back."
 SLIDE 8 - Demo (2:55-4:50)  Charles
 The slides recording ends on this slide for two seconds:
   Niyanthri: "Now, the demo."
-Charles's recording starts straight in the app. Times are from the start of the app part.
-Speak only when the app is quiet. If speech mishears a request, the transcript shows it: hold
-the mic and say it again, slowly.
-[0:00] Charles: "Hi everyone, I'm Zepeng, or Charles, as the app calls me. In this demo I'll
-       play the dispatcher, using our app, StitchFlow, and I'll run it all by voice. The rings
-       show how busy each workshop is, and OldMill is grey because it's suspended."
-[0:10] Hold the mic and say: "Hi, I've got order number 109, due April 13th. Keep it away from
+Charles's recording starts straight in the app, all by voice; the slide to confirm is the only
+touch. Times are from the start of the app part, about 1:30 when nothing goes wrong. Speak only
+when the app is quiet. If speech mishears a request, the transcript shows it: say it again,
+slowly. In the edit you may cut silences and any misheard retry, but never cut or change an
+answer.
+[0:00] Charles: "Hi everyone, I'm Zepeng, or Charles. I'll play the dispatcher, using StitchFlow
+       by voice."
+[0:06] Hold the mic and say: "Hi, I've got order number 109, due April 13th. Keep it away from
        BudgetWorks, their last batch came back rough."
-       (No customer or product names: speech often mishears them, and the order book supplies
-       both. Say "order number" clearly, so it is not heard as "other".)
-       Let the answer play: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days
-       early. Cost 550, defect risk 6.0%. Say book it, or tap book, to confirm."
-       Charles: "I only gave the order number. The customer and the quantity come from the
-       order book, and BudgetWorks is out because I asked."
-[0:35] Hold the mic and say: "Show me the other options." (optional if the video runs long)
-       Let it answer: "Here are the 4 workshops that can take it, ranked, and why the other 4
-       cannot."
-       Charles: "Every workshop that can take it, ranked, and the reason behind each no:
-       excluded by me, can't make tops, suspended, or over its batch limit."
-[0:50] Hold the mic and say: "Okay, book it." The sheet opens.
-       Charles: "This is the only thing I touch. One slide, so a misheard yes on a noisy floor
-       can never send work out." Slide to confirm.
-[1:03] Hold the mic and say: "Remember that."
-       Let it answer: "Remembered: Avoid BudgetWorks for Harbor Knits."
-       Charles: "Now it's a standing rule for this customer, with who said it and my words."
-[1:12] Hold the mic and say: "Next one: order number 81, due April 20th."
+       (No customer or product names: the order book supplies both. Say "order number"
+       clearly, so it is not heard as "other".)
+       Let the answer play: "GiantWeave, by Thursday 9 April, 3.71 days early. Say book it to
+       confirm."
+[0:20] Charles: "It found the order, kept BudgetWorks out because I asked, and shows why."
+[0:25] Hold the mic and say: "Okay, book it." The sheet opens: "Slide to confirm."
+       Charles: "Only a slide books it." Slide to confirm.
+       It says: "Booked with GiantWeave, arriving Thursday 9 April."
+[0:36] Hold the mic and say: "Remember that."
+       It says: "Remembered: Avoid BudgetWorks for Harbor Knits."
+[0:41] Hold the mic and say: "Next one: order number 81, due April 20th."
        (Say "due", not "go out by": "go out by" is a ship date, and the desk would ask which.)
        Let the answer play, then point at the "From memory" note on the card.
-       Charles: "Same customer, so the rule is applied without me repeating it, and the card
-       says it came from memory."
-[1:33] Charles: "Now a hard case, like the boss's message in the inbox."
-       Hold the mic and say: "Can QuickStitch take order number 103?"
-       Let the answer play: QuickStitch cannot make scarves, no workshop meets 4 April, and the
-       best alternative is 13.44 days late.
-[1:50] Charles: "It refuses, gives the earliest option and a two-shop split, and books nothing.
-       And on the right, every answer shows its working: what the model heard, and what
-       Python computed."
-[1:59] Charles: "That's StitchFlow." Pause for two seconds.
-[2:02] Stop recording. The whole video must stay under 4:55; if it runs long, drop the
-       "other options" step.
+[0:52] Charles: "Same customer, and the rule came back from memory."
+[0:56] Charles: "Now a hard case." Hold the mic and say: "Can QuickStitch take order number 103?"
+       Let the answer play: "QuickStitch cannot take order 103. Cannot make ACCESSORIES. Best
+       alternative: SteadyHands, 13.44 days late."
+[1:10] Charles: "It refuses, says why, and books nothing. And every answer shows its working,
+       here on the right."
+[1:18] Charles: "That's StitchFlow." Pause for two seconds.
+[1:22] Stop recording. With natural pauses this runs about 1:30 to 1:50.
 
 SLIDE 9 - Thank you (not recorded)
 The video ends on the demo, so this slide stays in the deck for the Q&A only.

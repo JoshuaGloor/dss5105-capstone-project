@@ -353,10 +353,9 @@ def card_for_result(
         card["sub"] = f"Arrives {pick['eta_day']}, {pick['slack']} before the {pick['due_day']} deadline"
         if result.get("commit_allowed"):
             card["actions"].append({"id": "book", "label": f"Book {pick['name']}", "primary": True})
+        # Spoken replies stay short on the floor: the decision and the date. The card keeps the rest.
         speak = (
-            f"{pick['name']} can deliver {order_id} by {day_label(pick['eta'], long=True)}, "
-            f"{pick['slack']} early. Cost {_spoken_amount(pick['cost'])}, defect risk {pick['defects']}. "
-            "Say book it, or tap book, to confirm."
+            f"{pick['name']}, by {day_label(pick['eta'], long=True)}, {pick['slack']} early. Say book it to confirm."
         )
     elif status == "CAPACITY" and pick:
         permitted = len(result["candidates"])
@@ -400,10 +399,7 @@ def card_for_result(
             speak += f" {pick['name']} can, by {day_label(pick['eta'], long=True)}."
         elif pick:
             card["sub"] = f"Best alternative: {pick['name']}, {pick['eta_day']}, {pick['lateness']} late"
-            speak += (
-                f" No permitted workshop meets {day_label(pick['due'], long=True)}. The best alternative is "
-                f"{pick['name']}, {day_label(pick['eta'], long=True)}, {pick['lateness']} late."
-            )
+            speak += f" Best alternative: {pick['name']}, {pick['lateness']} late."
     elif status == "NEEDS_REVIEW" and pick:
         if "NO_ON_TIME_OPTION" in result["flags"]:
             card["headline"] = f"No workshop can make {order_id} by {pick['due_day']}"
@@ -825,7 +821,7 @@ def request_booking(session: Session, services: Services) -> Session:
         tone="ok",
         kind="confirm",
         notes=["Slide to confirm. This saves the booking and reserves capacity in the plan."],
-        speak=f"Ready to book {_speakable(booking['order_id'])} with {booking['workshop']}. Slide to confirm.",
+        speak="Slide to confirm.",
     )
     return _append(session, _message("assistant", card=card), booking=booking)
 
@@ -879,8 +875,7 @@ def confirm_booking(session: Session, services: Services, actor: str) -> Session
             }
             for index, offer in enumerate(offers)
         ],
-        speak=f"Booked. {_speakable(record['order_id'])} goes to {record['workshop_name']}, arriving "
-        f"{day_label(booking['eta'], long=True)}. Reference {' '.join(reference[:4])}.",
+        speak=f"Booked with {record['workshop_name']}, arriving {day_label(booking['eta'], long=True)}.",
     )
     return _append(
         replace(session, conversation=intake.Conversation()),
