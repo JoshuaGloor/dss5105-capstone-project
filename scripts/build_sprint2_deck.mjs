@@ -80,7 +80,9 @@ const qa = script.split('Q&A PREPARATION')[1] || '';
 const C = {
   ink: '1D1B18', inkSoft: '4A463F', muted: '6B665D', paper: 'FAF8F4', card: 'FFFFFF', wash: 'F3EFE7',
   line: 'E4DDD0', camel: 'A3804C', camelText: '7D5E30', camelLight: 'CDB78F', forest: '2F5D46',
-  oxblood: '8A2C35', onInk: 'F4EFE6', onInkMuted: 'B9AF9F', amber: '9A6A12',
+  oxblood: '8A2C35', onInk: 'F4EFE6', onInkMuted: 'C9BEAD', amber: '9A6A12',
+  // Warm espresso for the dark slides and sand for emphasis cards: softer than near-black ink.
+  deep: '3E342B', sand: 'F1E7D6', sandLine: 'E2D3B9',
 };
 const HEAD = 'Georgia';
 const BODY = 'Arial';
@@ -97,7 +99,7 @@ pres.defineSlideMaster({
     options: { x: 0.6, y: 5.25, w: 7, h: 0.22, fontFace: BODY, fontSize: 7, color: C.muted, charSpacing: 1.5, margin: 0 } } }],
   slideNumber: { x: 8.9, y: 5.25, w: 0.5, h: 0.22, fontFace: BODY, fontSize: 7, color: C.muted, align: 'right' },
 });
-pres.defineSlideMaster({ title: 'DARK', background: { color: C.ink } });
+pres.defineSlideMaster({ title: 'DARK', background: { color: C.deep } });
 
 const T = (slide, text, opts) => slide.addText(text, { fontFace: BODY, color: C.ink, margin: 0, isTextBox: true, valign: 'top', ...opts });
 // Section number before the eyebrow, after Niyanthri's redesign.
@@ -143,7 +145,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   T(s, 'Say the order. StitchFlow finds the right workshop.', { x: 0.6, y: 2.44, w: 6.2, h: 0.36, fontFace: HEAD, fontSize: 13, italic: true, color: C.onInkMuted, valign: 'middle' });
   [['PRIMARY  ', 'MINIMISE LATENESS'], ['SECONDARY  ', 'MINIMISE DEFECTS']].forEach(([k, v], i) => {
     const x = 0.6 + i * 2.75;
-    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 3.04, w: 2.6, h: 0.36, rectRadius: 0.18, fill: { color: C.ink }, line: { color: C.camel, width: 1 } });
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 3.04, w: 2.6, h: 0.36, rectRadius: 0.18, fill: { color: C.deep }, line: { color: C.camel, width: 1 } });
     T(s, [{ text: k, options: { color: C.camel, bold: true } }, { text: v, options: { color: C.onInk, bold: true } }],
       { x, y: 3.04, w: 2.6, h: 0.36, fontSize: 8.5, charSpacing: 1.2, align: 'center', valign: 'middle' });
   });
@@ -168,11 +170,12 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
   frame(s, 2, 'OBJECTIVE AND FOCUS', 'The dispatcher decides on the factory floor, in seconds');
-  box(s, 0.6, 1.3, 3.95, 1.55, { fill: C.ink, line: C.ink });
-  kicker(s, 'A REAL REQUEST FROM THE INBOX', 0.85, 1.45, 3.5, C.camelLight);
+  box(s, 0.6, 1.3, 3.95, 1.55, { fill: C.sand, line: C.sandLine });
+  bar(s, 0.6, 1.3, 1.55, C.camel);
+  kicker(s, 'A REAL REQUEST FROM THE INBOX', 0.85, 1.45, 3.5, C.camelText);
   T(s, '"ORD-109, 500 vests for Harbor Knits, due Apr 13. ...and keep it away from BudgetWorks, the last batch came back rough."',
-    { x: 0.85, y: 1.68, w: 3.5, h: 0.85, fontFace: HEAD, fontSize: 13.5, italic: true, color: C.onInk });
-  T(s, 'Mei, 09:53, request R25', { x: 0.85, y: 2.55, w: 3.5, h: 0.18, fontSize: 8, color: C.onInkMuted });
+    { x: 0.85, y: 1.68, w: 3.5, h: 0.85, fontFace: HEAD, fontSize: 13.5, italic: true, color: C.ink });
+  T(s, 'Mei, 09:53, request R25', { x: 0.85, y: 2.55, w: 3.5, h: 0.18, fontSize: 8, color: C.muted });
   kicker(s, 'THE USER', 0.6, 3.0, 3.95, C.camelText);
   T(s, 'The production dispatcher at SweaterCo', { x: 0.6, y: 3.18, w: 3.95, h: 0.28, fontFace: HEAD, fontSize: 14 });
   T(s, 'On the floor with a phone. Most requests are messy: missing dates, vague orders, banned workshops.',
@@ -246,7 +249,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
   frame(s, 5, 'KEY CHOICES', 'Each choice, against the alternative we considered');
-  // The four choices the brief names (model, retrieval, data store, tools) lead, on dark cards.
+  // The four choices the brief names (model, retrieval, data store, tools) lead, on sand cards.
   const choices = [
     ['MODEL', 'One hosted model, named in .env', 'a fine-tuned or local model', 'It only extracts quoted fields, so no training is needed; swapping it is one line.'],
     ['RETRIEVAL', 'Exact lookup by order ID', 'embedding retrieval (RAG)', 'Orders have keys; an exact match cannot fetch the wrong order.'],
@@ -261,13 +264,14 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   choices.forEach(([k, chose, over, because], i) => {
     const x = 0.6 + (i % 4) * (cw + 0.12), y = 1.3 + Math.floor(i / 4) * (ch + 0.12);
     const dark = i < 4;
-    box(s, x, y, cw, ch, dark ? { fill: C.ink, line: C.ink } : {});
-    kicker(s, k, x + 0.15, y + 0.13, cw - 0.3, dark ? C.camelLight : C.camelText);
-    T(s, chose, { x: x + 0.15, y: y + 0.33, w: cw - 0.3, h: 0.5, fontFace: HEAD, fontSize: 12.5, color: dark ? C.onInk : C.ink });
-    T(s, `over ${over}`, { x: x + 0.15, y: y + 0.84, w: cw - 0.3, h: 0.2, fontSize: 8, italic: true, color: dark ? C.onInkMuted : C.muted });
-    T(s, because, { x: x + 0.15, y: y + 1.08, w: cw - 0.3, h: 0.52, fontSize: 8, color: dark ? C.onInk : C.inkSoft });
+    box(s, x, y, cw, ch, dark ? { fill: C.sand, line: C.sandLine } : {});
+    if (dark) bar(s, x, y, ch, C.camel);
+    kicker(s, k, x + 0.15, y + 0.13, cw - 0.3, C.camelText);
+    T(s, chose, { x: x + 0.15, y: y + 0.33, w: cw - 0.3, h: 0.5, fontFace: HEAD, fontSize: 12.5, color: C.ink });
+    T(s, `over ${over}`, { x: x + 0.15, y: y + 0.84, w: cw - 0.3, h: 0.2, fontSize: 8, italic: true, color: C.muted });
+    T(s, because, { x: x + 0.15, y: y + 1.08, w: cw - 0.3, h: 0.52, fontSize: 8, color: C.inkSoft });
   });
-  source(s, 'Dark: the four choices the brief asks us to justify. The model call is the only thing that leaves the machine; it never sees costs, queues or defect rates.');
+  source(s, 'Highlighted: the four choices the brief asks us to justify. The model call is the only thing that leaves the machine; it never sees costs, queues or defect rates.');
   notes(s, 5);
 }
 
@@ -315,8 +319,9 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   ];
   heroes.forEach(([value, text], i) => {
     const x = 0.6 + i * (tw + 0.12);
-    box(s, x, 1.28, tw, 1.12, i === 3 ? { fill: C.ink, line: C.ink } : {});
-    stat(s, x + 0.15, 1.3, tw - 0.3, value, text, i === 3 ? { color: C.onInk, labelColor: C.onInkMuted, size: 28 } : { size: 28 });
+    box(s, x, 1.28, tw, 1.12, i === 3 ? { fill: C.sand, line: C.sandLine } : {});
+    if (i === 3) bar(s, x, 1.28, 1.12, C.camel);
+    stat(s, x + 0.15, 1.3, tw - 0.3, value, text, { size: 28 });
   });
   const cw = (8.8 - 2 * 0.12) / 3;
   const plan = [
