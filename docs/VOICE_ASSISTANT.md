@@ -10,20 +10,21 @@ browser can type.
 
 ## The user and the job
 
-Ravi is SweaterCo's production dispatcher. He is on the factory floor, not at a desk.
-Requests arrive in the group chat ("ORD-109, 500 vests, keep it away from BudgetWorks"),
-and today he answers from memory: which of eight workshops can make it, which is free,
-which is allowed. He needs to say what has to go out, hear a safe answer he can trust,
-book it in one gesture, and know the record is there if anyone asks later.
+Ravi, one of the five people in the course's dispatch chat, is our user: a production
+dispatcher on the factory floor, not at a desk. Requests arrive in the group chat
+("ORD-109, 500 vests, keep it away from BudgetWorks"), and today the answer comes from
+memory: which of eight workshops can make it, which is free, which is allowed. Ravi needs
+to say what has to go out, hear a safe answer to trust, book it in one gesture, and know
+the record is there if anyone asks later.
 
 ## The journey, step by step
 
 | Step | Ravi does | The assistant does |
 |---|---|---|
-| 1. Glance | Opens the app on his phone | Greets him by name. The workshop strip shows each shop's queue as a ring (green to red); OldMill is greyed out as suspended, FreshStart carries its 300-piece cap |
-| 2. Ask | Holds the microphone: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away from BudgetWorks." | Shows the live transcript while he talks, then "Checking every workshop" |
+| 1. Glance | Opens the app on the phone | Greets Ravi by name. The workshop strip shows each shop's queue as a ring (green to red); OldMill is greyed out as suspended, FreshStart carries its 300-piece cap |
+| 2. Ask | Holds the microphone: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away from BudgetWorks." | Shows the live transcript while Ravi talks, then "Checking every workshop" |
 | 3. Hear the answer | Listens | Card and voice: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days early. Cost 550, defect risk 6.0%." The card shows the delivery timeline against the deadline, why this shop, the other permitted shops, and why the rest cannot take it ("BudgetWorks: Excluded by Ravi") |
-| 4. Book | Says "book it" | Opens a confirmation sheet: order, shop, arrival, cost, the constraint kept, and his name. Nothing is saved yet |
+| 4. Book | Says "book it" | Opens a confirmation sheet: order, shop, arrival, cost, the constraint kept, and Ravi's name. Nothing is saved yet |
 | 5. Confirm | Slides to book | Recomputes the answer, checks nothing changed, saves the booking with its evidence, reserves capacity, and reads back a reference |
 | 6. Teach | Taps "Remember" on "Always avoid BudgetWorks for Harbor Knits?" | Stores a standing rule with Mei's or Ravi's own words and the booking it came from |
 | 7. Next order | "ORD-081 needs to go out" | Applies the rule and says so on the card: "From memory: Avoid BudgetWorks for Harbor Knits", with who said it, when, and their words |
@@ -54,7 +55,7 @@ exact fields the model extracted and their quotes.
 
 | Choice | Alternative considered | Why |
 |---|---|---|
-| Browser speech recognition (Web Speech API) | Upload audio to a server transcription model | No extra key, cost or latency; live words appear while he talks. Trade-off: Chrome sends audio to its own service, and Firefox has no support, so typing always works too |
+| Browser speech recognition (Web Speech API) | Upload audio to a server transcription model | No extra key, cost or latency; live words appear while Ravi talks. Trade-off: Chrome sends audio to its own service, and Firefox has no support, so typing always works too |
 | Voice proposes, a slide commits | Book on a spoken "yes" | A misheard "yes" on a noisy floor would send real work to a workshop. The slide shows exactly what will be saved |
 | Control phrases matched by Python | Let the model classify every utterance | Deterministic, free, and a message cannot talk the system into a booking |
 | Spoken text from Python templates | Let the model summarise | The track's worst failure is a hallucinated delivery date. The voice reads the same tool strings as the card |
@@ -89,6 +90,10 @@ See [TOOL_SPEC.md](TOOL_SPEC.md#memory-store) for the contract.
 | The plan changed before confirming | The booking is recomputed in one transaction and refused if stale |
 
 ## A two-minute demo script
+
+The recorded Sprint 2 film follows the shot list in
+[docs/slides/Sprint2_Video_Script_Group11.txt](slides/Sprint2_Video_Script_Group11.txt); this is the
+short version for a live run.
 
 1. (0:00) Phone view. "This is Ravi on the floor." Point at the workshop strip.
 2. (0:10) Hold the mic: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away
