@@ -155,6 +155,14 @@ def _speakable(text: str) -> str:
     return text.replace("ORD-", "order ")
 
 
+def _quantity(pieces: int, product: str) -> str:
+    """'800 hoodies', '1,500 crewneck sweaters', '1,000 scarves': the tool's count and product name."""
+    word = product.lower()
+    if pieces != 1:
+        word = word[:-1] + "ves" if word.endswith("f") else word if word.endswith("s") else word + "s"
+    return f"{pieces:,} {word}"
+
+
 # Cards -----------------------------------------------------------------------------------------
 
 
@@ -347,7 +355,7 @@ def card_for_result(
     elif status == "CAPACITY" and pick:
         permitted = len(result["candidates"])
         on_time = sum(row["meets_deadline"] for row in result["candidates"])
-        quantity = f"{result['batch']['pieces']:,} {result['capacity_query']['product'].lower()}"
+        quantity = _quantity(result["batch"]["pieces"], result["capacity_query"]["product"])
         if on_time:
             card["headline"] = f"{on_time} of {permitted} workshops can deliver by {pick['due_day']}"
         else:

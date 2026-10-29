@@ -183,6 +183,7 @@ def test_a_capacity_question_after_an_answer_is_a_new_request_from_one_model_cal
     session = handle_utterance(session, question, current)
     card = last_card(session)
     assert card["status"] == "CAPACITY" and card["pick"] is not None
+    assert card["sub"].startswith("1,500 crewneck sweaters. Best option:")
     assert session.result["batch"]["category"] == "TOPS" and session.result["batch"]["pieces"] == 1500
     assert session.conversation.turns == ({"speaker": "Ravi", "text": question},)
     assert session.conversation.traces[-1]["restarted"] is True
