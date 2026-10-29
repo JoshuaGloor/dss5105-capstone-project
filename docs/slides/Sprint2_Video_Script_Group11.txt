@@ -5,35 +5,37 @@ scripts/build_sprint2_deck.mjs copies each SLIDE section into that slide's speak
 Q&A section into slide 9. Numbers come from docs/evidence/objective-study.json and the live app;
 if either changes, update both. Lines are timed at 140 words a minute.
 
-WHO SPEAKS (suggested; confirm before recording)
-  Joshua Wesley Gloor          slides 1 and 2
-  Chen Zepeng (Charles)        slides 3 to 5, and drives the demo (the voice at the microphone)
-  Sundara Rajan Saadhvika      slide 6
-  Sridhar Niyanthri Rajeswari  slide 7
-  Tang Zheling (Lynn)          the demo hard case
-  Ruby (Duong Thanh Nhan) is absent, as slide 1 shows.
+WHO SPEAKS (suggested; swap freely)
+  Joshua Wesley Gloor          slides 1, 2 and 4
+  Sundara Rajan Saadhvika      slides 3 and 6
+  Sridhar Niyanthri Rajeswari  slides 5 and 7
+  Chen Zepeng (Charles)        the whole demo (slide 8 and the app), recorded separately
+  Tang Zheling (Lynn) is not in the recording; Ruby (Duong Thanh Nhan) is absent, as slide 1 shows.
 
-HOW TO RECORD (about 30 minutes, almost no editing)
-Two takes on one MacBook, everyone in one quiet room, then join the two clips in QuickTime.
-1. Prepare the app (do this before Take A, and again for each new demo attempt):
+HOW TO RECORD (almost no editing)
+Two parts, then join the clips in QuickTime.
+1. Take A, slides 1-7, in Google Meet. One person shares Presentation_Group11_Sprint2.pptx (or
+   the PDF) full screen; each speaker unmutes only for their slides; the sharer advances.
+   Record with Meet (Activities > Recording) if the organiser's account allows it. A Mac screen
+   recording on the sharer's laptop does NOT capture the others' voices from Meet. If Meet
+   cannot record, each speaker records their own slides on their own laptop instead (Mac:
+   Cmd+Shift+5, Record Entire Screen, Options > Microphone; Windows: PowerPoint > Record, or
+   Win+Alt+R) and sends the clip to Charles. Headphones and a quiet room for everyone.
+2. Take B, the demo, by Charles on one MacBook. Start the app with a fresh plan, so the numbers
+   match this script (a new folder per attempt, inside the project):
      DSS5105_RUNTIME=$PWD/.cache/take1 sh scripts/run_app.sh     (take2, take3, ... for retries)
-   A new folder gives a fresh plan, so the numbers match this script. In Chrome, open
-   http://localhost:8501, allow the microphone, tap the avatar, enter "Charles", turn "Read answers
-   aloud" on, Save. Leave Priorities on Recommended. Stay online: speech recognition and the
-   model both need the network. Turn on Do Not Disturb and mute phones.
-2. Take A, slides 1-8: open Presentation_Group11_Sprint2.pptx in Keynote and press Play. Start a
-   screen recording with Cmd+Shift+5 > Record Entire Screen, Options > Microphone: MacBook
-   microphone. Each speaker sits close to the laptop for their slide. Advance with the arrow key.
-   Stop on slide 8 after "Now the demo".
-3. Take B, the demo: Chrome full screen (Ctrl+Cmd+F) on the app, same recording settings. The
-   app's voice comes out of the speakers and the microphone picks it up, so nothing else is
-   needed. Only Charles talks while holding the mic. Point the cursor at what you are describing.
-   No cuts inside the demo: if it goes wrong, start again with a new runtime folder. If a
-   rehearsal of Take B runs past 1:55, drop the (optional) steps.
-4. Join: open Take A in QuickTime, Edit > Add Clip to End > Take B. Trim dead air at the start
-   and end with Edit > Trim. File > Export As > 1080p, named Presentation_Group11_Sprint2.mp4.
-5. Watch it once end to end. It must run under 4:55.
-Rehearse each part once with a timer: Take A should run 2:50-2:58, Take B under 1:55.
+   In Chrome, open http://localhost:8501, allow the microphone, tap the avatar, enter "Charles",
+   turn "Read answers aloud" on, Save. Leave Priorities on Recommended. Stay online. Turn on Do
+   Not Disturb. Record with Cmd+Shift+5 > Record Entire Screen, Options > Microphone: MacBook
+   microphone; the app's voice comes out of the speakers and the microphone picks it up. Start
+   on slide 8 for two seconds, then switch to Chrome full screen (Ctrl+Cmd+F). No cuts inside
+   the demo: if it goes wrong, start again with a new runtime folder. If a rehearsal runs past
+   2:00, drop the (optional) steps.
+3. Join: open the first clip in QuickTime, Edit > Add Clip to End for each next clip in order.
+   Trim dead air at the start and end with Edit > Trim. File > Export As > 1080p, named
+   Presentation_Group11_Sprint2.mp4.
+4. Watch it once end to end. It must run under 4:55.
+Rehearse each part once with a timer: Take A should run 2:50-2:58, Take B under 2:00.
 
 SLIDE 1 - Cover (0:00-0:13)  Joshua
 "Hi, we're Group 11, Track 2. This is StitchFlow: say an order, and it finds the right workshop.
@@ -46,20 +48,20 @@ seconds, with a record of why. That one job is our scope.
 Since Sprint 1, we beat earliest finish, which tied us, our defects and fairness settings beat
 their baselines, and the dispatcher can now talk to the desk."
 
-SLIDE 3 - The user journey (0:45-1:08)  Charles
+SLIDE 3 - The user journey (0:45-1:08)  Saadhvika
 "We designed the journey for the floor. The dispatcher holds the mic and says the order. The
 desk answers on screen and out loud: the best workshop, when it arrives, and why. 'Book it' opens
 a sheet, and a slide confirms. It offers to remember the constraint, and uses it on the next
 order."
 
-SLIDE 4 - Architecture (1:08-1:35)  Charles
+SLIDE 4 - Architecture (1:08-1:35)  Joshua
 "This is what we built. Speech becomes text in the browser, and Python answers commands like
 'book it' itself. Everything else is one structured-output call, and every field must quote the
 message. Deterministic tools then look up the order, apply remembered rules, check eligibility
 and rank, so the model never does arithmetic. A slide confirms, and SQLite keeps the booking and
 the rule."
 
-SLIDE 5 - Key choices (1:35-1:53)  Charles
+SLIDE 5 - Key choices (1:35-1:53)  Niyanthri
 "We chose a fixed workflow over a ReAct agent, because every request needs the same checks;
 exact lookups over embeddings, so we never fetch the wrong order; exact rules in SQLite over a
 vector store; and a slide, never a spoken yes."
@@ -79,10 +81,10 @@ out with new wording; 96.9 percent passed on the first live run. Hard cases: an
 impossible date, a workshop that can't take it, and a misheard order. We give options, refuse
 with a reason, and read the order back."
 
-SLIDE 8 - Demo (2:55-4:50)  Charles, then Lynn
-Take A ends here:
+SLIDE 8 - Demo (2:55-4:50)  Charles
+Take B starts on this slide for two seconds:
   Charles: "Now the demo."
-Take B, in the app. Times are from the start of Take B. Speak only when the app is quiet.
+Then the app. Times are from the start of the app part. Speak only when the app is quiet.
 [0:00] Charles: "I'm Charles, playing the dispatcher. The rings show how busy each workshop is,
        and OldMill is grey because it's suspended."
 [0:08] Hold the mic and say: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away
@@ -99,13 +101,13 @@ Take B, in the app. Times are from the start of Take B. Speak only when the app 
 [0:58] Hold the mic and say: "ORD-081 for Harbor Knits needs to go out, due April 20."
        Let the answer play, then point at the memory note on the card.
        Charles: "Same customer, so the rule is applied, and the card says it came from memory."
-[1:22] Lynn: "Now a hard case, straight from the inbox."
-       Charles holds the mic and says: "QuickStitch for the scarves on ORD-103?"
+[1:22] Charles: "Now a hard case, straight from the inbox."
+       Hold the mic and say: "QuickStitch for the scarves on ORD-103?"
        Let the answer play: QuickStitch cannot make scarves, no workshop meets 4 April, and the
        best alternative is 13.44 days late.
-[1:45] Lynn: "It refuses, gives the earliest option and a two-shop split, and books nothing."
+[1:45] Charles: "It refuses, gives the earliest option and a two-shop split, and books nothing."
 [1:52] Open "Behind the answer". (optional)
-       Lynn: "This panel shows what the model read, with quotes, and what Python computed."
+       Charles: "This panel shows what the model read, with quotes, and what Python computed."
 [1:59] Stop recording.
 
 SLIDE 9 - Thank you (not recorded)
