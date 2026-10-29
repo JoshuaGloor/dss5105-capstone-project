@@ -64,19 +64,20 @@ SLIDE 5 - Key choices (1:35-1:53)  Charles
 exact lookups over embeddings, so we never fetch the wrong order; exact rules in SQLite over a
 vector store; and a slide, never a spoken yes."
 
-SLIDE 6 - Progress (1:53-2:13)  Saadhvika
-"Every feature has an owner. Six of eleven are done: the voice assistant, memory, capacity
-questions, the four-objective scorer, the desk redesign and the AWS deployment. In progress:
-clarification fixes, and our evaluation set. Planned: Lynn's live run on the full set, and a
+SLIDE 6 - Progress (1:53-2:11)  Saadhvika
+"Every feature has an owner. Seven of eleven are done, including the voice assistant, memory,
+the four-objective scorer and 205 generated evaluation requests. In progress: clarification
+fixes and independent inbox labels. Planned: Lynn's re-run of the test set, and Joshua's
 usability test."
 
-SLIDE 7 - Validation plan (2:13-2:55)  Niyanthri
+SLIDE 7 - Validation plan (2:11-2:55)  Niyanthri
 "We measure late batches and late days, our primary objective, in the course simulator, with and
-without a closure. Baselines are random, biggest capacity and cheapest, plus earliest finish.
-The minimum is to beat all three baselines, and handle all 30 inbox requests. Today: 1.4 percent
-late against 1.7, and 68 percent fewer late days. For language, the 30 inbox requests plus 50 new held-out ones, labelled
-separately, then agreed. Hard cases: an impossible date, a workshop that can't take it, and a
-misheard order. We give options, refuse with a reason, and read the order back."
+without a closure, against random, biggest capacity, cheapest and earliest finish. The minimum
+is to beat all three baselines and handle all 30 inbox requests. Today: 1.4 percent late against
+1.7, and 68 percent fewer late days. For language: the inbox plus 205 generated requests, 65 held
+out with new wording; 96.9 percent passed on the first live run. Hard cases: an
+impossible date, a workshop that can't take it, and a misheard order. We give options, refuse
+with a reason, and read the order back."
 
 SLIDE 8 - Demo (2:55-4:50)  Charles, then Lynn
 Take A ends here:
@@ -126,6 +127,13 @@ Q&A PREPARATION (not read aloud)
   the dispatcher and says requests from the chat out loud: Mei's R25 and the boss's R14.
 - Why "StitchFlow"? Stitch for garments, flow for orders moving to the right workshop.
   QuickStitch is one of the eight workshops, not us.
+- How was the evaluation set built? 205 requests generated from templates with fixed seeds,
+  across the seven request kinds: 140 train, 65 test, and the test wording never appears in
+  train. Labels come from construction (the generator knows the order, date and constraint it
+  wrote) plus the deterministic dispatch preview, so no model labels them. Results are
+  behaviour-rubric pass rates from one gpt-5.6 run on intake-v2: train 134/140 (95.7%), test
+  63/65 (96.9%). They are not model accuracy. The three original train failures (TR053,
+  TR056, TR059) were an unneeded quantity question blocking a refusal, fixed in intake-v3.
 - Is the demo real time? Yes. It is one take with no cuts; only the start and end are trimmed.
 - Why voice? The track's bonus asks how a dispatcher would really use it: on the floor, on a
   phone. Typing still works everywhere, and the course inbox is still evaluated as text.
