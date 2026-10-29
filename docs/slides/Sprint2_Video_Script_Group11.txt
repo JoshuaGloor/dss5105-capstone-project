@@ -90,34 +90,31 @@ SLIDE 8 - Demo (2:55-4:50)  Charles
 The slides recording ends on this slide for two seconds:
   Niyanthri: "Now, the demo."
 Charles's recording starts straight in the app. Times are from the start of the app part. Speak only when the app is quiet.
-[0:00] Charles: "Hi everyone, I'm Zepeng, or Charles, as the app calls me. Today I'm a
-       dispatcher. No desk. Just my phone, and StitchFlow. The rings show how busy each
-       workshop is; OldMill is grey, it's suspended."
-[0:10] Hold the mic and say: "Hi, I've got order 109 for Harbor Knits, 500 vests, due April
+[0:00] Charles: "Hi everyone, I'm Zepeng, or Charles, as the app calls me. In this demo I'll
+       play the dispatcher, using our app, StitchFlow. The rings show how busy each workshop
+       is, and OldMill is grey because it's suspended."
+[0:08] Hold the mic and say: "Hi, I've got order 109 for Harbor Knits, 500 vests, due April
        13th. And keep it away from BudgetWorks, their last batch came back rough."
        Let the answer play: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days
        early. Cost 550, defect risk 6.0%. Say book it, or tap book, to confirm."
-[0:32] Tap "Compare 4 workshops", then "Can't take it", then close them. (optional)
-       Charles: "I just said it. It found a workshop, told me when it'll arrive, and kept
-       BudgetWorks out, because I asked."
+[0:30] Tap "Compare 4 workshops", then "Can't take it", then close them. (optional)
+       Charles: "Here are the other options, and why the rest can't take it. BudgetWorks is out
+       because I asked."
 [0:40] Hold the mic and say: "Okay, book it." The sheet opens.
-       Charles: "Nothing happens until I slide." Slide to confirm.
-[0:50] On the receipt, tap "Remember".
-       Charles: "And it offers to remember that."
-[0:55] Hold the mic and say: "Next one: order 81 for Harbor Knits, due April 20th."
+       Charles: "Nothing is saved until I slide." Slide to confirm.
+[0:52] On the receipt, tap "Remember".
+       Charles: "And it offers to remember that rule."
+[0:58] Hold the mic and say: "Next one: order 81 for Harbor Knits, due April 20th."
        (Say "due", not "go out by": "go out by" is a ship date, and the desk would ask which.)
-       Let the answer play, then point at the "From memory" note on the card.
-       Charles: "Same customer, new order. I don't repeat myself; it remembers."
-[1:18] Charles: "Now, something hard. A real message from the boss."
+       Let the answer play, then point at the memory note on the card.
+       Charles: "Same customer, so the rule is applied, and the card says it came from memory."
+[1:22] Charles: "Now a hard case, straight from the inbox."
        Hold the mic and say: "QuickStitch for the scarves on order 103?"
        Let the answer play: QuickStitch cannot make scarves, no workshop meets 4 April, and the
        best alternative is 13.44 days late.
-[1:40] Charles: "It doesn't guess. It says no, tells me why, and shows the earliest option and a
-       split. Nothing is booked."
-[1:48] Point at the "Behind the answer" panel on the right.
-       Charles: "One more thing. Every answer shows its working: what the AI heard, and what our
-       code calculated."
-[1:56] Charles: "That's StitchFlow."
+[1:45] Charles: "It refuses, gives the earliest option and a two-shop split, and books nothing."
+[1:52] Point at the "Behind the answer" panel on the right. (optional)
+       Charles: "This panel shows what the model read, with quotes, and what Python computed."
 [1:59] Stop recording.
 
 SLIDE 9 - Thank you (not recorded)
