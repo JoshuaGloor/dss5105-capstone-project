@@ -35,14 +35,14 @@ const LANGUAGE = { model: 'gpt-5.6', train: 140, test: 65, trainPassed: 134, tes
 // Feature, owner, status (Done / In progress / Planned). Owners agreed by the team; [TBD] rows are still open.
 const EVAL_OWNERS = 'Saadhvika and Niyanthri';
 const PROGRESS = [
-  ['Voice assistant: phone UI, speech in and out, slide to book', 'Chen Zepeng', 'Done'],
-  ['Long-term memory: rules from confirmed bookings, log, profile', 'Chen Zepeng', 'Done'],
-  ['Four-objective scorer, frozen presets, objective lab', 'Chen Zepeng', 'Done'],
+  ['Voice assistant: speech in and out, slide to book', 'Chen Zepeng', 'Done'],
+  ['Long-term memory of confirmed rules, log, profile', 'Chen Zepeng', 'Done'],
+  ['Four-objective scorer, presets, objective lab', 'Chen Zepeng', 'Done'],
   ['Capacity questions and workshop checks from chat', 'Chen Zepeng', 'Done'],
   ['Chat-first desk redesign', 'Duong Thanh Nhan', 'Done'],
   ['AWS deployment behind HTTPS (demo site)', 'Joshua Wesley Gloor', 'Done'],
   ['Clarification reliability fixes and 247-assertion benchmark', 'Tang Zheling', 'In progress'],
-  ['Evaluation sets: 205 generated requests, 140 train and 65 test', EVAL_OWNERS, 'Done'],
+  ['Evaluation sets: 205 requests, 140 train / 65 test', EVAL_OWNERS, 'Done'],
   ['Independent labels for the 30 inbox requests', EVAL_OWNERS, 'In progress'],
   ['Re-run the 65 test requests on the current intake (v3)', 'Tang Zheling', 'Planned'],
   ['Usability test: two people acting as dispatchers, four tasks', 'Joshua Wesley Gloor', 'Planned'],
@@ -123,6 +123,14 @@ const tableCell = (text, o = {}) => ({ text, options: { fontFace: BODY, fontSize
   border: [{ type: 'none' }, { type: 'none' }, { type: 'solid', color: C.line, pt: 0.75 }, { type: 'none' }], ...o } });
 const tableHead = (text) => tableCell(text, { fontSize: 7, bold: true, color: C.muted, charSpacing: 1.5,
   border: [{ type: 'none' }, { type: 'none' }, { type: 'solid', color: C.ink, pt: 1 }, { type: 'none' }] });
+// Rounded cards and big numbers give each slide one place for the eye to land.
+const box = (slide, x, y, w, h, { fill = C.card, line = C.line, radius = 0.08 } = {}) =>
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: radius, fill: { color: fill }, line: { color: line, width: 0.75 } });
+const bar = (slide, x, y, h, color) => slide.addShape(pres.shapes.RECTANGLE, { x, y, w: 0.06, h, fill: { color }, line: { color, width: 0 } });
+const stat = (slide, x, y, w, value, label, { color = C.forest, size = 30, labelColor = C.inkSoft } = {}) => {
+  T(slide, value, { x, y, w, h: 0.55, fontFace: HEAD, fontSize: size, color, valign: 'bottom' });
+  T(slide, label, { x, y: y + 0.6, w, h: 0.5, fontSize: 8.5, color: labelColor });
+};
 const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].filter(Boolean).join('\n\n'));
 
 // ---- 1. Cover ------------------------------------------------------------------------------
@@ -160,28 +168,40 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
   frame(s, 2, 'OBJECTIVE AND FOCUS', 'The dispatcher decides on the factory floor, in seconds');
-  card(s, 0.6, 1.35, 3.85, 1.15);
-  kicker(s, 'THE USER', 0.8, 1.47, 3.4, C.camelText);
-  T(s, 'The production dispatcher at SweaterCo', { x: 0.8, y: 1.68, w: 3.5, h: 0.3, fontFace: HEAD, fontSize: 13.5 });
-  T(s, 'On the floor with a phone, not at a desk. Requests arrive in a group chat, and most are messy: missing dates, vague orders, banned workshops.',
-    { x: 0.8, y: 1.98, w: 3.5, h: 0.5, fontSize: 9, color: C.inkSoft });
-  kicker(s, 'A REAL REQUEST FROM THE INBOX', 0.6, 2.68, 3.85);
+  box(s, 0.6, 1.3, 3.95, 1.55, { fill: C.ink, line: C.ink });
+  kicker(s, 'A REAL REQUEST FROM THE INBOX', 0.85, 1.45, 3.5, C.camelLight);
   T(s, '"ORD-109, 500 vests for Harbor Knits, due Apr 13. ...and keep it away from BudgetWorks, the last batch came back rough."',
-    { x: 0.6, y: 2.9, w: 3.85, h: 0.65, fontFace: HEAD, fontSize: 12, italic: true });
-  kicker(s, 'WHAT THE DISPATCHER NEEDS', 0.6, 3.68, 3.85);
-  ['A safe workshop, its arrival date and why, in seconds', 'The constraint honoured, and who asked recorded', 'One deliberate step to commit; a record afterwards'].forEach((t, i) =>
-    T(s, `${i + 1}   ${t}`, { x: 0.6, y: 3.9 + i * 0.27, w: 3.85, h: 0.25, fontSize: 9.5, color: C.ink }));
-  kicker(s, 'WHAT CHANGED SINCE SPRINT 1', 4.85, 1.35, 4.55);
-  const changes = [
-    ['Earliest finish tied us on lateness', `Default beats it: ${pct(hybrid['% late'])} late vs ${pct(ef['% late'])}, ${fewer(hybrid['late days'], ef['late days'])}% fewer late days`],
-    ['Biggest capacity won on defects', `Defects setting wins: ${pct(N('defects')['% def pcs'])} defective pieces vs ${pct(N('greedy_biggest')['% def pcs'])}`],
-    ['Fairness not tuned', `Fairness setting: largest share ${pct(N('fairness')['max share'], 1)} vs random ${pct(N('random')['max share'], 1)}`],
-    ['Typing at a desk only', 'Voice on the phone, read aloud, slide to book'],
-    ['No memory between requests', 'Remembers confirmed constraints, and says when it applies one'],
+    { x: 0.85, y: 1.68, w: 3.5, h: 0.85, fontFace: HEAD, fontSize: 13.5, italic: true, color: C.onInk });
+  T(s, 'Mei, 09:53, request R25', { x: 0.85, y: 2.55, w: 3.5, h: 0.18, fontSize: 8, color: C.onInkMuted });
+  kicker(s, 'THE USER', 0.6, 3.0, 3.95, C.camelText);
+  T(s, 'The production dispatcher at SweaterCo', { x: 0.6, y: 3.18, w: 3.95, h: 0.28, fontFace: HEAD, fontSize: 14 });
+  T(s, 'On the floor with a phone. Most requests are messy: missing dates, vague orders, banned workshops.',
+    { x: 0.6, y: 3.47, w: 3.95, h: 0.34, fontSize: 9, color: C.inkSoft });
+  ['A safe workshop, its date and why, in seconds', 'The constraint kept, and who asked recorded', 'One deliberate step to commit; a record after'].forEach((t, i) => {
+    const y = 3.9 + i * 0.35;
+    box(s, 0.6, y, 3.95, 0.29);
+    T(s, String(i + 1), { x: 0.72, y, w: 0.2, h: 0.29, fontFace: HEAD, fontSize: 12, color: C.camel, valign: 'middle' });
+    T(s, t, { x: 0.95, y, w: 3.55, h: 0.29, fontSize: 9, valign: 'middle' });
+  });
+  kicker(s, 'WHAT CHANGED SINCE SPRINT 1', 4.85, 1.3, 4.55);
+  const tiles = [
+    [`${fewer(hybrid['late days'], ef['late days'])}%`, `fewer late days than earliest finish, which tied us in Sprint 1 (${pct(hybrid['% late'])} late vs ${pct(ef['% late'])})`],
+    [pct(N('defects')['% def pcs']), `defective pieces with the defects setting, vs ${pct(N('greedy_biggest')['% def pcs'])} for biggest capacity, which won in Sprint 1`],
+    [pct(N('fairness')['max share'], 1), `largest workshop share with the fairness setting, vs ${pct(N('random')['max share'], 1)} for random; not tuned in Sprint 1`],
   ];
-  s.addTable([[tableHead('SPRINT 1'), tableHead('SPRINT 2')],
-    ...changes.map(([a, b]) => [tableCell(a, { color: C.muted }), tableCell(b, { bold: true, color: C.forest })])],
-  { x: 4.85, y: 1.6, w: 4.55, colW: [1.75, 2.8], rowH: [0.26, 0.5, 0.5, 0.5, 0.5, 0.5] });
+  tiles.forEach(([value, label], i) => {
+    const x = 4.85 + i * 1.55;
+    box(s, x, 1.52, 1.45, 1.6);
+    stat(s, x + 0.14, 1.6, 1.2, value, label, { size: 26 });
+  });
+  [['NEW', 'Voice on the phone: answers read aloud, and one slide to book'],
+    ['NEW', 'Memory: confirmed constraints come back, with who said them']].forEach(([tag, text], i) => {
+    const y = 3.27 + i * 0.66;
+    box(s, 4.85, y, 4.55, 0.56);
+    bar(s, 4.85, y, 0.56, C.forest);
+    T(s, tag, { x: 5.05, y, w: 0.5, h: 0.56, fontSize: 7.5, bold: true, color: C.forest, charSpacing: 1.5, valign: 'middle' });
+    T(s, text, { x: 5.55, y, w: 3.75, h: 0.56, fontSize: 9.5, bold: true, valign: 'middle' });
+  });
   source(s, `Course simulator, mean of ${seeds.length} normal runs (seeds ${seedRange}); presets chosen on development seeds first. docs/OBJECTIVE_STUDY.md`);
   notes(s, 2);
 }
@@ -226,21 +246,28 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
   frame(s, 5, 'KEY CHOICES', 'Each choice, against the alternative we considered');
+  // The four choices the brief names (model, retrieval, data store, tools) lead, on dark cards.
   const choices = [
-    ['MODEL', 'One hosted model, named in .env', 'A fine-tuned or local model', 'It only extracts quoted fields, so no training is needed; swapping it is one line'],
-    ['ORCHESTRATION', 'One fixed workflow', 'A ReAct agent loop', 'Every request needs the same checks in order: testable, cheaper, no tool-choice errors'],
-    ['RETRIEVAL', 'Exact lookup by order ID', 'Embedding retrieval (RAG)', 'Orders have keys; an exact match cannot fetch the wrong order'],
-    ['DATA STORE', 'SQLite for records and memory', 'A vector store', 'A rule must apply exactly, with who said it, and be auditable in one local file'],
-    ['TOOLS', "The course's eligible_workshops()", 'Our own eligibility rule', 'Our checks and the course simulator can never disagree'],
-    ['REPLIES', 'Python templates', 'Model-written replies', 'No model arithmetic: dates and costs are copied from tool outputs'],
-    ['SPEECH', 'Browser speech recognition', 'Server speech-to-text', 'Free, live words while speaking, no extra key; typing always works'],
-    ['COMMIT', 'Slide to confirm', 'Book on a spoken "yes"', 'A misheard "yes" on a noisy floor cannot send work out'],
+    ['MODEL', 'One hosted model, named in .env', 'a fine-tuned or local model', 'It only extracts quoted fields, so no training is needed; swapping it is one line.'],
+    ['RETRIEVAL', 'Exact lookup by order ID', 'embedding retrieval (RAG)', 'Orders have keys; an exact match cannot fetch the wrong order.'],
+    ['DATA STORE', 'SQLite for records and memory', 'a vector store', 'A rule must apply exactly, with who said it, auditable in one local file.'],
+    ['TOOLS', "The course's eligible_workshops()", 'our own eligibility rule', 'Our checks and the course simulator can never disagree.'],
+    ['ORCHESTRATION', 'One fixed workflow', 'a ReAct agent loop', 'Every request needs the same checks in order: testable, cheaper, no tool-choice errors.'],
+    ['REPLIES', 'Python templates', 'model-written replies', 'No model arithmetic: dates and costs are copied from tool outputs.'],
+    ['SPEECH', 'Browser speech recognition', 'server speech-to-text', 'Free, live words while speaking, no extra key; typing always works.'],
+    ['COMMIT', 'Slide to confirm', 'booking on a spoken "yes"', 'A misheard "yes" on a noisy floor cannot send work out.'],
   ];
-  s.addTable([[tableHead('FOR'), tableHead('WE CHOSE'), tableHead('OVER'), tableHead('BECAUSE')],
-    ...choices.map(([k, a, b, c]) => [tableCell(k, { fontSize: 7, bold: true, color: C.camelText, charSpacing: 1.5 }),
-      tableCell(a, { bold: true }), tableCell(b, { color: C.muted }), tableCell(c, { color: C.inkSoft })])],
-  { x: 0.6, y: 1.36, w: 8.8, colW: [1.25, 2.35, 1.85, 3.35], rowH: [0.26, ...choices.map(() => 0.4)] });
-  source(s, 'Trust boundary: the model call is the only thing that leaves the machine. It never sees costs, queues or defect rates.');
+  const cw = (8.8 - 3 * 0.12) / 4, ch = 1.68;
+  choices.forEach(([k, chose, over, because], i) => {
+    const x = 0.6 + (i % 4) * (cw + 0.12), y = 1.3 + Math.floor(i / 4) * (ch + 0.12);
+    const dark = i < 4;
+    box(s, x, y, cw, ch, dark ? { fill: C.ink, line: C.ink } : {});
+    kicker(s, k, x + 0.15, y + 0.13, cw - 0.3, dark ? C.camelLight : C.camelText);
+    T(s, chose, { x: x + 0.15, y: y + 0.33, w: cw - 0.3, h: 0.5, fontFace: HEAD, fontSize: 12.5, color: dark ? C.onInk : C.ink });
+    T(s, `over ${over}`, { x: x + 0.15, y: y + 0.84, w: cw - 0.3, h: 0.2, fontSize: 8, italic: true, color: dark ? C.onInkMuted : C.muted });
+    T(s, because, { x: x + 0.15, y: y + 1.08, w: cw - 0.3, h: 0.52, fontSize: 8, color: dark ? C.onInk : C.inkSoft });
+  });
+  source(s, 'Dark: the four choices the brief asks us to justify. The model call is the only thing that leaves the machine; it never sees costs, queues or defect rates.');
   notes(s, 5);
 }
 
@@ -250,22 +277,27 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   frame(s, 6, 'PROGRESS SINCE THE SPRINT 1 ROADMAP', 'Every feature, its owner and its status');
   const tone = { Done: C.forest, 'In progress': C.amber, Planned: C.muted };
   const count = (status) => PROGRESS.filter((r) => r[2] === status).length;
-  // Headline count, after Niyanthri's redesign: features done in large type, the rest as pills.
+  // Headline count, after Niyanthri's redesign, then a board with one column per status.
   T(s, [{ text: String(count('Done')), options: { color: C.forest } }, { text: `/${PROGRESS.length}` }],
-    { x: 0.6, y: 1.35, w: 2.2, h: 1.0, fontFace: HEAD, fontSize: 60, valign: 'middle' });
-  T(s, 'features done this sprint', { x: 0.6, y: 2.4, w: 2.2, h: 0.28, fontSize: 11, bold: true });
-  [['In progress', true], ['Planned', false]].forEach(([status, filled], i) => {
-    const y = 2.86 + i * 0.44;
-    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y, w: 1.6, h: 0.32, rectRadius: 0.16,
-      fill: { color: filled ? tone[status] : C.paper }, line: { color: tone[status], width: 1 } });
-    T(s, `${count(status)} ${status.toLowerCase()}`, { x: 0.6, y, w: 1.6, h: 0.32, fontSize: 9, bold: true,
-      color: filled ? C.card : tone[status], align: 'center', valign: 'middle' });
+    { x: 0.6, y: 1.35, w: 1.9, h: 1.0, fontFace: HEAD, fontSize: 56, valign: 'middle' });
+  T(s, 'features done this sprint', { x: 0.6, y: 2.4, w: 1.9, h: 0.28, fontSize: 10.5, bold: true });
+  T(s, 'Each card names its owner. Code and pull requests are linked below.', { x: 0.6, y: 2.75, w: 1.75, h: 0.5, fontSize: 8.5, color: C.inkSoft });
+  const columns = [['Done', 3.4], ['In progress', 1.6], ['Planned', 1.6]];
+  let x = 2.6;
+  columns.forEach(([status, w]) => {
+    const items = PROGRESS.filter((r) => r[2] === status);
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 1.3, w, h: 0.28, rectRadius: 0.14, fill: { color: tone[status] }, line: { color: tone[status], width: 0 } });
+    T(s, `${status.toUpperCase()}  ${items.length}`, { x, y: 1.3, w, h: 0.28, fontSize: 8, bold: true, color: C.card, charSpacing: 1.5, align: 'center', valign: 'middle' });
+    const h = status === 'Done' ? 0.42 : 0.72;
+    items.forEach(([feature, owner], i) => {
+      const y = 1.66 + i * (h + 0.04);
+      box(s, x, y, w, h);
+      bar(s, x, y, h, tone[status]);
+      T(s, feature, { x: x + 0.14, y: y + 0.04, w: w - 0.2, h: h - 0.2, fontSize: 8, bold: true });
+      T(s, owner, { x: x + 0.14, y: y + h - 0.17, w: w - 0.2, h: 0.14, fontSize: 7, color: owner.startsWith('[') ? C.oxblood : C.muted });
+    });
+    x += w + 0.1;
   });
-  s.addTable([[tableHead('FEATURE'), tableHead('OWNER'), tableHead('STATUS')],
-    ...PROGRESS.map(([f, o, st]) => [tableCell(f, { fontSize: 8.5 }),
-      tableCell(o, { fontSize: 8.5, color: o.startsWith('[') ? C.oxblood : C.inkSoft }),
-      tableCell(st, { fontSize: 8.5, bold: true, color: tone[st] })])],
-  { x: 3.0, y: 1.32, w: 6.4, colW: [3.85, 1.65, 0.9], rowH: [0.24, ...PROGRESS.map(() => 0.29)] });
   source(s, `Code: ${GITHUB}. PRs: #15 and #18 this sprint, #16 and #17 evaluation sets, #14 clarification reliability.`);
   notes(s, 6);
 }
@@ -274,40 +306,44 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
   frame(s, 7, 'VALIDATION PLAN', 'What we measure, against what, and the hard cases');
+  const tw = (8.8 - 3 * 0.12) / 4;
+  const heroes = [
+    [pct(hybrid['% late']), `late batches (our objective), vs ${pct(ef['% late'])} for earliest finish`],
+    [hybrid['late days'].toFixed(3), `mean late days, vs ${ef['late days'].toFixed(3)} for earliest finish`],
+    [pct(N('defects')['% def pcs']), `defective pieces, vs ${pct(N(best('% def pcs'))['% def pcs'])} for ${label[best('% def pcs')]}`],
+    [pct(100 * LANGUAGE.testPassed / LANGUAGE.test, 1), `of ${LANGUAGE.test} held-out requests passed (${LANGUAGE.testPassed}/${LANGUAGE.test}); train ${pct(100 * LANGUAGE.trainPassed / LANGUAGE.train, 1)}`],
+  ];
+  heroes.forEach(([value, text], i) => {
+    const x = 0.6 + i * (tw + 0.12);
+    box(s, x, 1.28, tw, 1.12, i === 3 ? { fill: C.ink, line: C.ink } : {});
+    stat(s, x + 0.15, 1.3, tw - 0.3, value, text, i === 3 ? { color: C.onInk, labelColor: C.onInkMuted, size: 28 } : { size: 28 });
+  });
+  const cw = (8.8 - 2 * 0.12) / 3;
   const plan = [
-    ['WHAT WE MEASURE, AND WHY', 'Late batches and late days (our objective), defective pieces, largest share, change under a closure: the course simulator\'s own metrics. For language: the right behaviour on each request, and every number traced to a tool.'],
-    ['HOW THE EVALUATION SET IS BUILT', `All 30 inbox requests by the 7 kinds in the data dictionary, plus ${LANGUAGE.train + LANGUAGE.test} generated by ${EVAL_OWNERS}: ${LANGUAGE.train} to tune on, ${LANGUAGE.test} held out with new wording. Labels come from how each request was built, never from a model. First live run: test ${LANGUAGE.testPassed}/${LANGUAGE.test} passed (${pct(100 * LANGUAGE.testPassed / LANGUAGE.test, 1)}), train ${LANGUAGE.trainPassed}/${LANGUAGE.train} (${pct(100 * LANGUAGE.trainPassed / LANGUAGE.train, 1)}).`],
-    ['BASELINE AND TRACK MINIMUM', 'Random, biggest capacity and cheapest, plus the earliest-finish rule. Minimum: beat all three baselines on late batches and late days, and handle all 30 requests by kind.'],
+    ['WHAT WE MEASURE, AND WHY', "Late batches and late days (our objective), defective pieces, largest share and the change under a closure: the course simulator's own metrics. Language: the right behaviour per request, every number traced to a tool."],
+    ['HOW THE EVALUATION SET IS BUILT', `${'30'} inbox requests by kind, plus ${LANGUAGE.train + LANGUAGE.test} generated by ${EVAL_OWNERS}: ${LANGUAGE.train} to tune on, ${LANGUAGE.test} held out with new wording. Labels come from how each request was built, never from a model.`],
+    ['BASELINE AND TRACK MINIMUM', 'Random, biggest capacity and cheapest, plus earliest finish. Minimum: beat all three baselines on late batches and late days, and handle all 30 inbox requests by kind.'],
   ];
   plan.forEach(([k, t], i) => {
-    const y = 1.32 + i * 0.86;
-    kicker(s, k, 0.6, y, 4.2, C.camelText);
-    T(s, t, { x: 0.6, y: y + 0.2, w: 4.2, h: 0.62, fontSize: 8.5, color: C.inkSoft });
+    const x = 0.6 + i * (cw + 0.12);
+    box(s, x, 2.52, cw, 1.12, { fill: C.wash, line: C.wash });
+    kicker(s, k, x + 0.15, 2.62, cw - 0.3, C.camelText);
+    T(s, t, { x: x + 0.15, y: 2.82, w: cw - 0.3, h: 0.78, fontSize: 8, color: C.inkSoft });
   });
-  kicker(s, `TODAY, COURSE SEEDS ${seedRange}, NORMAL RUNS`, 5.1, 1.32, 4.3);
-  const results = [
-    ['Lateness (primary)', `${pct(hybrid['% late'])} late, ${hybrid['late days'].toFixed(3)} late days`, `earliest finish ${pct(ef['% late'])}, ${ef['late days'].toFixed(3)}`, 'Beats all'],
-    ['Defects', `${pct(N('defects')['% def pcs'])} defective pieces`, `${label[best('% def pcs')]} ${pct(N(best('% def pcs'))['% def pcs'])}`, 'Beats all'],
-    ['Fairness', `largest share ${pct(N('fairness')['max share'], 1)}`, `random ${pct(N('random')['max share'], 1)}`, 'Beats random'],
-    ['Robustness', `+${rows.robustness.delta['% late'].toFixed(3)} pts late under closure`, `random +${rows.random.delta['% late'].toFixed(3)}`, 'Steadier'],
-  ];
-  s.addTable([[tableHead('OBJECTIVE'), tableHead('OURS'), tableHead('BEST REFERENCE'), tableHead('')],
-    ...results.map(([o, a, b, v]) => [tableCell(o, { fontFace: HEAD, fontSize: 9.5 }), tableCell(a, { fontSize: 8.5 }), tableCell(b, { fontSize: 8.5, color: C.muted }),
-      tableCell(v, { bold: true, color: C.forest, fontSize: 8.5 })])],
-  { x: 5.1, y: 1.52, w: 4.3, colW: [1.05, 1.45, 1.1, 0.7], rowH: [0.22, 0.38, 0.38, 0.38, 0.38] });
-  kicker(s, 'HARD CASES AND HOW WE HANDLE THEM', 5.1, 3.48, 4.3);
+  kicker(s, 'HARD CASES AND HOW WE HANDLE THEM', 0.6, 3.76, 8.8);
   const hard = [
-    ['Impossible date', 'Earliest date, days late, a two-shop split; no booking'],
-    ['Workshop that cannot take it', 'Refused with the reason, plus the best alternative'],
-    ['Misheard order on the floor', 'Order, customer, pieces read back from orders.csv; slide to commit'],
+    ['Impossible date', 'Earliest date, days late and a two-shop split; nothing is booked'],
+    ['Workshop that cannot take it', 'Refused with the reason, plus the best permitted alternative'],
+    ['Misheard order on the floor', 'Order, customer and pieces read back from orders.csv; a slide commits'],
   ];
   hard.forEach(([h, t], i) => {
-    const y = 3.7 + i * 0.4;
-    T(s, String(i + 1), { x: 5.1, y, w: 0.25, h: 0.3, fontFace: HEAD, fontSize: 15, color: C.camel });
-    T(s, h, { x: 5.38, y, w: 4.0, h: 0.18, fontSize: 9, bold: true });
-    T(s, t, { x: 5.38, y: y + 0.17, w: 4.0, h: 0.2, fontSize: 8, color: C.inkSoft });
+    const x = 0.6 + i * (cw + 0.12);
+    box(s, x, 3.96, cw, 0.92);
+    T(s, String(i + 1), { x: x + 0.15, y: 4.02, w: 0.35, h: 0.5, fontFace: HEAD, fontSize: 26, color: C.camel });
+    T(s, h, { x: x + 0.55, y: 4.08, w: cw - 0.7, h: 0.22, fontSize: 9.5, bold: true });
+    T(s, t, { x: x + 0.55, y: 4.32, w: cw - 0.7, h: 0.5, fontSize: 8, color: C.inkSoft });
   });
-  source(s, `Allocation: presets chosen on seeds 6000-6029, course seeds run twice (OBJECTIVE_STUDY.md). Language: one ${LANGUAGE.model} run; a rubric pass rate, not model accuracy.`);
+  source(s, `Allocation: course seeds ${seedRange}, presets chosen on seeds 6000-6029 (OBJECTIVE_STUDY.md). Language: one ${LANGUAGE.model} run; a rubric pass rate, not model accuracy.`);
   notes(s, 7);
 }
 
