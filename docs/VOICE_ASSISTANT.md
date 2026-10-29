@@ -112,9 +112,11 @@ short version for a live run.
 - Speech recognition quality depends on the browser's service; recognition is not
   evaluated yet. Typed requests remain the reference input for the inbox evaluation.
 - A phone on the same Wi-Fi needs HTTPS for the microphone; on plain HTTP, type.
-- Spoken replies use the browser's own voices, English only: Samantha on macOS, Google US
-  English in Chrome, Aria or Jenny in Edge, then any other English voice except the macOS
-  novelty ones. A voice is never chosen by a partial name match ("Daria" is Bulgarian).
+- Spoken replies use the browser's own voices, English only: a downloaded macOS Premium or
+  Enhanced voice first (Ava, Zoe or Evan, from System Settings > Accessibility > Spoken
+  Content > Manage Voices), then Google US English in Chrome, Aria or Jenny in Edge, then
+  Samantha and any other English voice except the macOS novelty ones. Names match from the
+  start, so a voice is never chosen by a partial match ("Daria" is Bulgarian).
 - VS Code's built-in browser and other Electron windows expose the speech API but have no
   speech service, so every attempt fails as a network error. The app treats them as
   unsupported and says so; open it in Chrome, Edge or Safari to talk.

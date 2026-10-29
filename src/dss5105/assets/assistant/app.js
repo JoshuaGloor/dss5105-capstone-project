@@ -362,14 +362,17 @@ function createApp(root) {
     if (interim) nodes.listenText.append(el("span", { class: "interim", text: interim }));
   }
 
-  // Native English voices in order of preference: macOS, Chrome, then Edge and Windows. Only English
-  // voices are considered and names match from the start, so Bulgarian "Daria" never stands in for
-  // "Aria", and macOS novelty voices ("Bad News", "Bubbles") are never picked.
+  // Native English voices in order of preference: macOS neural voices (downloaded in System Settings
+  // > Accessibility > Spoken Content), then Chrome, Edge and Windows, then the standard macOS voice.
+  // Only English voices are considered and names match from the start, so Bulgarian "Daria" never
+  // stands in for "Aria", and macOS novelty voices ("Bad News", "Bubbles") are never picked.
   const VOICES = [
-    /^Samantha\b/,
+    /\(Premium\)/,
+    /\(Enhanced\)/,
+    /^(Ava|Zoe|Evan|Allison|Nathan|Susan)\b/,
     /^Google US English$/,
     /^Microsoft (Aria|Jenny|Ava)\b/,
-    /^(Ava|Allison|Susan|Zoe)\b/,
+    /^Samantha\b/,
     /^Google UK English Female$/,
     /^(Daniel|Karen|Moira)\b/,
   ];
