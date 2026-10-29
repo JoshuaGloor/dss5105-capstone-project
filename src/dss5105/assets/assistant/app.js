@@ -263,14 +263,25 @@ function createApp(root) {
   }
 
   // Speech -------------------------------------------------------------------------------
+  // Embedded Chromium (VS Code's browser and other Electron apps) exposes the API but has no
+  // speech service, so every attempt fails with "network". Treat it as unsupported.
+  function embeddedBrowser() {
+    return /Electron\//.test(navigator.userAgent);
+  }
+
   function recognitionClass() {
+    if (embeddedBrowser()) return null;
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
   }
 
   function startListening() {
     const Recognition = recognitionClass();
     if (!Recognition) {
-      toast("Voice input needs Chrome, Edge or Safari. You can type instead.");
+      toast(
+        embeddedBrowser()
+          ? "This built-in browser has no speech service. Open the app in Chrome, Edge or Safari to talk, or type here."
+          : "Voice input needs Chrome, Edge or Safari. You can type instead."
+      );
       nodes.input.focus();
       return;
     }
@@ -298,7 +309,7 @@ function createApp(root) {
         "not-allowed": "Microphone access is blocked. Allow it in the browser, or type instead.",
         "service-not-allowed": "Microphone access is blocked. Allow it in the browser, or type instead.",
         "no-speech": "I didn't hear anything. Hold the button and speak.",
-        network: "Speech recognition needs a network connection. You can type instead.",
+        network: "Speech recognition could not reach its service. Try again, or type instead.",
         "audio-capture": "No microphone was found. You can type instead.",
       };
       if (event.error !== "aborted") toast(messages[event.error] || "Voice input stopped. You can type instead.");
