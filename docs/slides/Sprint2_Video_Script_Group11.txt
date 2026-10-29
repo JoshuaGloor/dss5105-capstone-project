@@ -115,7 +115,8 @@ Charles's recording starts straight in the app. Times are from the start of the 
 [1:45] Charles: "It refuses, gives the earliest option and a two-shop split, and books nothing."
 [1:52] Point at the "Behind the answer" panel on the right. (optional)
        Charles: "This panel shows what the model read, with quotes, and what Python computed."
-[1:59] Stop recording.
+[1:57] Charles: "That's StitchFlow." Pause for two seconds.
+[2:00] Stop recording.
 
 SLIDE 9 - Thank you (not recorded)
 The video ends on the demo, so this slide stays in the deck for the Q&A only.
