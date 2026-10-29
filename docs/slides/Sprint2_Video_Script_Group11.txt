@@ -1,15 +1,15 @@
 Recording script, Group 11, Sprint 2 video
 Due Fri 30 Oct 2026, 15:00, on Canvas as Presentation_Group11_Sprint2.mp4. Hard stop at 5:00.
-Target 4:50: project 0:00-2:55 (slides 1-6), demo 2:55-4:50 (slide 7 and the app).
+Target 4:50: project 0:00-2:55 (slides 1-7), demo 2:55-4:50 (slide 8 and the app).
 scripts/build_sprint2_deck.mjs copies each SLIDE section into that slide's speaker notes, and the
-Q&A section into slide 8. Numbers come from docs/evidence/objective-study.json and the live app;
+Q&A section into slide 9. Numbers come from docs/evidence/objective-study.json and the live app;
 if either changes, update both. Lines are timed at 140 words a minute.
 
 WHO SPEAKS (suggested; confirm before recording)
   Joshua Wesley Gloor          slides 1 and 2
-  Chen Zepeng (Charles)        slides 3 and 4, and drives the demo (the voice at the microphone)
-  Sundara Rajan Saadhvika      slide 5
-  Sridhar Niyanthri Rajeswari  slide 6
+  Chen Zepeng (Charles)        slides 3 to 5, and drives the demo (the voice at the microphone)
+  Sundara Rajan Saadhvika      slide 6
+  Sridhar Niyanthri Rajeswari  slide 7
   Tang Zheling (Lynn)          the demo hard case
   Ruby (Duong Thanh Nhan) is absent, as slide 1 shows.
 
@@ -21,13 +21,13 @@ Two takes on one MacBook, everyone in one quiet room, then join the two clips in
    http://localhost:8501, allow the microphone, tap the avatar, enter "Charles", turn "Read answers
    aloud" on, Save. Leave Priorities on Recommended. Stay online: speech recognition and the
    model both need the network. Turn on Do Not Disturb and mute phones.
-2. Take A, slides 1-7: open Presentation_Group11_Sprint2.pptx in Keynote and press Play. Start a
+2. Take A, slides 1-8: open Presentation_Group11_Sprint2.pptx in Keynote and press Play. Start a
    screen recording with Cmd+Shift+5 > Record Entire Screen, Options > Microphone: MacBook
    microphone. Each speaker sits close to the laptop for their slide. Advance with the arrow key.
-   Stop on slide 7 after "Now the demo".
+   Stop on slide 8 after "Now the demo".
 3. Take B, the demo: Chrome full screen (Ctrl+Cmd+F) on the app, same recording settings. The
    app's voice comes out of the speakers and the microphone picks it up, so nothing else is
-   needed. Only Zepeng talks while holding the mic. Point the cursor at what you are describing.
+   needed. Only Charles talks while holding the mic. Point the cursor at what you are describing.
    No cuts inside the demo: if it goes wrong, start again with a new runtime folder. If a
    rehearsal of Take B runs past 1:55, drop the (optional) steps.
 4. Join: open Take A in QuickTime, Edit > Add Clip to End > Take B. Trim dead air at the start
@@ -46,27 +46,30 @@ seconds, with a record of why. That one job is our scope.
 Since Sprint 1, we beat earliest finish, which tied us, our defects and fairness settings beat
 their baselines, and the dispatcher can now talk to the desk."
 
-SLIDE 3 - The user journey (0:45-1:08)  Zepeng
+SLIDE 3 - The user journey (0:45-1:08)  Charles
 "We designed the journey for the floor. The dispatcher holds the mic and says the order. The desk answers
 on screen and out loud: the best workshop, when it arrives, and why. 'Book it' opens a sheet, and
 a slide confirms. It offers to remember the constraint, and uses it on the next order."
 
-SLIDE 4 - Architecture and key choices (1:08-1:53)  Zepeng
-"This diagram is what we built. Speech becomes text in the browser: free and live, instead of a
-server speech model. Python handles commands like 'book it' without a model. Everything else is
-one structured-output call, not a ReAct agent, because every request needs the same checks in
-order, and every field must quote the message. Deterministic tools then look up the order, apply
-remembered rules, check eligibility and rank. Replies are
-templates, so the model never does arithmetic. Memory is exact rules in SQLite, not a vector
-store, because a rule must match exactly. And only a slide books, never a spoken yes."
+SLIDE 4 - Architecture (1:08-1:35)  Charles
+"This is what we built. Speech becomes text in the browser, and Python answers commands like
+'book it' itself. Everything else is one structured-output call, and every field must quote the
+message. Deterministic tools then look up the order, apply remembered rules, check eligibility
+and rank, so the model never does arithmetic. A slide confirms, and SQLite keeps the booking and
+the rule."
 
-SLIDE 5 - Progress (1:53-2:13)  Saadhvika
+SLIDE 5 - Key choices (1:35-1:53)  Charles
+"We chose a fixed workflow over a ReAct agent, because every request needs the same checks;
+exact lookups over embeddings, so we never fetch the wrong order; exact rules in SQLite over a
+vector store; and a slide, never a spoken yes."
+
+SLIDE 6 - Progress (1:53-2:13)  Saadhvika
 "Every feature has an owner. Six of eleven are done: the voice assistant, memory, capacity
 questions, the four-objective scorer, the desk redesign and the AWS deployment. In progress:
 clarification fixes, and our evaluation set. Planned: Lynn's live run on the full set, and a
 usability test."
 
-SLIDE 6 - Validation plan (2:13-2:55)  Niyanthri
+SLIDE 7 - Validation plan (2:13-2:55)  Niyanthri
 "We measure late batches and late days, our primary objective, in the course simulator, with and
 without a closure. Baselines are random, biggest capacity and cheapest, plus earliest
 finish. The minimum is to beat all three
@@ -75,28 +78,28 @@ fewer late days. For language, the 30 inbox requests plus 50 new held-out ones, 
 separately, then agreed. Hard cases: an impossible date, a workshop that can't take it, and a
 misheard order. We give options, refuse with a reason, and read the order back."
 
-SLIDE 7 - Demo (2:55-4:50)  Zepeng, then Lynn
+SLIDE 8 - Demo (2:55-4:50)  Charles, then Lynn
 Take A ends here:
-  Zepeng: "Now the demo."
+  Charles: "Now the demo."
 Take B, in the app. Times are from the start of Take B. Speak only when the app is quiet.
-[0:00] Zepeng: "I'm Charles, playing the dispatcher. The rings show how busy each workshop is,
+[0:00] Charles: "I'm Charles, playing the dispatcher. The rings show how busy each workshop is,
        and OldMill is grey because it's suspended."
 [0:08] Hold the mic and say: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away
        from BudgetWorks."
        Let the answer play: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days
        early. Cost 550, defect risk 6.0%. Say book it, or tap book, to confirm."
 [0:30] Tap "Compare 4 workshops", then "Can't take it", then close them. (optional)
-       Zepeng: "Here are the other options, and why the rest can't take it. BudgetWorks is out
+       Charles: "Here are the other options, and why the rest can't take it. BudgetWorks is out
        because I asked."
 [0:40] Hold the mic and say: "Book it." The sheet opens.
-       Zepeng: "Nothing is saved until I slide." Slide to confirm.
+       Charles: "Nothing is saved until I slide." Slide to confirm.
 [0:52] On the receipt, tap "Remember".
-       Zepeng: "And it offers to remember that rule."
+       Charles: "And it offers to remember that rule."
 [0:58] Hold the mic and say: "ORD-081 for Harbor Knits needs to go out, due April 20."
        Let the answer play, then point at the memory note on the card.
-       Zepeng: "Same customer, so the rule is applied, and the card says it came from memory."
+       Charles: "Same customer, so the rule is applied, and the card says it came from memory."
 [1:22] Lynn: "Now a hard case, straight from the inbox."
-       Zepeng holds the mic and says: "QuickStitch for the scarves on ORD-103?"
+       Charles holds the mic and says: "QuickStitch for the scarves on ORD-103?"
        Let the answer play: QuickStitch cannot make scarves, no workshop meets 4 April, and the
        best alternative is 13.44 days late.
 [1:45] Lynn: "It refuses, gives the earliest option and a two-shop split, and books nothing."
@@ -104,12 +107,12 @@ Take B, in the app. Times are from the start of Take B. Speak only when the app 
        Lynn: "This panel shows what the model read, with quotes, and what Python computed."
 [1:59] Stop recording.
 
-SLIDE 8 - Thank you (not recorded)
+SLIDE 9 - Thank you (not recorded)
 The video ends on the demo, so this slide stays in the deck for the Q&A only.
 
 AFTER RECORDING
 - Upload the .mp4 to YouTube as unlisted, then open the link in a private window.
-- Put the link on slides 1 and 8:
+- Put the link on slides 1 and 9:
     DEMO_LINK=https://youtu.be/... node scripts/build_sprint2_deck.mjs
   then export the PDF again, and open the GitHub link in a private window too.
 - One member uploads the .mp4 and the .pptx (or .pdf) to Canvas by 15:00.

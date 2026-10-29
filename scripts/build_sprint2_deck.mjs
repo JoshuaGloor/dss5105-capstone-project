@@ -1,11 +1,12 @@
 // Build the Sprint 2 deck. Every metric is read from retained evidence JSON, never typed in.
 //
 //   mkdir -p .cache/deck-node && npm --prefix .cache/deck-node install pptxgenjs@3.12.0
+//   node scripts/build_architecture_diagram.mjs   # only when the architecture changes; see its header
 //   node scripts/build_sprint2_deck.mjs
 //
 // Output: docs/slides/Presentation_Group11_Sprint2.pptx (the exact upload name).
 // Sources: docs/evidence/objective-study.json, docs/slides/Sprint2_Video_Script_Group11.txt (speaker
-// notes), docs/slides/assets/sprint2/*.png (screenshots of the running app).
+// notes), docs/slides/assets/sprint2/*.png (screenshots of the running app, and architecture.png).
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -204,49 +205,41 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 4. Architecture --------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 4, 'ARCHITECTURE AS BUILT  /  KEY CHOICES', 'The model reads, Python computes, a person commits');
-  const boxes = [
-    ['PHONE APP', 'Browser', 'Speech to text, cards, voice, slide to book', 'assets/assistant', 'card'],
-    ['ROUTER', 'Python', '"book it", memory and workshop questions: no model', 'assistant.py', 'card'],
-    ['LLM', 'Structured output', 'Typed patch; every field must quote the message', 'intake.py', 'external'],
-    ['TOOLS', 'Deterministic', 'Order lookup, remembered rules, eligibility, estimates, ranking', 'dispatch.py  allocator.py', 'core'],
-    ['REPLY', 'Python template', 'Card and speech from tool strings only', 'assistant.py', 'card'],
-    ['CONFIRM + STORE', 'SQLite', 'Recompute, save the record, learn the rule', 'records.py  memory.py', 'card'],
-  ];
-  const bw = 1.33, bh = 1.32, by = 1.42, gapX = (8.8 - 6 * bw) / 5;
-  boxes.forEach(([title, kind, body, mod, style], i) => {
-    const x = 0.6 + i * (bw + gapX);
-    const core = style === 'core', ext = style === 'external';
-    card(s, x, by, bw, bh, core ? C.ink : ext ? C.wash : C.card, core ? C.ink : ext ? C.muted : C.line, ext ? 'dash' : undefined);
-    T(s, title, { x: x + 0.09, y: by + 0.08, w: bw - 0.18, h: 0.16, fontSize: 7, bold: true, charSpacing: 1.2, color: core ? C.camelLight : C.camelText });
-    T(s, kind, { x: x + 0.09, y: by + 0.25, w: bw - 0.18, h: 0.2, fontFace: HEAD, fontSize: 10.5, color: core ? C.onInk : C.ink });
-    T(s, body, { x: x + 0.09, y: by + 0.48, w: bw - 0.18, h: 0.6, fontSize: 7.5, color: core ? C.onInk : C.inkSoft });
-    T(s, mod.replace(/  /g, '\n'), { x: x + 0.09, y: by + bh - 0.3, w: bw - 0.18, h: 0.26, fontFace: MONO, fontSize: 6.5, color: core ? C.camelLight : C.camelText, valign: 'bottom' });
-    if (i < boxes.length - 1) {
-      s.addShape(pres.shapes.LINE, { x: x + bw + 0.02, y: by + bh / 2, w: gapX - 0.04, h: 0, line: { color: C.ink, width: 1, endArrowType: 'triangle' } });
-    }
-  });
-  const llmX = 0.6 + 2 * (bw + gapX);
-  T(s, 'Trust boundary: the model call is the only thing that leaves the machine. It never sees costs, queues or defect rates.',
-    { x: llmX - 0.6, y: by + bh + 0.06, w: bw + 1.2, h: 0.3, fontSize: 7, italic: true, color: C.muted, align: 'center' });
-  kicker(s, 'KEY CHOICES, AGAINST THE ALTERNATIVE WE CONSIDERED', 0.6, 3.15, 8.8);
-  const choices = [
-    ['One workflow', 'A ReAct agent loop', 'Every request needs the same checks in order: testable, cheaper, no tool-choice errors'],
-    ['Browser speech recognition', 'Server speech-to-text', 'Free, live words while speaking, no extra key; typing always works'],
-    ['Python templates for replies', 'Model-written replies', 'No model arithmetic: dates and costs are copied from tools'],
-    ['Exact rules in SQLite', 'A vector-store memory', 'A constraint must apply exactly, with who said it, and be auditable'],
-    ['Slide to confirm', 'Book on a spoken "yes"', 'A misheard "yes" on a noisy floor cannot send work out'],
-  ];
-  s.addTable([[tableHead('WE CHOSE'), tableHead('OVER'), tableHead('BECAUSE')],
-    ...choices.map(([a, b, c]) => [tableCell(a, { bold: true }), tableCell(b, { color: C.muted }), tableCell(c, { color: C.inkSoft })])],
-  { x: 0.6, y: 3.36, w: 8.8, colW: [2.0, 1.85, 4.95], rowH: [0.24, 0.27, 0.27, 0.27, 0.27, 0.27] });
+  frame(s, 4, 'ARCHITECTURE AS BUILT', 'The model reads, Python computes, a person commits');
+  // Hand-drawn diagram from scripts/build_architecture_diagram.mjs; run that first when it changes.
+  const [dw, dh] = pngSize(asset('architecture.png'));
+  image(s, asset('architecture.png'), 0.6 + (8.8 - 3.95 * dw / dh) / 2, 1.2, 3.95,
+    'Architecture: phone app and router, LLM intake and quote check, deterministic tools, reply card, slide to confirm, ' +
+    'plan ledger, memory store and course data, with the simulator and inbox evaluation', false);
   notes(s, 4);
 }
 
-// ---- 5. Progress ------------------------------------------------------------------------------------
+// ---- 5. Key choices ---------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 5, 'PROGRESS SINCE THE SPRINT 1 ROADMAP', 'Every feature, its owner and its status');
+  frame(s, 5, 'KEY CHOICES', 'Each choice, against the alternative we considered');
+  const choices = [
+    ['MODEL', 'One hosted model, named in .env', 'A fine-tuned or local model', 'It only extracts quoted fields, so no training is needed; swapping it is one line'],
+    ['ORCHESTRATION', 'One fixed workflow', 'A ReAct agent loop', 'Every request needs the same checks in order: testable, cheaper, no tool-choice errors'],
+    ['RETRIEVAL', 'Exact lookup by order ID', 'Embedding retrieval (RAG)', 'Orders have keys; an exact match cannot fetch the wrong order'],
+    ['DATA STORE', 'SQLite for records and memory', 'A vector store', 'A rule must apply exactly, with who said it, and be auditable in one local file'],
+    ['TOOLS', "The course's eligible_workshops()", 'Our own eligibility rule', 'Our checks and the course simulator can never disagree'],
+    ['REPLIES', 'Python templates', 'Model-written replies', 'No model arithmetic: dates and costs are copied from tool outputs'],
+    ['SPEECH', 'Browser speech recognition', 'Server speech-to-text', 'Free, live words while speaking, no extra key; typing always works'],
+    ['COMMIT', 'Slide to confirm', 'Book on a spoken "yes"', 'A misheard "yes" on a noisy floor cannot send work out'],
+  ];
+  s.addTable([[tableHead('FOR'), tableHead('WE CHOSE'), tableHead('OVER'), tableHead('BECAUSE')],
+    ...choices.map(([k, a, b, c]) => [tableCell(k, { fontSize: 7, bold: true, color: C.camelText, charSpacing: 1.5 }),
+      tableCell(a, { bold: true }), tableCell(b, { color: C.muted }), tableCell(c, { color: C.inkSoft })])],
+  { x: 0.6, y: 1.36, w: 8.8, colW: [1.25, 2.35, 1.85, 3.35], rowH: [0.26, ...choices.map(() => 0.4)] });
+  source(s, 'Trust boundary: the model call is the only thing that leaves the machine. It never sees costs, queues or defect rates.');
+  notes(s, 5);
+}
+
+// ---- 6. Progress ------------------------------------------------------------------------------------
+{
+  const s = pres.addSlide({ masterName: 'CONTENT' });
+  frame(s, 6, 'PROGRESS SINCE THE SPRINT 1 ROADMAP', 'Every feature, its owner and its status');
   const tone = { Done: C.forest, 'In progress': C.amber, Planned: C.muted };
   const count = (status) => PROGRESS.filter((r) => r[2] === status).length;
   // Headline count, after Niyanthri's redesign: features done in large type, the rest as pills.
@@ -266,13 +259,13 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
       tableCell(st, { fontSize: 8.5, bold: true, color: tone[st] })])],
   { x: 3.0, y: 1.32, w: 6.4, colW: [3.85, 1.65, 0.9], rowH: [0.24, ...PROGRESS.map(() => 0.29)] });
   source(s, `Code: ${GITHUB} (PRs #15 and #18 for this sprint, PR #14 for clarification reliability).`);
-  notes(s, 5);
+  notes(s, 6);
 }
 
-// ---- 6. Validation plan ----------------------------------------------------------------------------
+// ---- 7. Validation plan ----------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 6, 'VALIDATION PLAN', 'What we measure, against what, and the hard cases');
+  frame(s, 7, 'VALIDATION PLAN', 'What we measure, against what, and the hard cases');
   const plan = [
     ['WHAT WE MEASURE, AND WHY', 'Late batches and late days (our objective), defective pieces, largest share, change under a closure: the course simulator\'s own metrics. For language: the right behaviour on each request, and every number traced to a tool.'],
     ['HOW THE EVALUATION SET IS BUILT', `All 30 inbox requests, grouped by the 7 kinds in the data dictionary, plus 50 new held-out requests (rewordings, bait items) written and labelled by ${EVAL_OWNERS}. Labels are made separately, then agreed; a model judge counts only where it matches them.`],
@@ -307,13 +300,13 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
     T(s, t, { x: 5.38, y: y + 0.17, w: 4.0, h: 0.2, fontSize: 8, color: C.inkSoft });
   });
   source(s, 'Presets chosen on development seeds 6000-6029; the course seeds were run twice, as disclosed in docs/OBJECTIVE_STUDY.md.');
-  notes(s, 6);
+  notes(s, 7);
 }
 
-// ---- 7. Demo -----------------------------------------------------------------------------------------
+// ---- 8. Demo -----------------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'DARK' });
-  T(s, [{ text: '07   ', options: { color: C.onInk } }, { text: 'DEMO' }], { x: 0.6, y: 0.55, w: 4, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
+  T(s, [{ text: '08   ', options: { color: C.onInk } }, { text: 'DEMO' }], { x: 0.6, y: 0.55, w: 4, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
   T(s, 'Charles, as the dispatcher', { x: 0.6, y: 0.8, w: 5, h: 0.6, fontFace: HEAD, fontSize: 28, color: C.onInk });
   const demo = [
     'Says a real inbox request out loud',
@@ -329,10 +322,10 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
     T(s, t, { x: 0.98, y: 1.69 + i * 0.44, w: 4.3, h: 0.3, fontSize: 10.5, color: C.onInk });
   });
   image(s, asset('assistant-with-trace.png'), 5.5, 0.72, 4.1, 'The assistant beside its Behind the answer panel, showing a remembered rule applied to a new order');
-  notes(s, 7);
+  notes(s, 8);
 }
 
-// ---- 8. Thank you ------------------------------------------------------------------------------------
+// ---- 9. Thank you ------------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'DARK' });
   T(s, 'STITCHFLOW', { x: 0.6, y: 0.5, w: 4, h: 0.3, fontFace: HEAD, fontSize: 13, color: C.onInk, charSpacing: 9 });
@@ -344,7 +337,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
     { x: 0.6, y: 3.85, w: 8.8, h: 0.22, fontSize: 10 });
   T(s, 'SAY THE ORDER  /  PYTHON CHECKS  /  A PERSON COMMITS', { x: 0.6, y: 4.5, w: 8.8, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
   T(s, 'GROUP 11  /  DSS5105 CAPSTONE  /  30 OCTOBER 2026', { x: 0.6, y: 5.15, w: 8.8, h: 0.2, fontSize: 7.5, color: C.onInkMuted, charSpacing: 2 });
-  notes(s, 8, ['Q&A PREPARATION' + qa.replace(/\n+$/, '')]);
+  notes(s, 9, ['Q&A PREPARATION' + qa.replace(/\n+$/, '')]);
 }
 
 fs.mkdirSync(path.dirname(out), { recursive: true });
