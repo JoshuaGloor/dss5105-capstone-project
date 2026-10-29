@@ -35,6 +35,9 @@ Two parts, then join the clips in QuickTime.
    Trim dead air at the start and end with Edit > Trim. File > Export As > 1080p, named
    Presentation_Group11_Sprint2.mp4.
 4. Watch it once end to end. It must run under 4:55.
+   Clip sizes differ: a Meet recording is usually 1280 x 720, a Mac screen recording is full
+   Retina size and 16:10. If QuickTime shows black bars or a size jump, join the clips in iMovie
+   instead (new 16:9 project, drag the clips in order, File > Share > File, 1080p).
 Rehearse each part once with a timer: Take A should run 2:50-2:58, Take B under 2:00.
 
 SLIDE 1 - Cover (0:00-0:13)  Joshua
@@ -85,8 +88,8 @@ SLIDE 8 - Demo (2:55-4:50)  Charles
 Take B starts on this slide for two seconds:
   Charles: "Now the demo."
 Then the app. Times are from the start of the app part. Speak only when the app is quiet.
-[0:00] Charles: "I'm Charles, playing the dispatcher. The rings show how busy each workshop is,
-       and OldMill is grey because it's suspended."
+[0:00] Charles: "I'm Chen Zepeng, Charles in the app, playing the dispatcher. The rings show how
+       busy each workshop is, and OldMill is grey because it's suspended."
 [0:08] Hold the mic and say: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away
        from BudgetWorks."
        Let the answer play: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days

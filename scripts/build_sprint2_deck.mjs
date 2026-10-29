@@ -148,7 +148,8 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   T(s, [{ text: 'DEMO VIDEO  ', options: { bold: true, color: C.camel } }, { text: DEMO_LINK, options: { color: C.onInk } }],
     { x: 0.6, y: 4.84, w: 6.2, h: 0.2, fontSize: 8.5, charSpacing: 0.5 });
   T(s, 'DSS5105 CAPSTONE  /  30 OCTOBER 2026', { x: 0.6, y: 5.2, w: 6, h: 0.2, fontSize: 7, color: C.onInkMuted, charSpacing: 2 });
-  image(s, asset('phone-welcome.png'), 7.15, 0.45, 4.75, 'The dispatch assistant on a phone: a greeting, the eight workshops with their queue rings, and example requests');
+  const [pw, ph] = pngSize(asset('phone-welcome.png'));
+  image(s, asset('phone-welcome.png'), 9.45 - 4.75 * pw / ph, 0.45, 4.75, 'The dispatch assistant on a phone: a greeting, the eight workshops with their queue rings, and example requests');
   notes(s, 1);
 }
 
@@ -193,7 +194,8 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
     ['phone-receipt.png', 'Remember', 'It offers to keep the constraint for this customer.'],
     ['phone-memory.png', 'Reuse', 'Next order: the rule is applied, and the card says so.'],
   ];
-  const h = 3.0, w = h * (336 / 692), gap = (8.8 - 5 * w) / 4;
+  const [pw, ph] = pngSize(asset('phone-welcome.png'));
+  const h = 3.0, w = h * (pw / ph), gap = (8.8 - 5 * w) / 4;
   steps.forEach(([file, title, text], i) => {
     const x = 0.6 + i * (w + gap);
     image(s, asset(file), x, 1.3, h, `${title}: ${text}`);
@@ -311,6 +313,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   const s = pres.addSlide({ masterName: 'DARK' });
   T(s, [{ text: '08   ', options: { color: C.onInk } }, { text: 'DEMO' }], { x: 0.6, y: 0.55, w: 4, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
   T(s, 'Charles, as the dispatcher', { x: 0.6, y: 0.8, w: 5, h: 0.6, fontFace: HEAD, fontSize: 28, color: C.onInk });
+  T(s, `Presented by ${MEMBERS[0][0]} (${MEMBERS[0][1]}), who goes by Charles`, { x: 0.6, y: 1.36, w: 5, h: 0.22, fontSize: 9.5, color: C.onInkMuted });
   const demo = [
     'Says a real inbox request out loud',
     'Hears the best workshop and why',
@@ -324,7 +327,9 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
     T(s, String(i + 1), { x: 0.6, y: 1.65 + i * 0.44, w: 0.3, h: 0.32, fontFace: HEAD, fontSize: 15, color: C.camel });
     T(s, t, { x: 0.98, y: 1.69 + i * 0.44, w: 4.3, h: 0.3, fontSize: 10.5, color: C.onInk });
   });
-  image(s, asset('assistant-with-trace.png'), 5.5, 0.72, 4.1, 'The assistant beside its Behind the answer panel, showing a remembered rule applied to a new order');
+  const [tw, th] = pngSize(asset('assistant-with-trace.png'));
+  const traceH = Math.min(4.1, 3.95 * th / tw);
+  image(s, asset('assistant-with-trace.png'), 5.5, 0.72 + (4.1 - traceH) / 2, traceH, 'The assistant beside its Behind the answer panel, showing a remembered rule applied to a new order');
   notes(s, 8);
 }
 
