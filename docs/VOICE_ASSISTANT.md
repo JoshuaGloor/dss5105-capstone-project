@@ -91,7 +91,7 @@ See [TOOL_SPEC.md](TOOL_SPEC.md#memory-store) for the contract.
 
 ## A two-minute demo script
 
-The recorded Sprint 2 film follows the shot list in
+The recorded Sprint 2 video follows the script in
 [docs/slides/Sprint2_Video_Script_Group11.txt](slides/Sprint2_Video_Script_Group11.txt); this is the
 short version for a live run.
 
