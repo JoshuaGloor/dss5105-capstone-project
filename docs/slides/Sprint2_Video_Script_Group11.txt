@@ -31,6 +31,9 @@ Two parts, then join the clips in QuickTime.
    on slide 8 for two seconds, then switch to Chrome full screen (Ctrl+Cmd+F). No cuts inside
    the demo: if it goes wrong, start again with a new runtime folder. If a rehearsal runs past
    2:00, drop the (optional) steps.
+   Or record it in your own Google Meet, if Meet recording works for Take A: share the Chrome
+   tab with the app and tick "Also share tab audio", so the app's voice is recorded cleanly;
+   camera off. Both takes are then the same size, and QuickTime joins them without bars.
 3. Join: open the first clip in QuickTime, Edit > Add Clip to End for each next clip in order.
    Trim dead air at the start and end with Edit > Trim. File > Export As > 1080p, named
    Presentation_Group11_Sprint2.mp4.
