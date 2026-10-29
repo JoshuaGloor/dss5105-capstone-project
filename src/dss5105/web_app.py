@@ -213,7 +213,7 @@ def scroll_to_top():
 
 def main():
     st.set_page_config(
-        page_title="SweaterCo | Quick-Response Dispatch Desk", layout="wide", initial_sidebar_state="collapsed"
+        page_title="StitchFlow | Quick-Response Subcontracting Desk", layout="wide", initial_sidebar_state="collapsed"
     )
     st.html("<style>" + STYLE.read_text() + "</style>")
     top = st.container(key="topbar")
@@ -221,7 +221,7 @@ def main():
         [3.2, 2.4, 3.2, 1.4, 1.4], vertical_alignment="center"
     )
     brand.html(
-        '<div class="qr-brand"><span>S</span><div>SweaterCo'
+        '<div class="qr-brand"><span>S</span><div>StitchFlow'
         "<small>QUICK-RESPONSE SUBCONTRACTING DESK</small></div></div>"
     )
     mode = st.session_state.get("objective", "lateness")

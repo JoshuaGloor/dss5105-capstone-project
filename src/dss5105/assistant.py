@@ -577,7 +577,7 @@ def welcome(session: Session, name: str) -> Session:
     greeting = f"Hi {name}," if name else "Hi,"
     card = info_card(
         f"{greeting} what needs to go out today?",
-        label="Dispatch assistant",
+        label="StitchFlow",
         kind="welcome",
         notes=["Hold the microphone and speak, or type. I check every workshop before I suggest one."],
         suggestions=list(EXAMPLES),

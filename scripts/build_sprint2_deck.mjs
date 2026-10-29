@@ -83,12 +83,12 @@ const MONO = 'Courier New';
 const pres = new PptxGenJS();
 pres.layout = 'LAYOUT_16x9';
 pres.author = 'Group 11';
-pres.title = 'Quick-Response Subcontracting Desk - Sprint 2';
+pres.title = 'StitchFlow: Quick-Response Subcontracting Desk - Sprint 2';
 pres.theme = { headFontFace: HEAD, bodyFontFace: BODY };
 pres.defineSlideMaster({
   title: 'CONTENT',
   background: { color: C.paper },
-  objects: [{ text: { text: 'SWEATERCO  /  QUICK-RESPONSE SUBCONTRACTING DESK  /  GROUP 11  /  SPRINT 2',
+  objects: [{ text: { text: 'STITCHFLOW  /  QUICK-RESPONSE SUBCONTRACTING DESK  /  GROUP 11  /  SPRINT 2',
     options: { x: 0.6, y: 5.25, w: 7, h: 0.22, fontFace: BODY, fontSize: 7, color: C.muted, charSpacing: 1.5, margin: 0 } } }],
   slideNumber: { x: 8.9, y: 5.25, w: 0.5, h: 0.22, fontFace: BODY, fontSize: 7, color: C.muted, align: 'right' },
 });
@@ -123,8 +123,9 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
   const s = pres.addSlide({ masterName: 'DARK' });
   T(s, 'SWEATERCO', { x: 0.6, y: 0.42, w: 4, h: 0.3, fontFace: HEAD, fontSize: 13, color: C.onInk, charSpacing: 9 });
   T(s, 'GROUP 11  /  TRACK 2  /  SPRINT 2 REVIEW', { x: 0.6, y: 1.0, w: 6, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
-  T(s, 'The Quick-Response\nSubcontracting Desk', { x: 0.6, y: 1.25, w: 6.2, h: 1.25, fontFace: HEAD, fontSize: 34, color: C.onInk, valign: 'middle' });
-  T(s, 'Ravi talks. Python checks. A person commits.', { x: 0.6, y: 2.52, w: 6, h: 0.4, fontFace: HEAD, fontSize: 15, italic: true, color: C.onInkMuted });
+  T(s, 'StitchFlow', { x: 0.6, y: 1.25, w: 6.2, h: 0.8, fontFace: HEAD, fontSize: 44, color: C.onInk, valign: 'middle' });
+  T(s, 'The Quick-Response Subcontracting Desk', { x: 0.6, y: 2.05, w: 6.2, h: 0.36, fontFace: HEAD, fontSize: 17, color: C.onInk, valign: 'middle' });
+  T(s, 'Say the order. StitchFlow finds the right workshop.', { x: 0.6, y: 2.44, w: 6.2, h: 0.36, fontFace: HEAD, fontSize: 13, italic: true, color: C.onInkMuted, valign: 'middle' });
   [['PRIMARY  ', 'MINIMISE LATENESS'], ['SECONDARY  ', 'MINIMISE DEFECTS']].forEach(([k, v], i) => {
     const x = 0.6 + i * 2.75;
     s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 3.04, w: 2.6, h: 0.36, rectRadius: 0.18, fill: { color: C.ink }, line: { color: C.camel, width: 1 } });
@@ -148,16 +149,16 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 2. User, problem, and what changed ----------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 'OBJECTIVE AND FOCUS', 'Ravi decides on the factory floor, in seconds');
+  frame(s, 'OBJECTIVE AND FOCUS', 'The dispatcher decides on the factory floor, in seconds');
   card(s, 0.6, 1.35, 3.85, 1.15);
   kicker(s, 'THE USER', 0.8, 1.47, 3.4, C.camelText);
-  T(s, 'Ravi, production dispatcher at SweaterCo', { x: 0.8, y: 1.68, w: 3.5, h: 0.3, fontFace: HEAD, fontSize: 13.5 });
+  T(s, 'The production dispatcher at SweaterCo', { x: 0.8, y: 1.68, w: 3.5, h: 0.3, fontFace: HEAD, fontSize: 13.5 });
   T(s, 'On the floor with a phone, not at a desk. Requests arrive in a group chat, and most are messy: missing dates, vague orders, banned workshops.',
     { x: 0.8, y: 1.98, w: 3.5, h: 0.5, fontSize: 9, color: C.inkSoft });
   kicker(s, 'A REAL REQUEST FROM THE INBOX', 0.6, 2.68, 3.85);
   T(s, '"ORD-109, 500 vests for Harbor Knits, due Apr 13. ...and keep it away from BudgetWorks, the last batch came back rough."',
     { x: 0.6, y: 2.9, w: 3.85, h: 0.65, fontFace: HEAD, fontSize: 12, italic: true });
-  kicker(s, 'WHAT RAVI NEEDS', 0.6, 3.68, 3.85);
+  kicker(s, 'WHAT THE DISPATCHER NEEDS', 0.6, 3.68, 3.85);
   ['A safe workshop, its arrival date and why, in seconds', 'The constraint honoured, and who asked recorded', 'One deliberate step to commit; a record afterwards'].forEach((t, i) =>
     T(s, `${i + 1}   ${t}`, { x: 0.6, y: 3.9 + i * 0.27, w: 3.85, h: 0.25, fontSize: 9.5, color: C.ink }));
   kicker(s, 'WHAT CHANGED SINCE SPRINT 1', 4.85, 1.35, 4.55);
@@ -299,7 +300,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 {
   const s = pres.addSlide({ masterName: 'DARK' });
   T(s, 'DEMO', { x: 0.6, y: 0.55, w: 4, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
-  T(s, 'Ravi, on the floor', { x: 0.6, y: 0.8, w: 5, h: 0.6, fontFace: HEAD, fontSize: 28, color: C.onInk });
+  T(s, 'Charles, as the dispatcher', { x: 0.6, y: 0.8, w: 5, h: 0.6, fontFace: HEAD, fontSize: 28, color: C.onInk });
   const demo = [
     'Says a real inbox request out loud',
     'Hears the best workshop and why',
@@ -320,14 +321,14 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 8. Thank you ------------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'DARK' });
-  T(s, 'SWEATERCO', { x: 0.6, y: 0.5, w: 4, h: 0.3, fontFace: HEAD, fontSize: 13, color: C.onInk, charSpacing: 9 });
+  T(s, 'STITCHFLOW', { x: 0.6, y: 0.5, w: 4, h: 0.3, fontFace: HEAD, fontSize: 13, color: C.onInk, charSpacing: 9 });
   T(s, 'Thank you.', { x: 0.6, y: 1.6, w: 8.8, h: 0.9, fontFace: HEAD, fontSize: 40, color: C.onInk });
   T(s, 'Questions are welcome.', { x: 0.6, y: 2.5, w: 8.8, h: 0.5, fontFace: HEAD, fontSize: 18, italic: true, color: C.onInkMuted });
   T(s, [{ text: 'GITHUB  ', options: { bold: true, color: C.camel } }, { text: GITHUB, options: { color: C.onInk } }],
     { x: 0.6, y: 3.55, w: 8.8, h: 0.22, fontSize: 10 });
   T(s, [{ text: 'DEMO VIDEO  ', options: { bold: true, color: C.camel } }, { text: DEMO_LINK, options: { color: C.onInk } }],
     { x: 0.6, y: 3.85, w: 8.8, h: 0.22, fontSize: 10 });
-  T(s, 'RAVI TALKS  /  PYTHON CHECKS  /  A PERSON COMMITS', { x: 0.6, y: 4.5, w: 8.8, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
+  T(s, 'SAY THE ORDER  /  PYTHON CHECKS  /  A PERSON COMMITS', { x: 0.6, y: 4.5, w: 8.8, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
   T(s, 'GROUP 11  /  DSS5105 CAPSTONE  /  30 OCTOBER 2026', { x: 0.6, y: 5.15, w: 8.8, h: 0.2, fontSize: 7.5, color: C.onInkMuted, charSpacing: 2 });
   notes(s, 8, ['Q&A PREPARATION' + qa.replace(/\n+$/, '')]);
 }
