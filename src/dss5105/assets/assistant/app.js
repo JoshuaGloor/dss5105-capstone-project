@@ -362,12 +362,36 @@ function createApp(root) {
     if (interim) nodes.listenText.append(el("span", { class: "interim", text: interim }));
   }
 
+  // Native English voices in order of preference: macOS, Chrome, then Edge and Windows. Only English
+  // voices are considered and names match from the start, so Bulgarian "Daria" never stands in for
+  // "Aria", and macOS novelty voices ("Bad News", "Bubbles") are never picked.
+  const VOICES = [
+    /^Samantha\b/,
+    /^Google US English$/,
+    /^Microsoft (Aria|Jenny|Ava)\b/,
+    /^(Ava|Allison|Susan|Zoe)\b/,
+    /^Google UK English Female$/,
+    /^(Daniel|Karen|Moira)\b/,
+  ];
+  const NOVELTY =
+    /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Kathy|Ralph)\b/;
+
+  function englishVoice() {
+    if (!state.voices.length) state.voices = window.speechSynthesis.getVoices();
+    const english = state.voices.filter((voice) => /^en([-_]|$)/i.test(voice.lang || "") && !NOVELTY.test(voice.name));
+    for (const pattern of VOICES) {
+      const match = english.find((voice) => pattern.test(voice.name));
+      if (match) return match;
+    }
+    return english.find((voice) => /^en[-_]US/i.test(voice.lang)) || english[0] || null;
+  }
+
   function speak(text) {
     if (!text || !("speechSynthesis" in window) || !(state.data && state.data.profile.speak)) return;
     const utterance = new SpeechSynthesisUtterance(text);
-    const preferred = state.voices.find((v) => /Samantha|Google US English|Jenny|Aria/i.test(v.name));
-    const english = preferred || state.voices.find((v) => v.lang && v.lang.startsWith("en"));
-    if (english) utterance.voice = english;
+    const voice = englishVoice();
+    utterance.lang = voice ? voice.lang : "en-US";
+    if (voice) utterance.voice = voice;
     utterance.rate = 1.04;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
