@@ -61,7 +61,7 @@ templates, so the model never does arithmetic. Memory is exact rules in SQLite, 
 store, because a rule must match exactly. And only a slide books, never a spoken yes."
 
 SLIDE 5 - Progress (1:53-2:13)  Saadhvika
-"This is every feature with its owner and status. Done: the voice assistant, memory, capacity
+"Every feature has an owner. Six of eleven are done: the voice assistant, memory, capacity
 questions, the four-objective scorer, the desk redesign and the AWS deployment. In progress:
 clarification fixes, and our evaluation set. Planned: Lynn's live run on the full set, and a
 usability test."

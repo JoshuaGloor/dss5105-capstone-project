@@ -95,8 +95,10 @@ pres.defineSlideMaster({
 pres.defineSlideMaster({ title: 'DARK', background: { color: C.ink } });
 
 const T = (slide, text, opts) => slide.addText(text, { fontFace: BODY, color: C.ink, margin: 0, isTextBox: true, valign: 'top', ...opts });
-const frame = (slide, eyebrow, title) => {
-  T(slide, eyebrow, { x: 0.6, y: 0.34, w: 8.8, h: 0.22, fontSize: 8.5, bold: true, color: C.camelText, charSpacing: 3 });
+// Section number before the eyebrow, after Niyanthri's redesign.
+const frame = (slide, n, eyebrow, title) => {
+  T(slide, [{ text: `${String(n).padStart(2, '0')}   `, options: { color: C.ink } }, { text: eyebrow }],
+    { x: 0.6, y: 0.34, w: 8.8, h: 0.22, fontSize: 8.5, bold: true, color: C.camelText, charSpacing: 3 });
   T(slide, title, { x: 0.6, y: 0.58, w: 8.8, h: 0.6, fontFace: HEAD, fontSize: 23, valign: 'middle' });
 };
 const card = (slide, x, y, w, h, fill = C.card, line = C.line, dash) =>
@@ -149,7 +151,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 2. User, problem, and what changed ----------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 'OBJECTIVE AND FOCUS', 'The dispatcher decides on the factory floor, in seconds');
+  frame(s, 2, 'OBJECTIVE AND FOCUS', 'The dispatcher decides on the factory floor, in seconds');
   card(s, 0.6, 1.35, 3.85, 1.15);
   kicker(s, 'THE USER', 0.8, 1.47, 3.4, C.camelText);
   T(s, 'The production dispatcher at SweaterCo', { x: 0.8, y: 1.68, w: 3.5, h: 0.3, fontFace: HEAD, fontSize: 13.5 });
@@ -179,7 +181,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 3. User journey ------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 'THE USER JOURNEY  /  THINK LIKE THE USER', 'Say it, check it, slide to book, and it remembers');
+  frame(s, 3, 'THE USER JOURNEY  /  THINK LIKE THE USER', 'Say it, check it, slide to book, and it remembers');
   const steps = [
     ['phone-welcome.png', 'Ask', 'Hold the mic: order, date and any constraint, in plain words.'],
     ['phone-answer.png', 'Answer', 'Best workshop, arrival and spare days, and why. Read aloud.'],
@@ -202,7 +204,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 4. Architecture --------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 'ARCHITECTURE AS BUILT  /  KEY CHOICES', 'The model reads, Python computes, a person commits');
+  frame(s, 4, 'ARCHITECTURE AS BUILT  /  KEY CHOICES', 'The model reads, Python computes, a person commits');
   const boxes = [
     ['PHONE APP', 'Browser', 'Speech to text, cards, voice, slide to book', 'assets/assistant', 'card'],
     ['ROUTER', 'Python', '"book it", memory and workshop questions: no model', 'assistant.py', 'card'],
@@ -244,21 +246,33 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 5. Progress ------------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 'PROGRESS SINCE THE SPRINT 1 ROADMAP', 'Every feature, its owner and its status');
+  frame(s, 5, 'PROGRESS SINCE THE SPRINT 1 ROADMAP', 'Every feature, its owner and its status');
   const tone = { Done: C.forest, 'In progress': C.amber, Planned: C.muted };
+  const count = (status) => PROGRESS.filter((r) => r[2] === status).length;
+  // Headline count, after Niyanthri's redesign: features done in large type, the rest as pills.
+  T(s, [{ text: String(count('Done')), options: { color: C.forest } }, { text: `/${PROGRESS.length}` }],
+    { x: 0.6, y: 1.35, w: 2.2, h: 1.0, fontFace: HEAD, fontSize: 60, valign: 'middle' });
+  T(s, 'features done this sprint', { x: 0.6, y: 2.4, w: 2.2, h: 0.28, fontSize: 11, bold: true });
+  [['In progress', true], ['Planned', false]].forEach(([status, filled], i) => {
+    const y = 2.86 + i * 0.44;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y, w: 1.6, h: 0.32, rectRadius: 0.16,
+      fill: { color: filled ? tone[status] : C.paper }, line: { color: tone[status], width: 1 } });
+    T(s, `${count(status)} ${status.toLowerCase()}`, { x: 0.6, y, w: 1.6, h: 0.32, fontSize: 9, bold: true,
+      color: filled ? C.card : tone[status], align: 'center', valign: 'middle' });
+  });
   s.addTable([[tableHead('FEATURE'), tableHead('OWNER'), tableHead('STATUS')],
-    ...PROGRESS.map(([f, o, st]) => [tableCell(f), tableCell(o, { color: o.startsWith('[') ? C.oxblood : C.inkSoft }),
-      tableCell(st, { bold: true, color: tone[st] })])],
-  { x: 0.6, y: 1.32, w: 8.8, colW: [5.6, 2.0, 1.2], rowH: [0.24, ...PROGRESS.map(() => 0.29)] });
-  const done = PROGRESS.filter((r) => r[2] === 'Done').length;
-  source(s, `${done} of ${PROGRESS.length} done. Code: ${GITHUB} (PR #15 for this sprint, PR #14 for clarification reliability).`);
+    ...PROGRESS.map(([f, o, st]) => [tableCell(f, { fontSize: 8.5 }),
+      tableCell(o, { fontSize: 8.5, color: o.startsWith('[') ? C.oxblood : C.inkSoft }),
+      tableCell(st, { fontSize: 8.5, bold: true, color: tone[st] })])],
+  { x: 3.0, y: 1.32, w: 6.4, colW: [3.85, 1.65, 0.9], rowH: [0.24, ...PROGRESS.map(() => 0.29)] });
+  source(s, `Code: ${GITHUB} (PRs #15 and #18 for this sprint, PR #14 for clarification reliability).`);
   notes(s, 5);
 }
 
 // ---- 6. Validation plan ----------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CONTENT' });
-  frame(s, 'VALIDATION PLAN', 'What we measure, against what, and the hard cases');
+  frame(s, 6, 'VALIDATION PLAN', 'What we measure, against what, and the hard cases');
   const plan = [
     ['WHAT WE MEASURE, AND WHY', 'Late batches and late days (our objective), defective pieces, largest share, change under a closure: the course simulator\'s own metrics. For language: the right behaviour on each request, and every number traced to a tool.'],
     ['HOW THE EVALUATION SET IS BUILT', `All 30 inbox requests, grouped by the 7 kinds in the data dictionary, plus 50 new held-out requests (rewordings, bait items) written and labelled by ${EVAL_OWNERS}. Labels are made separately, then agreed; a model judge counts only where it matches them.`],
@@ -299,7 +313,7 @@ const notes = (slide, n, extra = []) => slide.addNotes([sections[n], ...extra].f
 // ---- 7. Demo -----------------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'DARK' });
-  T(s, 'DEMO', { x: 0.6, y: 0.55, w: 4, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
+  T(s, [{ text: '07   ', options: { color: C.onInk } }, { text: 'DEMO' }], { x: 0.6, y: 0.55, w: 4, h: 0.22, fontSize: 8.5, bold: true, color: C.camel, charSpacing: 3 });
   T(s, 'Charles, as the dispatcher', { x: 0.6, y: 0.8, w: 5, h: 0.6, fontFace: HEAD, fontSize: 28, color: C.onInk });
   const demo = [
     'Says a real inbox request out loud',
