@@ -356,16 +356,33 @@ def card_for_result(
         permitted = len(result["candidates"])
         on_time = sum(row["meets_deadline"] for row in result["candidates"])
         quantity = _quantity(result["batch"]["pieces"], result["capacity_query"]["product"])
-        if on_time:
+        suggested = result.get("suggested")
+        best = f"Best option: {pick['name']}, arriving {pick['eta_day']}."
+        if suggested and suggested["workshop_id"] == pick["workshop_id"]:
+            best = "It is also the best option."
+        if suggested and suggested["meets_deadline"]:
+            card["headline"] = f"{suggested['name']} can deliver {quantity} by {pick['due_day']}"
+            card["sub"] = f"Arrives {day_label(suggested['eta'])}. {best}"
+        elif suggested and suggested["eta"]:
+            card["headline"] = f"{suggested['name']} cannot deliver {quantity} by {pick['due_day']}"
+            card["sub"] = f"Earliest {day_label(suggested['eta'])}, {suggested['lateness']} late. {best}"
+        elif suggested:
+            card["headline"] = f"{suggested['name']} cannot take {quantity}"
+            card["sub"] = f"{' '.join(suggested['reasons'])} {best}"
+        elif on_time:
             card["headline"] = f"{on_time} of {permitted} workshops can deliver by {pick['due_day']}"
+            card["sub"] = f"{quantity}. {best}"
         else:
             card["headline"] = f"No workshop can deliver {quantity} by {pick['due_day']}"
-        card["sub"] = f"{quantity}. Best option: {pick['name']}, arriving {pick['eta_day']}"
+            card["sub"] = f"{quantity}. {best}"
         card["notes"] = ["Nothing is reserved until an order is booked.", *card["notes"]]
-        speak = (
-            f"{card['headline']}, for {quantity}. Best option: {pick['name']}, "
-            f"{day_label(pick['eta'], long=True)}. Nothing is reserved."
-        )
+        if suggested:
+            speak = f"{card['headline']}. {card['sub']} Nothing is reserved."
+        else:
+            speak = (
+                f"{card['headline']}, for {quantity}. Best option: {pick['name']}, "
+                f"{day_label(pick['eta'], long=True)}. Nothing is reserved."
+            )
     elif status == "REFUSE_SUGGESTION":
         refused = next(
             (row for row in result["excluded"] if row["workshop_id"] == result["input"]["suggested_workshop"]), None

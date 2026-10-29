@@ -6,7 +6,7 @@ from streamlit.testing.v1 import AppTest
 
 from dss5105 import assistant, llm, memory, records
 from dss5105.assistant import Services, Session, apply_event, build_view, handle_utterance
-from dss5105.dispatch import ROOT, read_inbox
+from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
 from dss5105.evaluate import PRESETS
 from dss5105.memory import MemoryStore
 from dss5105.records import AllocationStore
@@ -189,6 +189,17 @@ def test_a_capacity_question_after_an_answer_is_a_new_request_from_one_model_cal
     assert session.conversation.traces[-1]["restarted"] is True
     assert current.model.calls == 2
     assert session.result["commit_allowed"] is False
+
+
+def test_a_named_workshop_leads_the_capacity_card():
+    desk = DispatchDesk()
+    request = DispatchInput(
+        intent="capacity", product="tops", pieces=400, due_date="2026-04-15", suggested_workshop="W1"
+    )
+    envelope = {"request_id": "CHAT", "time": "now", "requester": "Charles", "text": "QuickStitch, 400 tops?"}
+    card = assistant.card_for_result(desk.preview(envelope, request, PRESETS["hybrid"]), desk.workshops)
+    assert card["headline"] == "QuickStitch can deliver 400 tops by Wed 15 Apr"
+    assert card["sub"].startswith("Arrives ") and card["speak"].endswith("Nothing is reserved.")
 
 
 def test_another_order_starts_a_fresh_request_without_a_second_call(services):

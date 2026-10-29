@@ -372,6 +372,19 @@ def test_capacity_question_asks_for_what_it_needs(desk, fields, question):
     assert result["candidates"] == []
 
 
+@pytest.mark.parametrize(
+    "workshop,opening",
+    [("W1", "QuickStitch can deliver 400 pieces of tops by 2026-04-15"), ("W4", "Little Loom cannot take")],
+)
+def test_capacity_question_answers_for_the_named_workshop_first(desk, workshop, opening):
+    request = DispatchInput(
+        intent="capacity", product="tops", pieces=400, due_date="2026-04-15", suggested_workshop=workshop
+    )
+    result = desk.preview(CAPACITY_ENVELOPE, request, PRESETS["hybrid"])
+    assert result["status"] == "CAPACITY" and result["message"].startswith(opening)
+    assert result["suggested"]["workshop_id"] == workshop and result["commit_allowed"] is False
+
+
 def test_capacity_question_reports_the_earliest_option_when_none_is_on_time(desk):
     request = DispatchInput(intent="capacity", product="Scarf", pieces=2000, due_date="2026-04-04")
     result = desk.preview(CAPACITY_ENVELOPE, request, PRESETS["hybrid"])

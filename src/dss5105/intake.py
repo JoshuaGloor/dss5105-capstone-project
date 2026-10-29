@@ -144,15 +144,21 @@ def parse_date_phrase(value: str, as_of: date) -> date | None:
         "november",
         "december",
     )
+    # "April 15" and, as written in Singapore and the UK, "15 April".
     match = re.fullmatch(r"([a-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?", text)
     if match:
         month_name, day, year = match.groups()
-        month = next((i for i, name in enumerate(months, 1) if month_name in (name, name[:3])), None)
-        if month is not None:
-            try:
-                return date(int(year) if year else as_of.year, month, int(day))
-            except ValueError:
-                pass
+    else:
+        match = re.fullmatch(r"(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-z]+)\.?(?:,?\s+(\d{4}))?", text)
+        if not match:
+            return None
+        day, month_name, year = match.groups()
+    month = next((i for i, name in enumerate(months, 1) if month_name in (name, name[:3])), None)
+    if month is not None:
+        try:
+            return date(int(year) if year else as_of.year, month, int(day))
+        except ValueError:
+            pass
     return None
 
 
@@ -202,6 +208,9 @@ MENTIONS = {
     r"moved|revised|earlier|later|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec",
 }
 UNCERTAIN = r"confirm|unsure|not\s+sure|unknown|maybe|perhaps|tbc|tbd|to\s+follow|will\s+let"
+# A count, optionally followed by words such as "pieces" or "pieces of tops"; hedges keep it unclear.
+QUANTITY = re.compile(r"([0-9]+|[1-9][0-9]{0,2}(?:,[0-9]{3})+)((?:\s+[a-z&'-]+)*)", re.IGNORECASE)
+HEDGES = r"or|so|about|around|roughly|approx\w*|max\w*|min\w*|least|most|more|less|plus|odd|ish|up|to"
 
 
 def _mentions(code: str, text: str, order_id: str | None) -> bool:
@@ -254,11 +263,12 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
             elif name == "product":
                 normalized = _product(value, desk)
             elif name == "pieces":
-                if not re.fullmatch(r"[0-9]+|[1-9][0-9]{0,2}(?:,[0-9]{3})+", value):
+                count = QUANTITY.fullmatch(value)
+                if not count or re.search(rf"\b(?:{HEDGES})\b", count.group(2), re.IGNORECASE):
                     needs.add("quantity")
                     unclear_quantity = True
                     continue
-                normalized = int(value.replace(",", ""))
+                normalized = int(count.group(1).replace(",", ""))
             elif name == "due_date":
                 parsed = parse_date_phrase(value, desk.as_of)
                 if parsed is None:
@@ -272,6 +282,15 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         provenance.append({**update, "normalized": normalized, "speaker": speaker, "turn": len(previous.turns)})
     for name in changed:
         needs.discard(RESOLVES.get(name))
+    # With no order ID or customer there is nothing recorded to send out, so a product and a quantity
+    # make it a capacity check: Python answers who can take it and asks nothing about which order.
+    # An order ID named later turns it back into an allocation unless this message asks about capacity.
+    if values["intent"] == "allocate" and values["order_id"] is None and values["customer"] is None:
+        if values["product"] is not None and (values["pieces"] is not None or unclear_quantity):
+            values["intent"] = "capacity"
+            needs.discard("order")
+    elif values["intent"] == "capacity" and values["order_id"] is not None and "intent" not in changed:
+        values["intent"] = "allocate"
     # A recorded order carries its own quantity and due date, so a question the model raises on its
     # own about either is dropped. A stated but unclear value, or a date said to be changing, still asks.
     recorded = values["order_id"] is not None and values["intent"] != "capacity"
