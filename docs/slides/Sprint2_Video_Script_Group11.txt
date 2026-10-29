@@ -91,8 +91,8 @@ The slides recording ends on this slide for two seconds:
   Niyanthri: "Now, the demo."
 Charles's recording starts straight in the app. Times are from the start of the app part. Speak only when the app is quiet.
 [0:00] Charles: "Hi everyone, I'm Zepeng, or Charles, as the app calls me. Today I'm a
-       dispatcher, and this phone is my whole desk. The rings show who's busy; OldMill is
-       suspended."
+       dispatcher, and with StitchFlow, this phone is my whole desk. The rings show who's
+       busy; OldMill is suspended."
 [0:10] Hold the mic and say: "Hi, I've got order 109 for Harbor Knits, 500 vests, due April
        13th. And keep it away from BudgetWorks, their last batch came back rough."
        Let the answer play: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days
