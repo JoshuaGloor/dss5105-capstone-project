@@ -41,12 +41,18 @@ SEGMENTS = (
     (None, "expected_rework", "Expected rework"),
 )
 COMMANDS = {
-    "book": r"(yes|yeah|yep|sure|ok|okay)|(yes[,.!]?\s*)?(please\s+)?(book|confirm|lock|go ahead|do it|place|send)"
+    "book": r"(yes|yeah|yep|sure|ok|okay)|((yes|yeah|ok|okay|great|perfect|alright|good)[,.!]?\s*)?(please\s+)?"
+    r"(book|confirm|lock|go ahead|do it|place|send)"
     r"(\s+(it|that|this|them))?(\s+(in|now|please))*",
     "cancel": r"(no|cancel|stop|never ?mind|not now|hold on|wait)(\s+(that|it|this))?",
     "new": r"(start (a )?new( request)?|new (request|order|one)|start over|start again|reset|clear( (it|that))?)",
     "repeat": r"(repeat( that)?|say (that|it) again|what was that|come again|pardon)",
     "help": r"(help|what can (you|i) (do|say|ask)|how does this work)",
+    # Voice for the two taps on a card: the remember offer and the list of other workshops.
+    "remember": r"((yes|yeah|ok|okay|sure)[,.!]?\s*)?(please\s+)?(remember|save|keep)\s+"
+    r"(that|it|this|that rule|the rule)(\s+(please|for next time|too))*",
+    "options": r"((ok|okay|so)[,.!]?\s*)?(can you\s+)?(show|tell|give)( me)? (the |all (the )?)?(other )?"
+    r"(options|workshops|alternatives|choices)(\s+please)?|what (are|were) the (other )?options|why not (the )?others",
 }
 EXAMPLES = (
     "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away from BudgetWorks.",
@@ -153,6 +159,14 @@ def _spoken_amount(shown: str) -> str:
 
 def _speakable(text: str) -> str:
     return text.replace("ORD-", "order ")
+
+
+def _quantity(pieces: int, product: str) -> str:
+    """'800 hoodies', '1,500 crewneck sweaters', '1,000 scarves': the tool's count and product name."""
+    word = product.lower()
+    if pieces != 1:
+        word = word[:-1] + "ves" if word.endswith("f") else word if word.endswith("s") else word + "s"
+    return f"{pieces:,} {word}"
 
 
 # Cards -----------------------------------------------------------------------------------------
@@ -339,25 +353,41 @@ def card_for_result(
         card["sub"] = f"Arrives {pick['eta_day']}, {pick['slack']} before the {pick['due_day']} deadline"
         if result.get("commit_allowed"):
             card["actions"].append({"id": "book", "label": f"Book {pick['name']}", "primary": True})
+        # Spoken replies stay short on the floor: the decision and the date. The card keeps the rest.
         speak = (
-            f"{pick['name']} can deliver {order_id} by {day_label(pick['eta'], long=True)}, "
-            f"{pick['slack']} early. Cost {_spoken_amount(pick['cost'])}, defect risk {pick['defects']}. "
-            "Say book it, or tap book, to confirm."
+            f"{pick['name']}, by {day_label(pick['eta'], long=True)}, {pick['slack']} early. Say book it to confirm."
         )
     elif status == "CAPACITY" and pick:
         permitted = len(result["candidates"])
         on_time = sum(row["meets_deadline"] for row in result["candidates"])
-        quantity = f"{result['batch']['pieces']:,} {result['capacity_query']['product'].lower()}"
-        if on_time:
+        quantity = _quantity(result["batch"]["pieces"], result["capacity_query"]["product"])
+        suggested = result.get("suggested")
+        best = f"Best option: {pick['name']}, arriving {pick['eta_day']}."
+        if suggested and suggested["workshop_id"] == pick["workshop_id"]:
+            best = "It is also the best option."
+        if suggested and suggested["meets_deadline"]:
+            card["headline"] = f"{suggested['name']} can deliver {quantity} by {pick['due_day']}"
+            card["sub"] = f"Arrives {day_label(suggested['eta'])}. {best}"
+        elif suggested and suggested["eta"]:
+            card["headline"] = f"{suggested['name']} cannot deliver {quantity} by {pick['due_day']}"
+            card["sub"] = f"Earliest {day_label(suggested['eta'])}, {suggested['lateness']} late. {best}"
+        elif suggested:
+            card["headline"] = f"{suggested['name']} cannot take {quantity}"
+            card["sub"] = f"{' '.join(suggested['reasons'])} {best}"
+        elif on_time:
             card["headline"] = f"{on_time} of {permitted} workshops can deliver by {pick['due_day']}"
+            card["sub"] = f"{quantity}. {best}"
         else:
             card["headline"] = f"No workshop can deliver {quantity} by {pick['due_day']}"
-        card["sub"] = f"{quantity}. Best option: {pick['name']}, arriving {pick['eta_day']}"
+            card["sub"] = f"{quantity}. {best}"
         card["notes"] = ["Nothing is reserved until an order is booked.", *card["notes"]]
-        speak = (
-            f"{card['headline']}, for {quantity}. Best option: {pick['name']}, "
-            f"{day_label(pick['eta'], long=True)}. Nothing is reserved."
-        )
+        if suggested:
+            speak = f"{card['headline']}. {card['sub']} Nothing is reserved."
+        else:
+            speak = (
+                f"{card['headline']}, for {quantity}. Best option: {pick['name']}, "
+                f"{day_label(pick['eta'], long=True)}. Nothing is reserved."
+            )
     elif status == "REFUSE_SUGGESTION":
         refused = next(
             (row for row in result["excluded"] if row["workshop_id"] == result["input"]["suggested_workshop"]), None
@@ -369,10 +399,7 @@ def card_for_result(
             speak += f" {pick['name']} can, by {day_label(pick['eta'], long=True)}."
         elif pick:
             card["sub"] = f"Best alternative: {pick['name']}, {pick['eta_day']}, {pick['lateness']} late"
-            speak += (
-                f" No permitted workshop meets {day_label(pick['due'], long=True)}. The best alternative is "
-                f"{pick['name']}, {day_label(pick['eta'], long=True)}, {pick['lateness']} late."
-            )
+            speak += f" Best alternative: {pick['name']}, {pick['lateness']} late."
     elif status == "NEEDS_REVIEW" and pick:
         if "NO_ON_TIME_OPTION" in result["flags"]:
             card["headline"] = f"No workshop can make {order_id} by {pick['due_day']}"
@@ -415,6 +442,28 @@ def info_card(headline: str, *, label: str = "Assistant", tone: str = "info", no
     return card
 
 
+def _options_card(session: Session) -> dict:
+    """The last answer's permitted workshops, ranked, and why the rest cannot take it: its own tool result."""
+    result = session.result
+    if not result or not result.get("candidates"):
+        return info_card("There is nothing to compare yet. Name an order first.")
+    rows = _options(result, _chosen(result))
+    notes = [
+        f"{row['rank']}. {row['name']}: {row['eta_day']}, "
+        + ("on time" if row["on_time"] else f"{row['lateness']} late")
+        + f", cost {row['cost']}, defect risk {row['defects']}"
+        for row in rows
+    ]
+    notes += [f"{row['name']} cannot take it: {' '.join(row['reasons'])}" for row in result["excluded"]]
+    permitted, blocked = len(rows), len(result["excluded"])
+    return info_card(
+        f"{permitted} workshops can take it; {blocked} cannot",
+        label="Options",
+        notes=notes,
+        speak=f"Here are the {permitted} workshops that can take it, ranked, and why the other {blocked} cannot.",
+    )
+
+
 def help_card() -> dict:
     return info_card(
         "Tell me what needs to go out, in your own words.",
@@ -423,7 +472,9 @@ def help_card() -> dict:
             "Name an order and its date: I check every workshop and recommend one.",
             "Add constraints like 'keep it away from BudgetWorks': I honour them and record who asked.",
             "Ask 'who can take 1,500 crewnecks by April 15?' to check capacity without booking.",
+            "Say 'show me the other options' to compare every workshop, and why the rest cannot take it.",
             "Say 'book it' to open the confirmation; booking always needs your slide to confirm.",
+            "After a booking, say 'remember that' to keep its constraint for the customer's next orders.",
             "Ask 'what did we book today?' or 'what rules do you remember?' for memory.",
         ],
         suggestions=list(EXAMPLES),
@@ -577,7 +628,7 @@ def welcome(session: Session, name: str) -> Session:
     greeting = f"Hi {name}," if name else "Hi,"
     card = info_card(
         f"{greeting} what needs to go out today?",
-        label="Dispatch assistant",
+        label="StitchFlow",
         kind="welcome",
         notes=["Hold the microphone and speak, or type. I check every workshop before I suggest one."],
         suggestions=list(EXAMPLES),
@@ -609,6 +660,13 @@ def handle_utterance(session: Session, text: str, services: Services, *, channel
         return _append(session, said, _message("assistant", card=last or help_card()))
     if command == "help":
         return _append(session, said, _message("assistant", card=help_card()))
+    if command == "remember":
+        if not session.rule_offers:
+            return _append(session, said, _message("assistant", card=info_card("There is nothing new to remember.")))
+        actor = services.memory.profile()["dispatcher"] or services.speaker or "Dispatcher"
+        return remember_offer(_append(session, said), 0, services, actor)
+    if command == "options":
+        return _append(session, said, _message("assistant", card=_options_card(session)))
     recall = parse_recall(text)
     if recall:
         card = _rules_card(services) if recall == "rules" else _bookings_card(services)
@@ -763,7 +821,7 @@ def request_booking(session: Session, services: Services) -> Session:
         tone="ok",
         kind="confirm",
         notes=["Slide to confirm. This saves the booking and reserves capacity in the plan."],
-        speak=f"Ready to book {_speakable(booking['order_id'])} with {booking['workshop']}. Slide to confirm.",
+        speak="Slide to confirm.",
     )
     return _append(session, _message("assistant", card=card), booking=booking)
 
@@ -817,8 +875,7 @@ def confirm_booking(session: Session, services: Services, actor: str) -> Session
             }
             for index, offer in enumerate(offers)
         ],
-        speak=f"Booked. {_speakable(record['order_id'])} goes to {record['workshop_name']}, arriving "
-        f"{day_label(booking['eta'], long=True)}. Reference {' '.join(reference[:4])}.",
+        speak=f"Booked with {record['workshop_name']}, arriving {day_label(booking['eta'], long=True)}.",
     )
     return _append(
         replace(session, conversation=intake.Conversation()),

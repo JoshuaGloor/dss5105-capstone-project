@@ -165,6 +165,9 @@ def test_unsupported_date_and_quantity_prompt_for_explicit_values():
     [
         ("Apr 13", date(2026, 4, 13)),
         ("April 13, 2027", date(2027, 4, 13)),
+        ("15 April", date(2026, 4, 15)),
+        ("15th April 2027", date(2027, 4, 15)),
+        ("15 of Apr", date(2026, 4, 15)),
         ("2026-04-13", date(2026, 4, 13)),
         ("today", date(2026, 4, 1)),
         ("tomorrow", date(2026, 4, 2)),
@@ -268,6 +271,60 @@ def test_capacity_question_is_extracted_as_quoted_fields_and_needs_a_product():
     )
     asked = turn("Who has room for 300 by Friday?", patch(("intent", "capacity", "Who has room"), needs=["product"]))
     assert "Which product" in asked.request.clarification
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [("400", 400), ("1,500", 1500), ("400 pieces", 400), ("400 pieces of tops", 400), ("400 or so", None)],
+)
+def test_a_count_with_unit_words_is_a_quantity_but_a_hedge_still_asks(value, expected):
+    text = f"ORD-109, {value}, due April 13."
+    state = turn(text, patch(("order_id", "ORD-109", text), ("pieces", value, text)))
+    assert state.request.pieces == expected
+    assert ("quantity" in state.needs) is (expected is None)
+
+
+def test_a_new_order_without_an_id_is_checked_against_every_workshop():
+    text = "I need an order for quickstitch 400 pieces of tops, ready by 15 April."
+    state = turn(
+        text,
+        patch(
+            ("suggested_workshop", "quickstitch", "quickstitch"),
+            ("pieces", "400 pieces", "400 pieces"),
+            ("product", "tops", "tops"),
+            ("due_date", "15 April", "15 April"),
+            needs=["order"],
+        ),
+    )
+    request = state.request
+    assert (request.intent, request.pieces, request.due_date, request.suggested_workshop) == (
+        "capacity",
+        400,
+        "2026-04-15",
+        "W1",
+    )
+    assert state.needs == () and request.clarification is None
+    named = turn("It is ORD-045.", patch(("order_id", "ORD-045", "ORD-045")), previous=state)
+    assert named.request.intent == "allocate" and named.request.order_id == "ORD-045"
+
+
+@pytest.mark.parametrize("said,value,expected", [("order 109", "109", "ORD-109"), ("order 81", "order 81", "ORD-081")])
+def test_a_spoken_order_number_is_read_as_its_recorded_id(said, value, expected):
+    text = f"Hi, I've got {said} for Harbor Knits. Keep it away from budget works."
+    exclusion = {"workshop": "budget works", "imposed_by": "", "evidence": "Keep it away from budget works"}
+    state = turn(text, patch(("order_id", value, said), exclusions=[exclusion]))
+    assert state.request.order_id == expected and state.request.exclusions[0]["workshop_id"] == "W3"
+    with pytest.raises(IntakeError):
+        turn(text, patch(("order_id", "110", said)))
+
+
+def test_date_digits_do_not_keep_an_unprompted_quantity_question():
+    text = "Next one, order 81 for Harbor Knits, due April 20th."
+    state = turn(
+        text, patch(("order_id", "81", "order 81"), ("due_date", "April 20th", "April 20th"), needs=["quantity"])
+    )
+    assert (state.request.order_id, state.request.due_date) == ("ORD-081", "2026-04-20")
+    assert "quantity" not in state.needs
 
 
 def test_switching_to_a_new_request_reuses_the_same_patch():
