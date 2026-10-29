@@ -12,36 +12,34 @@ WHO SPEAKS (agreed 29 Oct)
   Chen Zepeng (Charles)        the whole demo (slide 8 and the app), recorded separately
   Tang Zheling (Lynn) is not in the recording; Ruby (Duong Thanh Nhan) is absent, as slide 1 shows.
 
-HOW TO RECORD (almost no editing)
-Two parts, then join the clips in QuickTime.
-1. Take A, slides 1-7, in Google Meet. One person shares Presentation_Group11_Sprint2.pptx (or
-   the PDF) full screen; each speaker unmutes only for their slides; the sharer advances.
-   Record with Meet (Activities > Recording) if the organiser's account allows it. A Mac screen
-   recording on the sharer's laptop does NOT capture the others' voices from Meet. If Meet
-   cannot record, each speaker records their own slides on their own laptop instead (Mac:
-   Cmd+Shift+5, Record Entire Screen, Options > Microphone; Windows: PowerPoint > Record, or
-   Win+Alt+R) and sends the clip to Charles. Headphones and a quiet room for everyone.
-2. Take B, the demo, by Charles on one MacBook. Start the app with a fresh plan, so the numbers
-   match this script (a new folder per attempt, inside the project):
-     DSS5105_RUNTIME=$PWD/.cache/take1 sh scripts/run_app.sh     (take2, take3, ... for retries)
-   In Chrome, open http://localhost:8501, allow the microphone, tap the avatar, enter "Charles",
-   turn "Read answers aloud" on, Save. Leave Priorities on Recommended. Stay online. Turn on Do
-   Not Disturb. Record with Cmd+Shift+5 > Record Entire Screen, Options > Microphone: MacBook
-   microphone; the app's voice comes out of the speakers and the microphone picks it up. Start
-   on slide 8 for two seconds, then switch to Chrome full screen (Ctrl+Cmd+F). No cuts inside
-   the demo: if it goes wrong, start again with a new runtime folder. If a rehearsal runs past
-   2:00, drop the (optional) steps.
-   Or record it in your own Google Meet, if Meet recording works for Take A: share the Chrome
-   tab with the app and tick "Also share tab audio", so the app's voice is recorded cleanly;
-   camera off. Both takes are then the same size, and QuickTime joins them without bars.
-3. Join: open the first clip in QuickTime, Edit > Add Clip to End for each next clip in order.
-   Trim dead air at the start and end with Edit > Trim. File > Export As > 1080p, named
-   Presentation_Group11_Sprint2.mp4.
-4. Watch it once end to end. It must run under 4:55.
-   Clip sizes differ: a Meet recording is usually 1280 x 720, a Mac screen recording is full
-   Retina size and 16:10. If QuickTime shows black bars or a size jump, join the clips in iMovie
-   instead (new 16:9 project, drag the clips in order, File > Share > File, 1080p).
-Rehearse each part once with a timer: Take A should run 2:50-2:58, Take B under 2:00.
+HOW TO RECORD IN ZOOM (one meeting, one file, almost no editing)
+Before the meeting
+- Host: in the Zoom app, Settings > Recording, turn on local recording. A NUS Zoom account has no
+  40-minute limit. Everyone joins on a laptop with headphones, from a quiet room.
+- Charles starts the app with a fresh plan, so the numbers match this script (a new folder per
+  attempt, inside the project):
+    DSS5105_RUNTIME=$PWD/.cache/take1 sh scripts/run_app.sh     (take2, take3, ... for retries)
+  In Chrome, open http://localhost:8501, allow the microphone, tap the avatar, enter "Charles",
+  turn "Read answers aloud" on, Save. Leave Priorities on Recommended. Stay online. Do Not Disturb.
+Recording
+1. Cameras off (cleaner), everyone muted except the speaker. Host clicks Record > Record on this
+   computer.
+2. Slides 1-7: one person shares Presentation_Group11_Sprint2.pptx in Keynote or PowerPoint,
+   playing full screen, and advances; each speaker unmutes only for their slides.
+3. Stop sharing after slide 7. Pause the recording if you need a moment, then resume.
+4. Demo: Charles shares the Chrome window with the app and ticks "Share sound", so the app's voice
+   is recorded directly. Start on slide 8 for two seconds ("Now the demo."), then the app. Only
+   Charles talks. No cuts inside the demo; if it goes wrong, stop, restart the app with a new
+   runtime folder and record the demo again. If a rehearsal runs past 2:00, drop the
+   (optional) steps.
+5. Stop the recording and end the meeting. Zoom converts it to an mp4 in Documents/Zoom; do not
+   close Zoom until the conversion finishes.
+After
+6. Trim dead air at the start and end in QuickTime (Edit > Trim). If parts were recorded as
+   separate files, join them with Edit > Add Clip to End; they are all Zoom recordings, so they
+   match. File > Export As > 1080p, named Presentation_Group11_Sprint2.mp4.
+7. Watch it once end to end. It must run under 4:55.
+Rehearse each part once with a timer: slides 1-7 should run 2:50-2:58, the demo under 2:00.
 
 SLIDE 1 - Cover (0:00-0:13)  Joshua
 "Hi, we're Group 11, Track 2. This is StitchFlow: say an order, and it finds the right workshop.
