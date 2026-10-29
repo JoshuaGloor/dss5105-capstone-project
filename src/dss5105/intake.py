@@ -195,7 +195,10 @@ def _order_id(value: str, evidence: str) -> str:
         raise IntakeError("Please use a recorded order ID.")
     normalized = f"ORD-{int(match.group(1)):03d}"
     if normalized not in {f"ORD-{int(found.group(1)):03d}" for found in ORDER_REF.finditer(evidence)}:
-        raise IntakeError("An interpreted value is not supported by its quotation. Retry or start a new request.")
+        raise IntakeError(
+            'I did not hear the word "order" before the number. Say "order number" and the digits, '
+            "or type the order ID."
+        )
     return normalized
 
 

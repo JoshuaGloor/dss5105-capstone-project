@@ -89,12 +89,16 @@ with a reason, and read the order back."
 SLIDE 8 - Demo (2:55-4:50)  Charles
 The slides recording ends on this slide for two seconds:
   Niyanthri: "Now, the demo."
-Charles's recording starts straight in the app. Times are from the start of the app part. Speak only when the app is quiet.
-[0:00] Charles: "Hi everyone, I'm Zepeng, or Charles, as the app calls me. In this demo I'll
-       play the dispatcher, using our app, StitchFlow. The rings show how busy each workshop
+Charles's recording starts straight in the app. Times are from the start of the app part.
+Speak only when the app is quiet. If speech mishears a request, the transcript shows it: hold
+the mic and say it again, slowly.
+[0:00] Charles: "Hi everyone, I'm Zepeng, or Charles. In this demo I'll
+       play as the dispatcher, using our app, StitchFlow. The rings show how busy each workshop
        is, and OldMill is grey because it's suspended."
-[0:08] Hold the mic and say: "Hi, I've got order 109 for Harbor Knits, 500 vests, due April
-       13th. And keep it away from BudgetWorks, their last batch came back rough."
+[0:08] Hold the mic and say: "Hi, I've got order number 109, due April 13th. Keep it away from
+       BudgetWorks, their last batch came back rough."
+       (No customer or product names: speech often mishears them, and the order book supplies
+       both. Say "order number" clearly, so it is not heard as "other".)
        Let the answer play: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days
        early. Cost 550, defect risk 6.0%. Say book it, or tap book, to confirm."
 [0:30] Tap "Compare 4 workshops", then "Can't take it", then close them. (optional)
@@ -104,18 +108,18 @@ Charles's recording starts straight in the app. Times are from the start of the 
        Charles: "Nothing is saved until I slide." Slide to confirm.
 [0:52] On the receipt, tap "Remember".
        Charles: "And it offers to remember that rule."
-[0:58] Hold the mic and say: "Next one: order 81 for Harbor Knits, due April 20th."
+[0:58] Hold the mic and say: "Next one: order number 81, due April 20th."
        (Say "due", not "go out by": "go out by" is a ship date, and the desk would ask which.)
        Let the answer play, then point at the memory note on the card.
        Charles: "Same customer, so the rule is applied, and the card says it came from memory."
-[1:22] Charles: "Now a hard case, straight from the inbox."
-       Hold the mic and say: "QuickStitch for the scarves on order 103?"
+[1:22] Charles: "Now a hard case, like the boss's message in the inbox."
+       Hold the mic and say: "Can QuickStitch take order number 103?"
        Let the answer play: QuickStitch cannot make scarves, no workshop meets 4 April, and the
        best alternative is 13.44 days late.
 [1:45] Charles: "It refuses, gives the earliest option and a two-shop split, and books nothing."
 [1:52] Point at the "Behind the answer" panel on the right. (optional)
        Charles: "This panel shows what the model read, with quotes, and what Python computed."
-[1:57] Charles: "That's StitchFlow." Pause for two seconds.
+[1:57] Charles: "And That is StitchFlow." Pause for two seconds.
 [2:00] Stop recording.
 
 SLIDE 9 - Thank you (not recorded)
