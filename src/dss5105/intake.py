@@ -176,9 +176,32 @@ def _literal(value: str, evidence: str):
         raise IntakeError("An interpreted value is not supported by its quotation. Retry or start a new request.")
 
 
+def _squash(text: str) -> str:
+    """Speech writes "BudgetWorks" as "budget works"; names compare without spaces or hyphens."""
+    return re.sub(r"[\s-]+", "", text).casefold()
+
+
+# "ORD-109" as typed, or "order 109", "order number 109" or "order #81" as spoken.
+ORDER_REF = re.compile(r"\b(?:ord|order)\.?[\s-]*(?:number\s+|no\.?\s*|#\s*)?(\d{1,3})\b", re.IGNORECASE)
+
+
+def _order_id(value: str, evidence: str) -> str:
+    """The recorded ID form of an order reference the user actually said; never one they did not.
+
+    The value may be the whole reference or just its number, but the quoted words must contain it.
+    """
+    match = ORDER_REF.fullmatch(value.strip()) or re.fullmatch(r"#?\s*(\d{1,3})", value.strip())
+    if not match:
+        raise IntakeError("Please use a recorded order ID.")
+    normalized = f"ORD-{int(match.group(1)):03d}"
+    if normalized not in {f"ORD-{int(found.group(1)):03d}" for found in ORDER_REF.finditer(evidence)}:
+        raise IntakeError("An interpreted value is not supported by its quotation. Retry or start a new request.")
+    return normalized
+
+
 def _workshop(value: str, desk: DispatchDesk) -> str:
     for key, workshop in desk.workshops.items():
-        if value.casefold() in (key.casefold(), workshop.name.casefold()):
+        if _squash(value) in (_squash(key), _squash(workshop.name)):
             return key
     raise IntakeError("The workshop name could not be matched to the register. Retry with its recorded name or ID.")
 
@@ -213,11 +236,25 @@ QUANTITY = re.compile(r"([0-9]+|[1-9][0-9]{0,2}(?:,[0-9]{3})+)((?:\s+[a-z&'-]+)*
 HEDGES = r"or|so|about|around|roughly|approx\w*|max\w*|min\w*|least|most|more|less|plus|odd|ish|up|to"
 
 
+MONTH = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?"
+DATE_PHRASE = re.compile(
+    rf"\b{MONTH}\s+\d{{1,2}}(?:st|nd|rd|th)?\b|\b\d{{1,2}}(?:st|nd|rd|th)?\s+(?:of\s+)?{MONTH}|\b\d{{4}}-\d{{2}}-\d{{2}}\b",
+    re.IGNORECASE,
+)
+
+
 def _mentions(code: str, text: str, order_id: str | None) -> bool:
-    """Whether the message itself talks about this field; only then is the model's question kept."""
+    """Whether the message itself talks about this field; only then is the model's question kept.
+
+    Digits count as a mention, except those of an order reference and, for quantity, of a date.
+    """
     if re.search(rf"\b(?:{MENTIONS[code]}|{UNCERTAIN})", text, re.IGNORECASE):
         return True
-    remainder = re.sub(re.escape(order_id), " ", text, flags=re.IGNORECASE) if order_id else text
+    remainder = ORDER_REF.sub(" ", text)
+    if order_id:
+        remainder = re.sub(re.escape(order_id), " ", remainder, flags=re.IGNORECASE)
+    if code == "quantity":
+        remainder = DATE_PHRASE.sub(" ", remainder)
     return bool(re.search(r"\d", remainder))
 
 
@@ -248,12 +285,15 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
                 raise IntakeError("The interpretation has an unsupported setting. Retry or start a new request.")
             normalized = (value == "true") if name in ("date_uncertain", "split_requested") else value
         else:
-            _literal(value, update["evidence"])
-            normalized = value
             if name == "order_id":
-                if not re.fullmatch(r"ORD-\d{3}", value, re.IGNORECASE):
-                    raise IntakeError("Please use a recorded order ID.")
-                normalized = value.upper()
+                normalized = _order_id(value, update["evidence"])
+            elif name == "suggested_workshop":
+                if _squash(value) not in _squash(update["evidence"]):
+                    _literal(value, update["evidence"])
+            else:
+                _literal(value, update["evidence"])
+                normalized = value
+            if name == "order_id":
                 if previous.request.order_id is not None and previous.request.order_id != normalized:
                     raise DifferentOrder(
                         "This is a different order. Start a new request to keep its constraints separate."
@@ -306,7 +346,8 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
     exclusions = {item["workshop_id"]: item for item in values["exclusions"]}
     for exclusion in patch["exclusions"]:
         _quoted(exclusion, {"workshop", "imposed_by", "evidence"}, text)
-        _literal(exclusion["workshop"], exclusion["evidence"])
+        if _squash(exclusion["workshop"]) not in _squash(exclusion["evidence"]):
+            _literal(exclusion["workshop"], exclusion["evidence"])
         workshop_id = _workshop(exclusion["workshop"], desk)
         imposer = exclusion["imposed_by"].strip()
         if imposer:

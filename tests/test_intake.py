@@ -308,6 +308,25 @@ def test_a_new_order_without_an_id_is_checked_against_every_workshop():
     assert named.request.intent == "allocate" and named.request.order_id == "ORD-045"
 
 
+@pytest.mark.parametrize("said,value,expected", [("order 109", "109", "ORD-109"), ("order 81", "order 81", "ORD-081")])
+def test_a_spoken_order_number_is_read_as_its_recorded_id(said, value, expected):
+    text = f"Hi, I've got {said} for Harbor Knits. Keep it away from budget works."
+    exclusion = {"workshop": "budget works", "imposed_by": "", "evidence": "Keep it away from budget works"}
+    state = turn(text, patch(("order_id", value, said), exclusions=[exclusion]))
+    assert state.request.order_id == expected and state.request.exclusions[0]["workshop_id"] == "W3"
+    with pytest.raises(IntakeError):
+        turn(text, patch(("order_id", "110", said)))
+
+
+def test_date_digits_do_not_keep_an_unprompted_quantity_question():
+    text = "Next one, order 81 for Harbor Knits, due April 20th."
+    state = turn(
+        text, patch(("order_id", "81", "order 81"), ("due_date", "April 20th", "April 20th"), needs=["quantity"])
+    )
+    assert (state.request.order_id, state.request.due_date) == ("ORD-081", "2026-04-20")
+    assert "quantity" not in state.needs
+
+
 def test_switching_to_a_new_request_reuses_the_same_patch():
     first = turn("ORD-109 please", patch(("order_id", "ORD-109", "ORD-109")))
     text = "And ORD-053?"

@@ -41,7 +41,8 @@ SEGMENTS = (
     (None, "expected_rework", "Expected rework"),
 )
 COMMANDS = {
-    "book": r"(yes|yeah|yep|sure|ok|okay)|(yes[,.!]?\s*)?(please\s+)?(book|confirm|lock|go ahead|do it|place|send)"
+    "book": r"(yes|yeah|yep|sure|ok|okay)|((yes|yeah|ok|okay|great|perfect|alright|good)[,.!]?\s*)?(please\s+)?"
+    r"(book|confirm|lock|go ahead|do it|place|send)"
     r"(\s+(it|that|this|them))?(\s+(in|now|please))*",
     "cancel": r"(no|cancel|stop|never ?mind|not now|hold on|wait)(\s+(that|it|this))?",
     "new": r"(start (a )?new( request)?|new (request|order|one)|start over|start again|reset|clear( (it|that))?)",

@@ -77,6 +77,8 @@ def last_card(session):
     [
         ("Book it", "book"),
         ("yes, book it please", "book"),
+        ("Okay, book it.", "book"),
+        ("Great, book it", "book"),
         ("Okay.", "book"),
         ("go ahead", "book"),
         ("cancel", "cancel"),

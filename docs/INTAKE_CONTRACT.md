@@ -135,3 +135,9 @@ fixtures or offline tests as real-provider results.
   ready by 15 April" is answered as a check of every workshop, with QuickStitch first. An
   order ID named in a later message turns it back into an allocation. Requests with a
   customer still go to the order lookup, so the course inbox behaves as before.
+- Spoken input: "order 109", "order number 81" or "order #81" normalizes to ORD-109 and
+  ORD-081. The model may copy the whole reference or only its number, but the quoted words
+  must contain that order reference, so an ID the user did not say is still rejected.
+  Workshop names match without spaces or hyphens ("budget works" is BudgetWorks). When
+  judging whether a message mentions a quantity, digits inside an order reference or a date
+  phrase ("April 20th") do not count.
