@@ -5,10 +5,10 @@ scripts/build_sprint2_deck.mjs copies each SLIDE section into that slide's speak
 Q&A section into slide 9. Numbers come from docs/evidence/objective-study.json and the live app;
 if either changes, update both. Lines are timed at 140 words a minute.
 
-WHO SPEAKS (suggested; swap freely)
-  Joshua Wesley Gloor          slides 1, 2 and 4
-  Sundara Rajan Saadhvika      slides 3 and 6
-  Sridhar Niyanthri Rajeswari  slides 5 and 7
+WHO SPEAKS (agreed 29 Oct)
+  Joshua Wesley Gloor          slides 1, 2 and 3
+  Sundara Rajan Saadhvika      slides 4 and 5
+  Sridhar Niyanthri Rajeswari  slides 6 and 7
   Chen Zepeng (Charles)        the whole demo (slide 8 and the app), recorded separately
   Tang Zheling (Lynn) is not in the recording; Ruby (Duong Thanh Nhan) is absent, as slide 1 shows.
 
@@ -48,25 +48,25 @@ seconds, with a record of why. That one job is our scope.
 Since Sprint 1, we beat earliest finish, which tied us, our defects and fairness settings beat
 their baselines, and the dispatcher can now talk to the desk."
 
-SLIDE 3 - The user journey (0:45-1:08)  Saadhvika
+SLIDE 3 - The user journey (0:45-1:08)  Joshua
 "We designed the journey for the floor. The dispatcher holds the mic and says the order. The
 desk answers on screen and out loud: the best workshop, when it arrives, and why. 'Book it' opens
 a sheet, and a slide confirms. It offers to remember the constraint, and uses it on the next
 order."
 
-SLIDE 4 - Architecture (1:08-1:35)  Joshua
+SLIDE 4 - Architecture (1:08-1:35)  Saadhvika
 "This is what we built. Speech becomes text in the browser, and Python answers commands like
 'book it' itself. Everything else is one structured-output call, and every field must quote the
 message. Deterministic tools then look up the order, apply remembered rules, check eligibility
 and rank, so the model never does arithmetic. A slide confirms, and SQLite keeps the booking and
 the rule."
 
-SLIDE 5 - Key choices (1:35-1:53)  Niyanthri
+SLIDE 5 - Key choices (1:35-1:53)  Saadhvika
 "We chose a fixed workflow over a ReAct agent, because every request needs the same checks;
 exact lookups over embeddings, so we never fetch the wrong order; exact rules in SQLite over a
 vector store; and a slide, never a spoken yes."
 
-SLIDE 6 - Progress (1:53-2:11)  Saadhvika
+SLIDE 6 - Progress (1:53-2:11)  Niyanthri
 "Every feature has an owner. Seven of eleven are done, including the voice assistant, memory,
 the four-objective scorer and 205 generated evaluation requests. In progress: clarification
 fixes and independent inbox labels. Planned: Lynn's re-run of the test set, and Joshua's
