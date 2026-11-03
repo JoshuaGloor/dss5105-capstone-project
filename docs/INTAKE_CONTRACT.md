@@ -110,3 +110,19 @@ annotation and held-out results remain pending. The authorized first live run is
 documented in [CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md); its draft
 checks do not establish complete semantic accuracy. The UI must not present draft
 fixtures or offline tests as real-provider results.
+
+## Sprint 2 additions (intake-v3)
+
+- `intent` gains `capacity`: a question about who could take a quantity of a product by a
+  date, with no order named to send out. The model copies the product (or the word tops
+  or accessories), quantity and date phrase; a message naming an order stays `allocate`.
+  `needs` gains `product` for a capacity question without a recognisable product.
+- `interpret_turn(..., restart_new_requests=True)` is used by the voice assistant. When the
+  latest message names a different order, or switches between allocating and a capacity
+  question, the same validated patch is applied to an empty request. There is no second
+  model call, and the trace records `restarted: true`. Without the flag, a different
+  order still raises, as before.
+- A quantity question the model raises on its own is dropped when the request names a
+  recorded order: `orders.csv` holds its quantity, and the dispatch tool still asks about
+  any stated amendment. A stated but unclear quantity ("usual quantities") still asks.
+  This fixes the live R14 failure, where an unneeded quantity question blocked the refusal.

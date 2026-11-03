@@ -17,12 +17,23 @@ from dss5105 import intake
 from dss5105.allocator import ObjectiveWeights
 from dss5105.cards import chosen_candidate, option_tiles, render_working, tone
 from dss5105.dispatch import DispatchDesk, DispatchInput
-from dss5105.evaluate import PRESETS
+from dss5105.evaluate import DEFAULT_PRESET, PRESETS
 from dss5105.records import AllocationError, AllocationStore
 from dss5105.replies import build_reply
 
-LABELS = {"lateness": "Lateness", "defects": "Defect", "hybrid": "Hybrid", "custom": "Custom"}
-CUSTOM_DEFAULTS = {"lateness": 1.0, "defects": 0.05, "cost": 0.1}
+LABELS = {
+    "hybrid": "Recommended",
+    "lateness": "Lateness",
+    "defects": "Defect",
+    "fairness": "Fairness",
+    "robustness": "Robustness",
+    "custom": "Custom",
+}
+# Custom sliders start from the recommended preset: one weight per objective, then cost.
+CUSTOM_DEFAULTS = {
+    term: getattr(PRESETS[DEFAULT_PRESET], term) for term in ("lateness", "defects", "fairness", "robustness", "cost")
+}
+CUSTOM_BUFFER_DEFAULT = PRESETS[DEFAULT_PRESET].deadline_buffer_days
 SESSION_KEYS = (
     "history",
     "conversation",
@@ -50,7 +61,7 @@ class DeskContext:
 
 
 def objective_mode() -> str:
-    return st.session_state.get("objective", "lateness")
+    return st.session_state.get("objective", DEFAULT_PRESET)
 
 
 def read_weights() -> tuple[ObjectiveWeights | None, str]:
@@ -60,6 +71,9 @@ def read_weights() -> tuple[ObjectiveWeights | None, str]:
         return PRESETS[mode], ""
     try:
         values = {term: st.session_state.get("weight_" + term, value) for term, value in CUSTOM_DEFAULTS.items()}
+        values["deadline_buffer_days"] = st.session_state.get("weight_buffer", CUSTOM_BUFFER_DEFAULT)
+        values["capacity_reservation"] = 1.0 if st.session_state.get("weight_reservation", True) else 0.0
+        values["deadline_miss_days"] = 7.0 if st.session_state.get("weight_on_time_first", True) else 0.0
         return ObjectiveWeights(**values), ""
     except ValueError as error:
         return None, str(error)

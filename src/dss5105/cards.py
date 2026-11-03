@@ -20,6 +20,7 @@ TONES = {
     "RECORDED_STATUS": "ask",
     "DECLINE": "limit",
     "NO_FEASIBLE_OPTION": "bad",
+    "CAPACITY": "ask",
 }
 
 

@@ -60,9 +60,10 @@ COPY examples/ ./examples/
 COPY .streamlit/ ./.streamlit/
 COPY streamlit_app.py ./
 
-# records.py stores confirmed allocations in SQLite under /app/runtime, creating
-# the directory on first use. The rest of /app is root-owned and read-only to the
-# app user, so this one directory has to be writable.
+# records.py (the saved plan and its archived copies) and memory.py (the dispatcher's
+# profile and standing rules) store SQLite under /app/runtime, creating the directory
+# on first use. The rest of /app is root-owned and read-only to the app user, so this
+# one directory has to be writable.
 RUN mkdir -p /app/runtime && chown app:app /app/runtime
 
 # Python runtime settings, see
@@ -81,8 +82,17 @@ ENV PYTHONPATH=/app/src
 # The CMD at the bottom relies on this.
 ENV PATH=/app/.venv/bin:$PATH
 
-# Safety check: fail the build, not at runtime, if that layout ever breaks.
-RUN python -c "import dss5105.harness, dss5105.dispatch, dss5105.web_app; print('Import check ok')"
+# Safety check: fail the build, not at runtime. TL;DR check everything is there.
+# Every page streamlit_app.py registers is imported, and the assistant's HTML, CSS and JS are read:
+# they ship as data under src/, so we read the files to make sure they are there.
+#
+# The point of the list comprehension is the read_text call on each of app.html, app.css and app.js,
+# which raises FileNotFoundError here instead of blanking the default page in production.
+RUN python -c "import dss5105.harness, dss5105.dispatch, dss5105.web_app, \
+    dss5105.workshop_ui, dss5105.lab_page, dss5105.memory_page; \
+    from dss5105.assistant_page import ASSETS; \
+    [(ASSETS / f'app.{part}').read_text(encoding='utf-8') for part in ('html', 'css', 'js')]; \
+    print('Import check ok')"
 
 # Streamlit writes ~/.streamlit at startup, so runtime user needs its own HOME.
 USER app

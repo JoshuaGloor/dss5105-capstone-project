@@ -1,0 +1,56 @@
+<div class="stage" id="stage">
+  <div class="device" id="device">
+    <div class="island" aria-hidden="true"></div>
+    <div class="app" id="app">
+      <header class="top">
+        <div class="top-row">
+          <button class="avatar" id="profileBtn" type="button" aria-label="Profile and voice settings">
+            <span id="avatarText">D</span>
+          </button>
+          <div class="hello">
+            <div class="hello-title" id="helloTitle">Dispatch</div>
+            <div class="hello-sub" id="helloSub"></div>
+          </div>
+          <button class="icon-btn" id="memoryBtn" type="button" aria-label="Memory"></button>
+          <button class="icon-btn" id="prioritiesBtn" type="button" aria-label="Priorities"></button>
+        </div>
+        <div class="stories" id="stories" role="list" aria-label="Workshops"></div>
+      </header>
+      <main class="thread" id="thread" aria-live="polite" aria-label="Conversation"></main>
+      <form class="composer" id="composer" autocomplete="off">
+        <div class="input-wrap">
+          <input id="textInput" type="text" placeholder="Ask or type a request" aria-label="Type a request" maxlength="1000" />
+        </div>
+        <button class="mic" id="micBtn" type="button" aria-label="Hold to talk">
+          <span class="mic-halo" aria-hidden="true"></span>
+          <span class="mic-icon" id="micIcon" aria-hidden="true"></span>
+        </button>
+      </form>
+      <div class="listen" id="listen" hidden>
+        <div class="orb" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="listen-state" id="listenState">Listening</div>
+        <div class="listen-text" id="listenText" aria-live="polite"></div>
+        <div class="listen-hint" id="listenHint">Release to send</div>
+        <div class="listen-actions">
+          <button type="button" class="round ghost" id="listenCancel" aria-label="Cancel"></button>
+          <button type="button" class="round solid" id="listenDone" aria-label="Send"></button>
+        </div>
+      </div>
+      <div class="scrim" id="scrim" hidden></div>
+      <section class="sheet" id="sheet" hidden role="dialog" aria-modal="true">
+        <div class="grabber" aria-hidden="true"></div>
+        <div class="sheet-body" id="sheetBody"></div>
+      </section>
+      <div class="toast" id="toast" hidden role="status"></div>
+    </div>
+  </div>
+  <aside class="behind" id="behind" aria-label="Behind the answer">
+    <div class="behind-head">
+      <div class="eyebrow">Behind the answer</div>
+      <h2 id="behindTitle">Waiting for a request</h2>
+      <p class="behind-sub">The model only extracts quoted fields. Python checks, estimates, ranks and writes every number you see or hear.</p>
+    </div>
+    <ol class="pipeline" id="pipeline"></ol>
+    <div class="behind-foot" id="behindFoot"></div>
+  </aside>
+</div>

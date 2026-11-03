@@ -18,11 +18,13 @@ The allocator's value over earliest finish is now measured in
 A 10-day deadline buffer with a small cost weight cuts late days and cost but adds
 a few late batches, making it a candidate for the other-objective or hybrid comparison.
 
-The next team gate is to choose a primary objective using the Tracks v4 metrics and
-guardrails, then finish register/overload tools and deadline amendments. Lateness
-is the proposed candidate; pure defects currently fails the timeliness guardrail.
-The case for lateness against all four candidates, and the Sprint 1 slide content,
-are drafted in [SPRINT1_DECK.md](docs/SPRINT1_DECK.md) for team sign-off.
+The team has selected **minimise lateness** as its primary objective. Next, connect
+workshop-capacity questions to chat and support deadline amendments. Workshop
+lookup and extra-work tools now run directly in Streamlit without changing queues.
+Pure defects currently fails the timeliness guardrail. The objective rationale and
+Sprint 1 slide content are in [SPRINT1_DECK.md](docs/SPRINT1_DECK.md). The ranked gaps
+before Sprint 2 are in [SPRINT1_REVIEW.md](docs/SPRINT1_REVIEW.md). The final hybrid must
+mix course objectives (cost is not one); see [DEFECTS_FRONTIER.md](docs/DEFECTS_FRONTIER.md).
 
 Local durable confirmation is now implemented behind an explicit saved-plan mode.
 See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md). It is offline-tested
@@ -45,9 +47,9 @@ to compare eligible workshops. The dispatcher sees the recommendation, tradeoffs
 and evidence before confirming an allocation. The system records the decision and
 updates capacity only after confirmation against current state.
 
-The primary objective remains **undecided**. Lateness is the prototype's initial
-example. The team must select and justify its primary at Sprint 1, retain another
-objective for comparison, and justify a hybrid. Cost is a measured tradeoff; it is
+The primary objective is **minimise lateness**, measured by late fraction and mean
+late days. The team will declare it at Sprint 1, retain another objective for
+comparison, and justify a hybrid. Cost is a measured tradeoff; it is
 not one of the course's four candidate primary objectives. Do not promise a hybrid
 will be numerically between other policies on every metric.
 
@@ -92,6 +94,7 @@ Product references:
 | Portable HTML prototype | Interactive inbox, preset comparison, evidence export, demo confirmation |
 | Streamlit web page | Implemented: native controls call live Python previews |
 | Custom weights | Available through CLI and live Streamlit sliders |
+| Workshop lookup and extra-work scenarios | Implemented direct tools and offline Streamlit controls; free-text routing pending |
 | Confirmed allocation storage and queue mutation | Implemented in Saved local plan; independent previews remain demo-only |
 | Full chat evaluation and faithfulness checker | Initial live inbox run and partial tool-integrity audit complete; independent gold, held-out and full explanation checks pending |
 
@@ -154,6 +157,10 @@ separately from explanation faithfulness. Do not label fixture replay an agent d
       or nonfinite configurations must be rejected with a clear message.
 - [x] Show configuration/data errors, clarification, refusal, and empty-candidate states.
 - [x] Add model-pending and unavailable-model states with explicit retry and no stale preview.
+- [x] Finalize and implement workshop lookup and extra-work scenarios with snapshot
+      evidence, course-helper eligibility and no queue mutation.
+- [x] Add an offline workshop-capacity workspace using independent or saved queues.
+- [ ] Connect workshop lookup and extra-work questions to language intake.
 
 Stack decision: Streamlit for the web interface, existing Python modules for tools
 and scoring, and the existing model helper for language intake. A separate frontend
@@ -180,7 +187,8 @@ overbook; stored decisions reproduce their inputs, constraints, configuration, a
 
 ### Phase E - Evaluate, deploy, and prepare final evidence
 
-- [ ] Freeze and justify primary, comparison, and hybrid configurations.
+- [x] Select minimise lateness as the primary objective for Sprint 1.
+- [ ] Freeze and justify final primary, comparison, and hybrid configurations.
 - [ ] Freeze final configurations and rerun shared baselines, simple heuristic,
       normal and ten-seed shock scenarios. Exploratory v3 evidence is refreshed.
       Preserve seeds, source hashes, raw results, baseline wins, and inference limits.
@@ -209,8 +217,8 @@ the project brief. Do not claim that Sprint 1 requires the complete application.
 
 ## Team decisions for the next meeting
 
-1. Select a primary candidate based on evidence; agree how the other objective and
-   hybrid expose its tradeoffs. The formal declaration is at Sprint 1.
+1. Declare minimise lateness at Sprint 1; agree how the comparison objective and
+   hybrid expose its tradeoffs and justify their final configurations.
 2. Confirm the ship-date rule: a ship date equal to the recorded due date is used as
    the deadline; any other ship date is still clarified. Use the course-defined April
    queue snapshot; agree later operational queue assumptions.

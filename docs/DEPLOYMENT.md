@@ -32,15 +32,16 @@ Paste the hash into the `basic_auth` block in the `infra/Caddyfile` and deploy.
 
 ## Saved allocations
 
-Confirmed allocations and the desk's live queue state live in SQLite, in a
-docker volume on the instance. They survive deploys, reboots, and Power
-stop/start.
+Confirmed allocations, the desk's live queue state, and the dispatcher's
+remembered profile and standing rules live in SQLite, in a docker volume on the
+instance. They survive deploys, reboots, and Power stop/start.
 
 They are lost if the instance is **replaced**, which only an infrastructure
 change can cause: editing `infra/tofu/user_data.sh` or `docker_compose_version`,
 or running `tofu destroy`. No workflow can do it, and `tofu plan` says when a
 change would replace the instance. Export the records from the app first
-(**Export saved allocation records**).
+(**Export saved allocation records**); memory has no export, so standing rules
+would have to be taught again.
 
 ## Local development
 
@@ -78,7 +79,9 @@ cd ../ && tofu init && tofu plan && tofu apply
 Then set two repo variables under Settings -> Secrets and variables -> Actions:
 `AWS_REGION` (`ap-southeast-1`) and `AWS_DEPLOY_ROLE_ARN` (the bootstrap output).
 Leave `SITE_ADDRESS` unset until you have a domain; set it to one and Caddy
-obtains a certificate by itself.
+obtains a certificate by itself. Our deployment keeps a domain there, and the
+assistant's voice input depends on it: browsers only expose the microphone on a
+secure origin, so on a plain-HTTP address the app is typing-only.
 
 Rotating the key later is step 2 with `--overwrite`, then a deploy. No repo change.
 
@@ -88,6 +91,10 @@ Rotating the key later is step 2 with `--overwrite`, then a deploy. No repo chan
 - **"The language model is unavailable"**: the app only works on models where
   thinking is off by default (currently). Opus 5 and newer fail, because structured
   output forces a tool call and those models reject it.
+- **The microphone is blocked, or the button says voice needs another browser**:
+  speech recognition needs a secure origin and a browser that has it (Chrome, Edge
+  or Safari). Check that `SITE_ADDRESS` still names the domain, so Caddy serves
+  HTTPS rather than the bare IP. See [VOICE_ASSISTANT.md](VOICE_ASSISTANT.md).
 
 ## Teardown
 

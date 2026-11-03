@@ -10,7 +10,7 @@ The first real-provider development run is documented in
 [CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md), including a blocking
 clarification failure and additional manual-review issues. It is not held-out accuracy.
 Offline tests establish orchestration and validation, not language quality.
-The primary objective remains undecided. Independent previews use demo confirmation;
+The primary objective is minimise lateness. Independent previews use demo confirmation;
 Saved local plan supports a separate human-confirmed durable allocation. The model
 cannot commit a record, and confirming does not invoke the model again.
 
@@ -69,7 +69,7 @@ Use an explicit ISO date when other date formats require clarification.
 Each reply is a card built by `replies.py` from the dispatch result. The model writes
 none of it. A card has:
 
-- a status badge and a one-line headline, such as "Send ORD-109 to Nimble Needle.";
+- a status badge and a headline identifying the recommended workshop for the order;
 - facts copied from the tool's display strings: workshop, estimated delivery,
   expected turnaround, deadline, cost and batch defect risk;
 - notes: the ranking basis, refusal reasons, the ship-date note, and every review

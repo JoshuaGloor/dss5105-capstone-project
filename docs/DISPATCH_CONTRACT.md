@@ -106,6 +106,15 @@ whole-batch delivery and its lateness even when the cost constraint selects nobo
 An exception never enables confirmation. These are estimates under the supplied
 snapshot, not guaranteed earliest achievable dates.
 
+`decision_basis` explains the chosen workshop (the recommendation, or the alternative
+after a refusal) and is `null` when nothing is chosen. It never chooses or reorders.
+Its tool-authored `reasons` name any metric on which the choice is best among the
+permitted workshops (or among those that meet the deadline, when the choice is on time
+and others are not), its slack or lateness against the deadline, and its differences
+from the next-ranked workshop (or the first-ranked one, when a hard date or a suggestion
+moved the choice). Differences are taken between the displayed values, so they agree
+with the comparison table. The raw differences are stored beside the sentences.
+
 ### Two-workshop split assessment
 
 `split_option` is computed when the request asks for a split or no permitted whole

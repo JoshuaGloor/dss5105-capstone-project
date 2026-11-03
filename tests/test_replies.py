@@ -35,7 +35,7 @@ def test_every_numeral_on_a_card_is_copied_from_the_tool_result(desk, request_id
 def test_recommendation_card_uses_the_chosen_candidate_display(desk):
     result, card = reply(desk, "R25")
     chosen = next(row for row in result["candidates"] if row["estimate"]["workshop_id"] == result["recommendation"])
-    assert card["headline"] == f"Send ORD-109 to {chosen['name']}."
+    assert card["headline"] == f"Recommended workshop for ORD-109: {chosen['name']}."
     assert ["Estimated delivery", chosen["display"]["eta"]] in card["facts"]
     assert card["choices"] == []
     assert any("imposed by Mei" in detail for _, detail in card["steps"])

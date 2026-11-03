@@ -3,7 +3,9 @@
 import copy
 import hashlib
 import json
+import tempfile
 from dataclasses import asdict
+from pathlib import Path
 
 import pytest
 
@@ -397,7 +399,16 @@ def test_single_record_and_bundle_load_identically_without_changing_inputs(data,
     assert {name: (tmp_path / name).read_bytes() for name in contents} == before
 
 
-def test_cli_reads_held_out_directory_records_and_ignores_recorder_metadata(data, tmp_path):
+@pytest.fixture
+def repository_tmp_path():
+    cache = ROOT / ".cache" / "reliability-tests"
+    cache.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=cache) as directory:
+        yield Path(directory)
+
+
+def test_cli_reads_held_out_directory_records_and_ignores_recorder_metadata(data, repository_tmp_path):
+    tmp_path = repository_tmp_path
     benchmark, manifest, make = data
     record = make()
     case = next(case for case in benchmark["cases"] if case["id"] == "R04")
@@ -450,7 +461,8 @@ def test_serialization_is_deterministic_and_record_order_independent(data):
     assert all("\r\n" not in value for value in first.values())
 
 
-def test_cli_writes_five_files_and_never_overwrites_input(data, tmp_path):
+def test_cli_writes_five_files_and_never_overwrites_input(data, repository_tmp_path):
+    tmp_path = repository_tmp_path
     benchmark, manifest, make = data
     benchmark_path = tmp_path / "benchmark.json"
     input_path = tmp_path / "input.json"
@@ -477,6 +489,16 @@ def test_cli_writes_five_files_and_never_overwrites_input(data, tmp_path):
     assert hashlib.sha256(input_path.read_bytes()).hexdigest() == before
     with pytest.raises(SystemExit):
         main(args)
+
+
+def test_cli_rejects_output_outside_repository_before_creating_files(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr("dss5105.reliability_score.ROOT", tmp_path / "repository")
+    output = tmp_path / "output"
+    # An untrusted output must be rejected before even trying to read this absent input.
+    with pytest.raises(SystemExit):
+        main(["--input", str(tmp_path / "absent.json"), "--output", str(output)])
+    assert "Output must be a new directory inside the repository" in capsys.readouterr().err
+    assert not output.exists()
 
 
 def test_regression_known_exclusion_missing_alternative(data):

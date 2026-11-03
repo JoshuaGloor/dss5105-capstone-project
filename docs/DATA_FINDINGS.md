@@ -100,6 +100,19 @@ over the required ten seeds.
 
 ## Questions not yet settled
 
+The Sprint 1 refinement adds direct workshop lookup and hypothetical extra-work
+checks in Streamlit. Reproduce the [tool evidence](evidence/workshop-tools.json) with:
+
+```bash
+uv run python scripts/workshop_evidence.py
+```
+
+This records an eligible batch lookup, delivery before/after additional work at the
+same workshop, and rejection when extra work exceeds a trial workshop's batch cap.
+It uses the course snapshot and code hashes, never a provider or a saved allocation.
+The scorer and course data did not change, so these tools do not create a new
+simulator-policy result. Their language-query routing remains planned.
+
 The read-only dispatch preview now defines an independent inbox snapshot and
 conservative date/constraint handling in [DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md).
 Reproduce its development inputs with `uv run python -m dss5105.prototype`; the

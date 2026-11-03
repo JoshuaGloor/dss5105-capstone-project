@@ -1,4 +1,4 @@
-# Allocation engine: first experiment
+# Allocation engine
 
 This is an offline Python allocator, not the complete chat application. No LLM,
 API key, new dependency, or modification to the course harness is needed.
@@ -58,52 +58,60 @@ printed and saved output records the actual weights and fixed score scales.
 5. `evaluate.run_experiment`: run the course baselines, the short heuristic, and
    the weighted policies through the unmodified simulator.
 
-## Score definition and initial configurations
+## Score definition and presets
 
 All objectives use this same formula; a policy name never changes allocation logic:
 
 ```text
-score = lateness_weight * lateness_days / lateness_scale
-      + defects_weight * defect_risk / defects_scale
-      + cost_weight * cost_per_piece / cost_scale
+score = lateness   * (lateness_days + capacity_reservation * reserved_days + miss_charge) / 7
+      + defects    * defect_risk / 0.1 * pieces / 750
+      + fairness   * projected_share / 0.25
+      + robustness * stress_lateness_days / 7
+      + cost       * cost_per_piece / 1
 
-lateness_days = max(0, expected_turnaround_days + deadline_buffer_days - days_until_due)
+lateness_days        = max(0, expected_turnaround_days + deadline_buffer_days - days_until_due)
+reserved_days        = pieces / (ACTIVE capacity of each other category this workshop makes)
+projected_share      = (pieces this workshop already holds in the ledger + pieces) / (ledger total + pieces)
+stress_lateness_days = max(0, expected_turnaround_days + 14 - days_until_due)
+miss_charge          = deadline_miss_days if the unbuffered expected turnaround misses the date, else 0
 ```
 
-`deadline_buffer_days` is part of the configuration and defaults to 0, which is the
-original score. A positive buffer penalizes candidates that would use nearly all of
-the slack; estimates and the "meets deadline" test do not change. See
-[MARGIN_STUDY.md](MARGIN_STUDY.md) for why it exists and what it buys.
+`deadline_buffer_days`, `capacity_reservation` and `deadline_miss_days` are part of the
+configuration and default to 0. With both at 0 and only the original weights, the ranking is exactly the
+Sprint 1 score. A positive buffer penalizes candidates that would use nearly all of
+the slack; reservation charges the lateness objective for scarce shared capacity (a
+tops batch at a shop that also makes accessories); the miss charge keeps an on-time
+workshop ahead of a late one. Estimates and the "meets deadline" test do not change. See [MARGIN_STUDY.md](MARGIN_STUDY.md) for the buffer and
+[OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md) for the new terms and how the presets were chosen.
 
 The minimum score wins. All configurations break ties by expected turnaround,
-then workshop ID. Thus, when every shop can deliver on time, pure lateness chooses
-the earliest expected delivery among the tied candidates.
+then workshop ID. For a fixed batch, pure lateness without reservation has the same
+ranking as earliest expected turnaround; with reservation it prefers a tops-only shop
+over a shared one whenever both meet the date with the same lateness.
 
-More generally, for a fixed batch, this pure-lateness configuration always has
-the same ranking as earliest expected turnaround: clipping at the deadline is
-monotone, and the turnaround tie-break orders the zero-penalty candidates. Changing
-only that batch's deadline does not change its selected workshop. Compared with
-`earliest_finish`, the effective difference is the expected rework adjustment,
-not a new deadline-aware scheduling algorithm. Deadlines can affect the tradeoff
-when nonzero defect or cost weights are included.
+Fairness reads a ledger of pieces already placed: in the simulator the `Allocator`
+remembers its own decisions in the current replay; in the desk and the assistant it is
+the saved plan's bookings. An empty ledger leaves fairness without effect.
 
-| Preset | Lateness weight | Defects weight | Cost weight |
-|---|---|---|---|
-| lateness | 1.0 | 0.0 | 0.0 |
-| defects | 0.0 | 1.0 | 0.0 |
-| hybrid | 0.7 | 0.3 | 0.0 |
+| Preset | Lateness | Defects | Fairness | Robustness | Buffer | Purpose |
+|---|---|---|---|---|---|---|
+| hybrid (default) | 1.0 | 0.2 | 0 | 0 | 2 days | Our priority: lateness first, then defects |
+| lateness | 1.0 | 0 | 0 | 0 | 0 | Primary objective alone |
+| defects | 0.2 | 1.0 | 0 | 0 | 5 days | Defects objective within the lateness guardrail |
+| fairness | 1.0 | 0 | 1.0 | 0 | 0 | Spread the work while delivering on time |
+| robustness | 1.0 | 0 | 0 | 0.5 | 0 | Absorb a two-week closure |
 
-Reference scales are 7 days of lateness, 0.1 batch-defect probability, and 1 cost
-unit per piece. These fixed units make the tradeoff inspectable across orders;
-they do not use future orders or simulator outcomes for normalization. They are
-initial design assumptions, not measured optimal scales. The hybrid gives more
-weight to lateness while allowing quality to influence the decision. It is an
-exploratory configuration, not a justified final business preference or a tuned
-winner. Weights and scales both affect the tradeoff; report both.
+Every preset uses capacity reservation 1 and a one-week deadline miss charge.
 
-Cost uses a per-piece reference because batch sizes vary. The candidate estimate
-also records total batch cost. Fairness weighting, a dedicated robustness policy,
-and chat-imposed constraints are not implemented in this first increment.
+Every preset was frozen on development seeds 6000-6029 before the course seeds ran.
+The Sprint 1 presets remain in `evaluate.SPRINT1_PRESETS` so the earlier margin,
+defects-frontier and tuning studies still reproduce their evidence. (The Sprint 1
+0.7/0.3 hybrid now uses the pieces-weighted defect term, so its rows differ slightly
+from the archived evidence; its exact numbers are reproducible from commit e8c40a5.)
+
+Reference scales are fixed units: a week of lateness, a 10% batch-defect probability on
+a 750-piece batch, a quarter of all pieces, and one cost unit per piece. They make the
+tradeoff inspectable across orders and never use future orders or outcomes.
 
 ## Limits to keep in the report
 
@@ -122,9 +130,9 @@ and chat-imposed constraints are not implemented in this first increment.
 - `rank_candidates` returns an empty list when nobody is eligible. The simulator
   callback raises `NoEligibleWorkshop` because the harness has no deferral protocol.
   The future chat layer must turn this into an explicit escalation, not invent a shop.
-- No primary objective has been ratified. [DATA_FINDINGS.md](DATA_FINDINGS.md)
-  records these runs separately from unverified historical probes. The experiments
-  do not validate a weight-sweep frontier or the earlier chat-feasibility labels.
+- The team's primary objective is minimise lateness, with minimise defects second; the
+  default `hybrid` preset encodes that order. [DATA_FINDINGS.md](DATA_FINDINGS.md)
+  records the earlier runs separately from unverified historical probes.
 - Chat interpretation, confirmed commitments, and explanation faithfulness remain
   separate work. This experiment is not the complete Track 2 evaluation.
 

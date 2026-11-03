@@ -94,7 +94,16 @@ def test_envelope_and_context_are_explicit():
     assert context["as_of"] == "2026-04-01"
     assert context["queue_mode"] == "independent_workshops_csv_snapshot"
     assert context["scope"] == "registered_order_preview"
-    assert set(context["objective_weights"]) == {"lateness", "defects", "cost", "deadline_buffer_days"}
+    assert context["objective_weights"] == {
+        "lateness": 1,
+        "defects": 0,
+        "cost": 0,
+        "deadline_buffer_days": 0,
+        "fairness": 0,
+        "robustness": 0,
+        "capacity_reservation": 0,
+        "deadline_miss_days": 0,
+    }
     assert context["source_hash_modes"] == SOURCE_HASH_MODES
     assert set(context["source_sha256"]) == set(context["source_hash_modes"])
     for path, digest in context["source_sha256"].items():

@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import pytest
 
-from dss5105.evaluate import PRESETS
+from dss5105.evaluate import SPRINT1_PRESETS as PRESETS
 from dss5105.harness import Simulator
 from dss5105.tune import run_tuning, select_candidates, summarize
 

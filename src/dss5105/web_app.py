@@ -10,6 +10,7 @@ from uuid import uuid4
 import streamlit as st
 
 from dss5105.chat_ui import (
+    CUSTOM_BUFFER_DEFAULT,
     CUSTOM_DEFAULTS,
     LABELS,
     DeskContext,
@@ -30,9 +31,11 @@ from dss5105.records import AllocationStore
 
 STYLE = Path(__file__).with_name("assets") / "desk.css"
 OBJECTIVE_NOTES = {
+    "hybrid": "Recommended (lateness first, then defects)",
     "lateness": "Lateness (primary objective)",
     "defects": "Defect (secondary objective)",
-    "hybrid": "Hybrid (hybrid objective with fixed weights)",
+    "fairness": "Fairness (spread the work)",
+    "robustness": "Robustness (absorb a workshop stoppage)",
     "custom": "Custom (customizable weights for objectives)",
 }
 # One supplied example per request kind in the course data dictionary: (request id, header, description, tone).
@@ -70,7 +73,10 @@ SCENARIOS = (
 def objectives_panel() -> str:
     """Objective choice and workspace switch, drawn inside the Objectives popover. Returns the workspace."""
     st.subheader("Objectives")
-    st.caption("Primary selection is pending. These presets are exploratory.")
+    st.caption(
+        "Primary: minimise lateness. Secondary: minimise defects. Each preset was chosen on development seeds; "
+        "see docs/OBJECTIVE_STUDY.md."
+    )
     mode = st.radio(
         "Objective",
         options=list(LABELS),
@@ -82,6 +88,9 @@ def objectives_panel() -> str:
         st.caption("Adjust relative weights. They apply to the next request you send.")
         for term, value in CUSTOM_DEFAULTS.items():
             st.slider(term.capitalize() + " weight", 0.0, 1.0, value, 0.01, key="weight_" + term)
+        st.slider("Safety buffer (days)", 0.0, 10.0, CUSTOM_BUFFER_DEFAULT, 0.5, key="weight_buffer")
+        st.toggle("Protect scarce capacity", value=True, key="weight_reservation")
+        st.toggle("On-time first", value=True, key="weight_on_time_first")
         if read_weights()[0] is None:
             st.error("Every weight is zero. Set at least one weight above zero before sending a request.")
     st.caption("Eligibility and exclusions always apply. A hybrid need not lie between the other results.")

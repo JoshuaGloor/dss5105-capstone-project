@@ -33,10 +33,11 @@ def test_custom_weights_are_applied_and_unspecified_weights_are_zero(tmp_path):
     output = tmp_path / "nested" / "custom.json"
     evaluate.main(["--defects-weight", "1", "--output", str(output)])
     result = json.loads(output.read_text())
-    assert result["weights"] == {"custom": {"lateness": 0.0, "defects": 1.0, "cost": 0.0, "deadline_buffer_days": 0.0}}
+    assert result["weights"] == {"custom": asdict(ObjectiveWeights(lateness=0.0, defects=1.0))}
+    assert result["weights"]["custom"]["fairness"] == result["weights"]["custom"]["robustness"] == 0.0
     assert set(result["policies"]) == REFERENCES | {"custom"}
-    preset = evaluate.run_experiment(configurations={"defects": evaluate.PRESETS["defects"]})
-    assert result["policies"]["custom"] == preset["policies"]["defects"]
+    preset = evaluate.run_experiment(configurations={"defects_only": ObjectiveWeights(lateness=0, defects=1)})
+    assert result["policies"]["custom"] == preset["policies"]["defects_only"]
     assert evaluate.PRESETS == original_presets
 
 

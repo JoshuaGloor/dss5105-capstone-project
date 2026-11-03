@@ -8,11 +8,12 @@ import json
 from pathlib import Path
 
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
-from dss5105.evaluate import PRESETS
+from dss5105.evaluate import SPRINT1_PRESETS as PRESETS
 from dss5105.replies import build_reply
 
 
 def build_bundle() -> dict:
+    """Previews for the three Sprint 1 configurations the HTML design reference was built around."""
     inbox = read_inbox()
     fixture_path = ROOT / "examples" / "dispatch_inputs.json"
     fixtures = json.loads(fixture_path.read_text())

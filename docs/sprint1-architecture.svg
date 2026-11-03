@@ -1,94 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">SweaterCo Quick-Response Subcontracting Desk: target architecture and current implementation status</title>
-  <desc id="desc">The Streamlit dispatcher connects through a language extraction layer to deterministic Python tools. Revised live language evaluation is pending. Course data feeds resolution, eligibility and configurable ranking. Explicit human confirmation in saved-plan mode updates versioned local queues and SQLite audit storage. The shared simulator evaluates policies separately from chat evaluation. Offline draft inputs also exercise the tools without a model.</desc>
-  <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1,1 L9,5 L1,9" fill="none" stroke="#71817b" stroke-width="1.5"/></marker>
-    <style>
-      text { font-family:Arial,Helvetica,sans-serif; fill:#203731; }
-      .caption { font-size:16px; fill:#60726c; }
-      .label { font-size:13px; font-weight:700; letter-spacing:1.4px; }
-      .heading { font-size:23px; font-weight:700; }
-      .body { font-size:17px; }
-      .tiny { font-size:14px; fill:#60726c; }
-      .ready { fill:#e9f3e9; stroke:#8aad98; stroke-width:1.5; }
-      .planned { fill:#fafaf6; stroke:#9ca8a1; stroke-width:1.5; stroke-dasharray:7 5; }
-      .prototype { fill:#e8eff5; stroke:#8aa5b9; stroke-width:1.5; }
-      .line { fill:none; stroke:#71817b; stroke-width:1.6; marker-end:url(#arrow); }
-    </style>
-  </defs>
-  <rect width="1600" height="900" fill="#f4f3ec"/>
-  <text x="56" y="58" class="label">GROUP 11 / TRACK 2 / SPRINT 1</text>
-  <text x="56" y="111" font-size="43" font-weight="700" letter-spacing="-1">Understand the request. Calculate with tools. Confirm with evidence.</text>
-  <text x="56" y="149" class="caption">Target architecture / Primary objective pending / No arithmetic delegated to the language model</text>
-  <rect x="56" y="184" width="16" height="16" class="ready" rx="3"/><text x="82" y="197" class="tiny">Implemented</text>
-  <rect x="216" y="184" width="16" height="16" class="prototype" rx="3"/><text x="242" y="197" class="tiny">Interactive prototype</text>
-  <rect x="430" y="184" width="16" height="16" class="planned" rx="3"/><text x="456" y="197" class="tiny">Planned integration</text>
-
-  <rect x="56" y="258" width="284" height="265" rx="12" class="ready"/>
-  <text x="79" y="291" class="label">DISPATCHER EXPERIENCE</text>
-  <text x="79" y="331" class="heading">Streamlit web desk</text>
-  <text x="79" y="371" class="body">Original request and context</text>
-  <text x="79" y="403" class="body">Primary / other / hybrid</text>
-  <text x="79" y="435" class="body">Candidates + explanations</text>
-  <text x="79" y="467" class="body">Evidence export</text>
-  <text x="79" y="501" class="tiny">Previews / saved local allocations</text>
-
-  <rect x="377" y="258" width="284" height="265" rx="12" class="ready"/>
-  <text x="400" y="291" class="label">LANGUAGE BOUNDARY</text>
-  <text x="400" y="331" class="heading">Language intake</text>
-  <text x="400" y="371" class="body">Interpret intent and references</text>
-  <text x="400" y="403" class="body">Capture source constraints</text>
-  <text x="400" y="435" class="body">Clarify ambiguous requests</text>
-  <text x="400" y="467" class="body">Return quoted field updates</text>
-  <text x="400" y="501" class="tiny">Offline-tested / revised live run pending</text>
-
-  <rect x="698" y="239" width="481" height="303" rx="12" fill="#fff" stroke="#8aad98" stroke-width="2"/>
-  <text x="723" y="272" class="label">DETERMINISTIC PYTHON BOUNDARY</text>
-  <rect x="721" y="288" width="435" height="60" rx="7" class="ready"/>
-  <text x="738" y="313" class="body" font-weight="700">Validate + resolve + enforce constraints</text>
-  <text x="738" y="335" class="tiny">Exact order lookup / course eligible_workshops()</text>
-  <rect x="721" y="360" width="435" height="68" rx="7" class="ready"/>
-  <text x="738" y="386" class="body" font-weight="700">Estimate delivery + configurable scorer</text>
-  <text x="738" y="411" class="tiny">Queue + processing + transport + expected rework</text>
-  <rect x="721" y="440" width="435" height="79" rx="7" class="ready"/>
-  <text x="738" y="467" class="body" font-weight="700">Recommendation or explicit exception</text>
-  <text x="738" y="490" class="tiny">Clarify / refuse / decline / review late options</text>
-  <text x="738" y="510" class="tiny">Typed evidence, weights, provenance, snapshot hashes</text>
-
-  <rect x="1216" y="258" width="328" height="265" rx="12" class="ready"/>
-  <text x="1239" y="291" class="label">CONFIRMATION + STATE</text>
-  <text x="1239" y="331" class="heading">Human-reviewed commit</text>
-  <text x="1239" y="371" class="body">Revalidate queue state version</text>
-  <text x="1239" y="403" class="body">Prevent duplicate allocations</text>
-  <text x="1239" y="435" class="body">Update queues transactionally</text>
-  <text x="1239" y="467" class="body">Retain an auditable decision</text>
-  <text x="1239" y="501" class="tiny">Saved-plan mode / local SQLite records</text>
-
-  <path d="M340 357 H374" class="line"/>
-  <path d="M661 357 H695" class="line"/>
-  <path d="M1179 390 H1213" class="line"/>
-  <path d="M936 542 V565 H196 V526" class="line"/>
-  <rect x="290" y="552" width="365" height="26" fill="#f4f3ec"/>
-  <text x="305" y="570" class="tiny">Tool evidence returns to the review interface</text>
-
-  <rect x="56" y="615" width="605" height="117" rx="10" class="ready"/>
-  <text x="79" y="648" class="heading">Course data + draft structured inputs</text>
-  <text x="79" y="679" class="body">orders.csv / workshops.csv / raw dispatch_requests.txt</text>
-  <text x="79" y="707" class="tiny">Fixtures exercise tools today; they are not NLP or gold labels.</text>
-  <path d="M661 660 H678 V481 H695" class="line"/>
-
-  <rect x="698" y="615" width="481" height="117" rx="10" class="ready"/>
-  <text x="722" y="648" class="heading">Shared policy evaluation</text>
-  <text x="722" y="679" class="body">Baselines + heuristic + weighted allocator</text>
-  <text x="722" y="707" class="tiny">Unmodified simulator / normal + shock / retained traces</text>
-  <path d="M1128 543 V612" class="line"/>
-
-  <rect x="1216" y="615" width="328" height="117" rx="10" class="planned"/>
-  <text x="1239" y="648" class="heading">Separate chat evaluation</text>
-  <text x="1239" y="679" class="body">Decision + explanation fidelity</text>
-  <text x="1239" y="707" class="tiny">Supplied inbox + frozen held-out cases</text>
-
-  <rect x="56" y="781" width="1488" height="66" rx="10" fill="#203731"/>
-  <text x="80" y="808" font-size="17" style="fill:#fff" font-weight="700">Preview is not allocation.</text>
-  <text x="80" y="832" font-size="15" style="fill:#d6e4db">Same snapshot for comparisons. Hard constraints before ranking. Explicit confirmation saves the local plan. No workshop is contacted.</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+<title id="title">Quick-Response Subcontracting Desk architecture</title>
+<desc id="desc">Streamlit dispatcher desk, LangChain structured language interpretation, Python decision tools and dispatcher approval. Session memory supports interpretation, course data feeds tools, and SQLite stores confirmed decisions and queues. The shared simulator tests the same Python allocator.</desc>
+<rect width="960" height="540" fill="#f4f3ec"/>
+<g font-family="Arial, sans-serif" fill="#203731">
+<text x="48" y="77" font-size="34" font-weight="700">System architecture</text>
+<text x="48" y="130" font-size="19" fill="#60726c">One dispatcher workflow with separate language, calculation and approval steps</text>
+<g fill="#fff" stroke="#c8d7ce" stroke-width="1.2">
+<rect x="48" y="177" width="164" height="166"/>
+<rect x="244" y="177" width="180" height="166"/>
+<rect x="456" y="177" width="200" height="166" fill="#e9f3ea"/>
+<rect x="688" y="177" width="224" height="166"/>
+<rect x="244" y="385" width="180" height="91"/>
+<rect x="456" y="385" width="200" height="91"/>
+<rect x="688" y="385" width="224" height="91"/>
+</g>
+<g fill="none" stroke="#60726c" stroke-width="1.6">
+<path d="M212 260 H244"/><path d="M424 260 H456"/><path d="M656 260 H688"/>
+<path d="M334 385 V343"/><path d="M556 385 V343"/><path d="M800 343 V385"/>
+</g>
+<g fill="#60726c">
+<polygon points="244,260 236,256 236,264"/>
+<polygon points="456,260 448,256 448,264"/>
+<polygon points="688,260 680,256 680,264"/>
+<polygon points="334,343 330,351 338,351"/>
+<polygon points="556,343 552,351 560,351"/>
+<polygon points="800,385 796,377 804,377"/>
+</g>
+<g font-size="21" font-weight="700" fill="#1c5948">
+<text x="62" y="210">Dispatcher<tspan x="62" dy="25">desk</tspan></text>
+<text x="258" y="210">Request<tspan x="258" dy="25">interpreter</tspan></text>
+<text x="470" y="210">Decision tools</text>
+<text x="702" y="210">Review and<tspan x="702" dy="25">approve</tspan></text>
+<text x="470" y="418">Source data</text><text x="702" y="418">Confirmed plan</text>
+</g>
+<g font-size="17">
+<text x="62" y="267">Streamlit<tspan x="62" dy="21">Request and</tspan><tspan x="62" dy="21">comparison</tspan></text>
+<text x="258" y="267">LLM via LangChain<tspan x="258" dy="21">Structured fields</tspan></text>
+<text x="470" y="267">Python<tspan x="470" dy="21">Eligibility and estimates</tspan><tspan x="470" dy="21">Workload and ranking</tspan></text>
+<text x="702" y="267">Dispatcher confirms<tspan x="702" dy="21">Recheck current queues</tspan></text>
+</g>
+<text x="258" y="418" font-size="18" font-weight="700" fill="#1c5948">Session memory</text>
+<text x="258" y="447" font-size="14">Conversation and draft<tspan x="258" dy="18">Streamlit session state</tspan></text>
+<text x="470" y="447" font-size="15">Orders and workshops<tspan x="470" dy="18">Course CSV files</tspan></text>
+<text x="702" y="447" font-size="16">SQLite decision records<tspan x="702" dy="19">Versioned planning queues</tspan></text>
+<text x="48" y="418" font-size="18" font-weight="700" fill="#1c5948">Policy evaluation</text>
+<text x="48" y="449" font-size="15" fill="#60726c">Shared simulator<tspan x="48" dy="19">Same Python allocator</tspan></text>
+<text x="48" y="517" font-size="11.5" fill="#60726c">Python calculates every estimate. Capacity updates only after dispatcher confirmation.</text>
+</g></svg>

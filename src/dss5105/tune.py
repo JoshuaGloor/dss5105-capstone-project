@@ -9,7 +9,7 @@ from pathlib import Path
 from statistics import mean
 
 from dss5105.allocator import ObjectiveWeights, ScoreScales, earliest_finish, make_allocator
-from dss5105.evaluate import PRESETS
+from dss5105.evaluate import SPRINT1_PRESETS as PRESETS
 from dss5105.harness import HARNESS_PATH, Simulator, cheapest, greedy_biggest, random_choice
 
 # Fix the search and check scenarios before inspecting their results.

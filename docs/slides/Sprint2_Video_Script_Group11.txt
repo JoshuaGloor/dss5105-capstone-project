@@ -1,0 +1,97 @@
+Recording script, Group 11, Sprint 2 video (due Fri 30 Oct 2026, 15:00)
+Hard stop at 5:00. Target 4:40: project about 2:40, demo about 2:00.
+Timed at 138 words a minute. Saadhvika presents slide 5 and Niyanthri slide 6, as the owners
+of the evaluation set; assign the other slides and the demo voice before recording. scripts/build_sprint2_deck.mjs copies each SLIDE section into
+that slide's speaker notes. Numbers come from docs/evidence/objective-study.json and the
+live app; if either changes, update both.
+
+BEFORE RECORDING
+- Start a clean rehearsal plan so the demo numbers match this script:
+    DSS5105_RUNTIME=$PWD/.cache/rehearsal-video sh scripts/run_app.sh
+- Chrome on http://localhost:8501, window about 1440 x 900, zoom 100%.
+  Allow the microphone when Chrome asks (localhost counts as secure).
+- In the app, tap the avatar, enter "Ravi", turn "Read answers aloud" on, Save.
+- Record slides and the screen with QuickTime or OBS at 1080p. Export as
+  Presentation_Group11_Sprint2.mp4 and upload it to YouTube (unlisted), then put the
+  link on slide 1 and slide 8.
+
+SLIDE 1 - Cover (0:12)
+Hi, we are Group 11, Track 2: the Quick-Response Subcontracting Desk for SweaterCo.
+Our primary objective is to minimise lateness. Our secondary objective is to minimise defects.
+
+SLIDE 2 - The user, and what changed since Sprint 1 (0:24)
+Our user is Ravi, the production dispatcher. He is on the factory floor, and requests arrive in
+a group chat. He needs a safe answer in seconds, with a record of why.
+Since Sprint 1, we beat the earliest-finish rule that tied us, our defects and fairness settings
+beat their baselines, and Ravi can now talk to the desk, which remembers what he confirms.
+
+SLIDE 3 - The user journey (0:25)
+Here is his journey. He holds the microphone and says the order, the date and any constraint.
+The assistant answers on screen and out loud: the best workshop, when it arrives, and why.
+He says "book it" and slides to confirm. It offers to remember his constraint, and applies it
+to that customer's next order. Voice can propose. Only the slide commits.
+
+SLIDE 4 - Architecture and key choices (0:36)
+It is one workflow, not a ReAct loop, because every request needs the same checks in order.
+Speech becomes text in the browser. Python handles commands like "book it" itself. Everything
+else is one structured-output call, and every field must quote the message or Python rejects it.
+Deterministic tools then find the order, apply remembered rules, check eligibility, estimate and
+rank. Replies are Python templates, so the model never does arithmetic. A person confirms, and
+SQLite keeps the record and the memory, as exact rules rather than a vector store.
+
+SLIDE 5 - Progress (Saadhvika, 0:18)
+Here is every feature with its owner. The assistant, memory, the four-objective scorer, the desk
+redesign and the AWS deployment are done. In progress: clarification reliability, and our
+evaluation set of 50 new requests with independent labels. Next: Lynn's live run on the full
+set, and a usability test.
+
+SLIDE 6 - Validation plan (Niyanthri, 0:35)
+For allocation we measure late batches and late days in the course simulator, normal and with a
+closure, against the three baselines and earliest finish, choosing settings on separate seeds
+first. Our default is 1.4 percent late against 1.7, with 68 percent fewer late days. For
+language: all 30 inbox requests by kind, plus 50 new held-out requests that we are writing and
+labelling separately. Hard cases: impossible dates, ineligible workshops, misheard orders. We give
+options, refuse with a reason, and read the order back before booking.
+
+SLIDE 7 - Demo (2:00)
+[0:00] Show slide 7 for two seconds, then switch to the app.
+Now the demo. This is Ravi's phone. The rings show how busy each workshop is, and OldMill is
+greyed out because it is suspended.
+[0:10] Hold the microphone and say: "ORD-109, 500 vests for Harbor Knits, due April 13.
+Keep it away from BudgetWorks." Let the reply play.
+He just says it. GiantWeave delivers on Thursday, 9 April, 3.71 days early. BudgetWorks is
+excluded, and the card says Ravi asked.
+[0:35] Open "Compare 4 workshops", then "Can't take it". Close them.
+[0:45] Say "book it". On the sheet, slide to confirm. Tap "Remember" on the offer.
+One slide, and the booking is saved with his name. The rule goes into memory.
+[1:05] Say: "ORD-081 for Harbor Knits needs to go out, due April 20."
+A new order for the same customer: the rule is applied, and the card says it came from memory.
+[1:20] Hard case. Say: "QuickStitch for the scarves on ORD-103?"
+QuickStitch cannot make scarves, and no workshop can meet the 4 April date. The desk says so,
+gives the earliest option, 13.44 days late, and a two-shop split. Nothing is booked.
+[1:40] Point at the "Behind the answer" panel.
+Every answer shows what the model extracted, with its quotes, and what Python computed.
+
+SLIDE 8 - Thank you (0:05)
+Thank you. The code and the video link are on the first slide.
+
+Q&A PREPARATION (not read aloud)
+- Ruby (Duong Thanh Nhan) cannot attend: she emails Salman and Jack with her reason before the
+  session, and slide 1 shows "Absent" with that reason. Any member may be asked about her desk
+  redesign: one answer at a time, objective panel, saved plan, Show working.
+- Why voice? The track's bonus asks how a dispatcher would really use it: on the floor, on a
+  phone. Typing still works everywhere, and the course inbox is still evaluated as text.
+- Can a misheard "yes" book something? No. "Book it" only opens the sheet. Saving needs a
+  name and the slide, and the preview is recomputed and checked for changes first.
+- Does the model see costs or queues? No. It sees the message, the conversation, and the
+  workshop, customer and product names. Python computes every number.
+- What does memory store? Constraints from confirmed bookings, with who said them and their
+  words; a log of answers and bookings; the dispatcher's name and priorities. Nothing is
+  learned from the model alone, and a rule can be paused.
+- Did you tune on the course seeds? Presets were chosen on development seeds 6000-6029. The
+  course seeds were run twice: after the first run a desk case (R12) showed reservation could
+  prefer a slightly late shop, so we added an on-time-first charge and re-ran everything. It is
+  disclosed in docs/OBJECTIVE_STUDY.md; the default's numbers did not change.
+- Where do baselines still win? Under the closure our default is 0.17 points worse on late
+  batches than earliest finish. The Sprint 1 lateness preset moves fewer late days under the
+  closure than our robustness preset. We do not claim a universal robustness win.
