@@ -41,9 +41,12 @@ or simulator outcomes. Do not send fixture interpretations as model input.
   can resolve orders via the Python lookup; a model cannot invent an ID from a list.
 - Normalize known workshop IDs/names and common product plurals against the course
   register. Unknown customer/product filters may produce NOT_FOUND normally.
-- Quantities accept digits and correctly grouped thousands separators. Quantity
-  words need clarification; the model must not convert them to arithmetic results.
-- Dates accept ISO, English month/day with optional year, today, and tomorrow.
+- Quantities accept digits and correctly grouped thousands separators, optionally
+  followed by words such as "pieces" or "pieces of tops". Quantity words, and hedges
+  such as "400 or so", need clarification; the model must not convert them to
+  arithmetic results.
+- Dates accept ISO, English month/day or day/month ("April 15", "15 April", "15th
+  April 2026") with optional year, today, and tomorrow.
   Python applies the inbox year when omitted and the declared snapshot for relative
   dates. Ambiguous formats and other relative phrases prompt for an explicit date.
 - An unknown revised date marks the prior deadline uncertain. A validated new date
@@ -126,3 +129,15 @@ fixtures or offline tests as real-provider results.
   recorded order: `orders.csv` holds its quantity, and the dispatch tool still asks about
   any stated amendment. A stated but unclear quantity ("usual quantities") still asks.
   This fixes the live R14 failure, where an unneeded quantity question blocked the refusal.
+- A new order: with no order ID and no customer there is nothing recorded to send out, so
+  Python sets `intent=capacity` when a product and a quantity are stated, and drops the
+  model's question about which order. "I need an order for QuickStitch, 400 pieces of tops,
+  ready by 15 April" is answered as a check of every workshop, with QuickStitch first. An
+  order ID named in a later message turns it back into an allocation. Requests with a
+  customer still go to the order lookup, so the course inbox behaves as before.
+- Spoken input: "order 109", "order number 81" or "order #81" normalizes to ORD-109 and
+  ORD-081. The model may copy the whole reference or only its number, but the quoted words
+  must contain that order reference, so an ID the user did not say is still rejected.
+  Workshop names match without spaces or hyphens ("budget works" is BudgetWorks). When
+  judging whether a message mentions a quantity, digits inside an order reference or a date
+  phrase ("April 20th") do not count.

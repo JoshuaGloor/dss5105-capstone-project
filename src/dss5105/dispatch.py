@@ -817,6 +817,29 @@ class DispatchDesk:
         if candidates:
             result["recommendation"] = (on_time or candidates)[0]["estimate"]["workshop_id"]
         quantity = f"{request.pieces:,} pieces of {request.product.lower()}"
+        opening = ""
+        if request.suggested_workshop is not None:
+            suggestion = request.suggested_workshop
+            row = next((row for row in candidates if row["estimate"]["workshop_id"] == suggestion), None)
+            blocked = next((row for row in result["excluded"] if row["workshop_id"] == suggestion), None)
+            name = self.workshops[suggestion].name
+            result["suggested"] = {
+                "workshop_id": suggestion,
+                "name": name,
+                "meets_deadline": bool(row and row["meets_deadline"]),
+                "eta": row["display"]["eta"] if row else None,
+                "lateness": row["display"]["lateness"] if row else None,
+                "reasons": blocked["reasons"] if blocked else [],
+            }
+            if row and row["meets_deadline"]:
+                opening = f"{name} can deliver {quantity} by {due.isoformat()}, arriving {row['display']['eta']}. "
+            elif row:
+                opening = (
+                    f"{name} cannot deliver {quantity} by {due.isoformat()}: earliest {row['display']['eta']}, "
+                    f"{row['display']['lateness']} late. "
+                )
+            elif blocked:
+                opening = f"{name} cannot take {quantity}: {' '.join(blocked['reasons'])} "
         if not candidates:
             message = f"No active workshop can take {quantity} as one batch."
         elif on_time:
@@ -829,7 +852,7 @@ class DispatchDesk:
                 f"No permitted workshop can deliver {quantity} by {due.isoformat()}. Earliest: "
                 f"{earliest['name']} on {earliest['display']['eta']}, {earliest['display']['lateness']} late."
             )
-        return finish("CAPACITY", message + " Nothing is reserved until an order is booked.")
+        return finish("CAPACITY", opening + message + " Nothing is reserved until an order is booked.")
 
 
 def main():
