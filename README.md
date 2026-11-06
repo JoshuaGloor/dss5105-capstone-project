@@ -82,6 +82,14 @@ language run on the corrected inbox is still required.
 See [the evaluation command](docs/CHAT_EVALUATION.md) to reproduce a paid run;
 default tests remain offline. Its draft-check results are not held-out accuracy.
 
+## Offline evaluator review demo
+
+Run `uv run python -m dss5105.evaluator_demo` (Windows:
+`scripts\run_evaluator_demo.cmd`) to generate six disclosed synthetic scenarios and
+local, filterable HTML reports. No model or API key is needed. For saved evidence,
+add `--html-report` to `python -m dss5105.reliability_score`.
+See [the mechanism and recording walkthrough](docs/EVALUATOR_DEMO.md).
+
 ## Portable HTML prototype and CLI
 
 ```bash
