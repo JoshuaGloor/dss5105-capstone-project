@@ -1,5 +1,7 @@
 # Voice dispatch assistant
 
+The app is called StitchFlow: say an order, and it finds the right workshop.
+
 The Sprint 2 announcement asks Track 2 teams to think like the user: "a dispatcher might
 talk to your system on their phone and ask it to send products to a customer." This is
 that flow, built on the same tools the desk and the simulator use.
@@ -10,22 +12,23 @@ browser can type.
 
 ## The user and the job
 
-Ravi is SweaterCo's production dispatcher. He is on the factory floor, not at a desk.
-Requests arrive in the group chat ("ORD-109, 500 vests, keep it away from BudgetWorks"),
-and today he answers from memory: which of eight workshops can make it, which is free,
-which is allowed. He needs to say what has to go out, hear a safe answer he can trust,
-book it in one gesture, and know the record is there if anyone asks later.
+Our user is SweaterCo's production dispatcher, the person who handles the dispatch chat,
+on the factory floor rather than at a desk. Five people post requests there (Ravi, Priya, Mei,
+Chen and the boss), for example "ORD-109, 500 vests, keep it away from BudgetWorks", and
+today the answer comes from memory: which of eight workshops can make it, which is free,
+which is allowed. The dispatcher needs to say what has to go out, hear a safe answer to trust, book it in one gesture, and know
+the record is there if anyone asks later.
 
 ## The journey, step by step
 
-| Step | Ravi does | The assistant does |
+| Step | The dispatcher does | The assistant does |
 |---|---|---|
-| 1. Glance | Opens the app on his phone | Greets him by name. The workshop strip shows each shop's queue as a ring (green to red); OldMill is greyed out as suspended, FreshStart carries its 300-piece cap |
-| 2. Ask | Holds the microphone: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away from BudgetWorks." | Shows the live transcript while he talks, then "Checking every workshop" |
-| 3. Hear the answer | Listens | Card and voice: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days early. Cost 550, defect risk 6.0%." The card shows the delivery timeline against the deadline, why this shop, the other permitted shops, and why the rest cannot take it ("BudgetWorks: Excluded by Ravi") |
-| 4. Book | Says "book it" | Opens a confirmation sheet: order, shop, arrival, cost, the constraint kept, and his name. Nothing is saved yet |
+| 1. Glance | Opens the app on the phone | Greets the dispatcher by name. The workshop strip shows each shop's queue as a ring (green to red); OldMill is greyed out as suspended, FreshStart carries its 300-piece cap |
+| 2. Ask | Holds the microphone: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away from BudgetWorks." | Shows the live transcript while the dispatcher talks, then "Checking every workshop" |
+| 3. Hear the answer | Listens | Card and voice: "GiantWeave can deliver order 109 by Thursday 9 April, 3.71 days early. Cost 550, defect risk 6.0%." The card shows the delivery timeline against the deadline, why this shop, the other permitted shops, and why the rest cannot take it ("BudgetWorks: Excluded by Charles") |
+| 4. Book | Says "book it" | Opens a confirmation sheet: order, shop, arrival, cost, the constraint kept, and the dispatcher's name. Nothing is saved yet |
 | 5. Confirm | Slides to book | Recomputes the answer, checks nothing changed, saves the booking with its evidence, reserves capacity, and reads back a reference |
-| 6. Teach | Taps "Remember" on "Always avoid BudgetWorks for Harbor Knits?" | Stores a standing rule with Mei's or Ravi's own words and the booking it came from |
+| 6. Teach | Taps "Remember" on "Always avoid BudgetWorks for Harbor Knits?" | Stores a standing rule with the requester's own words and the booking it came from |
 | 7. Next order | "ORD-081 needs to go out" | Applies the rule and says so on the card: "From memory: Avoid BudgetWorks for Harbor Knits", with who said it, when, and their words |
 | 8. Check | "What did we book today?" | Lists this plan's bookings from the ledger, with no model call |
 
@@ -54,7 +57,7 @@ exact fields the model extracted and their quotes.
 
 | Choice | Alternative considered | Why |
 |---|---|---|
-| Browser speech recognition (Web Speech API) | Upload audio to a server transcription model | No extra key, cost or latency; live words appear while he talks. Trade-off: Chrome sends audio to its own service, and Firefox has no support, so typing always works too |
+| Browser speech recognition (Web Speech API) | Upload audio to a server transcription model | No extra key, cost or latency; live words appear while the dispatcher talks. Trade-off: Chrome sends audio to its own service, and Firefox has no support, so typing always works too |
 | Voice proposes, a slide commits | Book on a spoken "yes" | A misheard "yes" on a noisy floor would send real work to a workshop. The slide shows exactly what will be saved |
 | Control phrases matched by Python | Let the model classify every utterance | Deterministic, free, and a message cannot talk the system into a booking |
 | Spoken text from Python templates | Let the model summarise | The track's worst failure is a hallucinated delivery date. The voice reads the same tool strings as the card |
@@ -90,7 +93,11 @@ See [TOOL_SPEC.md](TOOL_SPEC.md#memory-store) for the contract.
 
 ## A two-minute demo script
 
-1. (0:00) Phone view. "This is Ravi on the floor." Point at the workshop strip.
+The recorded Sprint 2 video follows the script in
+[docs/slides/Sprint2_Video_Script_Group11.txt](slides/Sprint2_Video_Script_Group11.txt); this is the
+short version for a live run.
+
+1. (0:00) Phone view. "I'm Charles, playing the dispatcher." Point at the workshop strip.
 2. (0:10) Hold the mic: "ORD-109, 500 vests for Harbor Knits, due April 13. Keep it away
    from BudgetWorks." Let the reply play. Open "Compare" and "Can't take it".
 3. (0:40) Say "book it", slide to confirm, show the receipt, tap Remember.
@@ -105,5 +112,13 @@ See [TOOL_SPEC.md](TOOL_SPEC.md#memory-store) for the contract.
 - Speech recognition quality depends on the browser's service; recognition is not
   evaluated yet. Typed requests remain the reference input for the inbox evaluation.
 - A phone on the same Wi-Fi needs HTTPS for the microphone; on plain HTTP, type.
+- Spoken replies use the browser's own voices, English only: a downloaded macOS Premium or
+  Enhanced voice first (Ava, Zoe or Evan, from System Settings > Accessibility > Spoken
+  Content > Manage Voices), then Google US English in Chrome, Aria or Jenny in Edge, then
+  Samantha and any other English voice except the macOS novelty ones. Names match from the
+  start, so a voice is never chosen by a partial match ("Daria" is Bulgarian).
+- VS Code's built-in browser and other Electron windows expose the speech API but have no
+  speech service, so every attempt fails as a network error. The app treats them as
+  unsupported and says so; open it in Chrome, Edge or Safari to talk.
 - Dispatcher identity is self-declared; there is no authentication.
 - Bookings are a local plan: no workshop is contacted, and splits cannot be booked.

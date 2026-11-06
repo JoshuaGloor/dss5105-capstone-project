@@ -133,6 +133,9 @@ returns `CLARIFY` with the question. Otherwise the preview ranks the permitted
 workshops on the same estimates as an allocation and returns status `CAPACITY`, the
 best option under the configured weights, and `commit_allowed` false. The language
 intake extracts these fields with `intent=capacity`; it never computes them.
+A `suggested_workshop` is answered first: `suggested` holds its name, whether it meets
+the date, its arrival and lateness, or the reasons it is excluded, and the message
+opens with that answer before naming the best option. It never changes the ranking.
 
 ## Standing rules in previews
 

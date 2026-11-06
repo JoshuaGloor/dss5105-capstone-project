@@ -263,14 +263,25 @@ function createApp(root) {
   }
 
   // Speech -------------------------------------------------------------------------------
+  // Embedded Chromium (VS Code's browser and other Electron apps) exposes the API but has no
+  // speech service, so every attempt fails with "network". Treat it as unsupported.
+  function embeddedBrowser() {
+    return /Electron\//.test(navigator.userAgent);
+  }
+
   function recognitionClass() {
+    if (embeddedBrowser()) return null;
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
   }
 
   function startListening() {
     const Recognition = recognitionClass();
     if (!Recognition) {
-      toast("Voice input needs Chrome, Edge or Safari. You can type instead.");
+      toast(
+        embeddedBrowser()
+          ? "This built-in browser has no speech service. Open the app in Chrome, Edge or Safari to talk, or type here."
+          : "Voice input needs Chrome, Edge or Safari. You can type instead."
+      );
       nodes.input.focus();
       return;
     }
@@ -298,7 +309,7 @@ function createApp(root) {
         "not-allowed": "Microphone access is blocked. Allow it in the browser, or type instead.",
         "service-not-allowed": "Microphone access is blocked. Allow it in the browser, or type instead.",
         "no-speech": "I didn't hear anything. Hold the button and speak.",
-        network: "Speech recognition needs a network connection. You can type instead.",
+        network: "Speech recognition could not reach its service. Try again, or type instead.",
         "audio-capture": "No microphone was found. You can type instead.",
       };
       if (event.error !== "aborted") toast(messages[event.error] || "Voice input stopped. You can type instead.");
@@ -351,12 +362,39 @@ function createApp(root) {
     if (interim) nodes.listenText.append(el("span", { class: "interim", text: interim }));
   }
 
+  // Native English voices in order of preference: macOS neural voices (downloaded in System Settings
+  // > Accessibility > Spoken Content), then Chrome, Edge and Windows, then the standard macOS voice.
+  // Only English voices are considered and names match from the start, so Bulgarian "Daria" never
+  // stands in for "Aria", and macOS novelty voices ("Bad News", "Bubbles") are never picked.
+  const VOICES = [
+    /\(Premium\)/,
+    /\(Enhanced\)/,
+    /^(Ava|Zoe|Evan|Allison|Nathan|Susan)\b/,
+    /^Google US English$/,
+    /^Microsoft (Aria|Jenny|Ava)\b/,
+    /^Samantha\b/,
+    /^Google UK English Female$/,
+    /^(Daniel|Karen|Moira)\b/,
+  ];
+  const NOVELTY =
+    /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Kathy|Ralph)\b/;
+
+  function englishVoice() {
+    if (!state.voices.length) state.voices = window.speechSynthesis.getVoices();
+    const english = state.voices.filter((voice) => /^en([-_]|$)/i.test(voice.lang || "") && !NOVELTY.test(voice.name));
+    for (const pattern of VOICES) {
+      const match = english.find((voice) => pattern.test(voice.name));
+      if (match) return match;
+    }
+    return english.find((voice) => /^en[-_]US/i.test(voice.lang)) || english[0] || null;
+  }
+
   function speak(text) {
     if (!text || !("speechSynthesis" in window) || !(state.data && state.data.profile.speak)) return;
     const utterance = new SpeechSynthesisUtterance(text);
-    const preferred = state.voices.find((v) => /Samantha|Google US English|Jenny|Aria/i.test(v.name));
-    const english = preferred || state.voices.find((v) => v.lang && v.lang.startsWith("en"));
-    if (english) utterance.voice = english;
+    const voice = englishVoice();
+    utterance.lang = voice ? voice.lang : "en-US";
+    if (voice) utterance.voice = voice;
     utterance.rate = 1.04;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);

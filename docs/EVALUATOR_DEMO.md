@@ -85,7 +85,7 @@ call a provider, rescore records, alter labels or commit an allocation.
 
 ## Run locally on Windows
 
-Open PowerShell and change to THIS checkout containing the unpushed demo:
+Open PowerShell and change to the checkout containing this evaluator demo:
 
 ```powershell
 cd D:\DESKTOP\dss5105\Capstone_Project\pr14-conflicts-ci
@@ -184,6 +184,6 @@ calls. Run:
 uv run pytest tests/test_reliability_report.py tests/test_reliability_score.py
 ```
 
-This increment stays local until reviewed and explicitly submitted. Local test
-success is not a new CI or model-performance result. See
+Keep the pull request open for team review before merging. Local test success
+is not a GitHub CI or model-performance result. See
 [RELIABILITY_SCORER.md](RELIABILITY_SCORER.md) for the full contract and limits.

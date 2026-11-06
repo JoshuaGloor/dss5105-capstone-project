@@ -7,6 +7,12 @@ restarts. Retrieval only discharges implicit needs for a uniquely resolved order
 with valid registered fields; capacity questions and explicit uncertainty remain
 blocking. Conversation trace updates retain deferred needs.
 
+Integration also retains main's spoken order references, quantities with unit
+words and orderless capacity checks. Only references matching the identified
+order are ignored by retrieval guards. A quantity question can ignore a date
+phrase only after that exact phrase was successfully parsed from the current
+patch; other numbers, alternative orders and explicit uncertainty stay blocking.
+
 The provisional benchmark context now lists all eight default scoring settings,
 with the new settings at zero, and refreshed hashes for the merged regression
 tests. Case labels and adjudication states are unchanged. Historical results must

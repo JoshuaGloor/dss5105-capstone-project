@@ -151,15 +151,21 @@ def parse_date_phrase(value: str, as_of: date) -> date | None:
         "november",
         "december",
     )
+    # "April 15" and, as written in Singapore and the UK, "15 April".
     match = re.fullmatch(r"([a-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?", text)
     if match:
         month_name, day, year = match.groups()
-        month = next((i for i, name in enumerate(months, 1) if month_name in (name, name[:3])), None)
-        if month is not None:
-            try:
-                return date(int(year) if year else as_of.year, month, int(day))
-            except ValueError:
-                pass
+    else:
+        match = re.fullmatch(r"(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-z]+)\.?(?:,?\s+(\d{4}))?", text)
+        if not match:
+            return None
+        day, month_name, year = match.groups()
+    month = next((i for i, name in enumerate(months, 1) if month_name in (name, name[:3])), None)
+    if month is not None:
+        try:
+            return date(int(year) if year else as_of.year, month, int(day))
+        except ValueError:
+            pass
     return None
 
 
@@ -177,9 +183,35 @@ def _literal(value: str, evidence: str):
         raise IntakeError("An interpreted value is not supported by its quotation. Retry or start a new request.")
 
 
+def _squash(text: str) -> str:
+    """Speech writes "BudgetWorks" as "budget works"; names compare without spaces or hyphens."""
+    return re.sub(r"[\s-]+", "", text).casefold()
+
+
+# "ORD-109" as typed, or "order 109", "order number 109" or "order #81" as spoken.
+ORDER_REF = re.compile(r"\b(?:ord|order)\.?[\s-]*(?:number\s+|no\.?\s*|#\s*)?(\d{1,3})\b", re.IGNORECASE)
+
+
+def _order_id(value: str, evidence: str) -> str:
+    """The recorded ID form of an order reference the user actually said; never one they did not.
+
+    The value may be the whole reference or just its number, but the quoted words must contain it.
+    """
+    match = ORDER_REF.fullmatch(value.strip()) or re.fullmatch(r"#?\s*(\d{1,3})", value.strip())
+    if not match:
+        raise IntakeError("Please use a recorded order ID.")
+    normalized = f"ORD-{int(match.group(1)):03d}"
+    if normalized not in {f"ORD-{int(found.group(1)):03d}" for found in ORDER_REF.finditer(evidence)}:
+        raise IntakeError(
+            'I did not hear the word "order" before the number. Say "order number" and the digits, '
+            "or type the order ID."
+        )
+    return normalized
+
+
 def _workshop(value: str, desk: DispatchDesk) -> str:
     for key, workshop in desk.workshops.items():
-        if value.casefold() in (key.casefold(), workshop.name.casefold()):
+        if _squash(value) in (_squash(key), _squash(workshop.name)):
             return key
     raise IntakeError("The workshop name could not be matched to the register. Retry with its recorded name or ID.")
 
@@ -203,6 +235,11 @@ def _product(value: str, desk: DispatchDesk) -> str:
     return aliases.get(value.casefold(), value)
 
 
+# A count may include spoken unit words; hedges still require clarification.
+QUANTITY = re.compile(r"([0-9]+|[1-9][0-9]{0,2}(?:,[0-9]{3})+)((?:\s+[a-z&'-]+)*)", re.IGNORECASE)
+HEDGES = r"or|so|about|around|roughly|approx\w*|max\w*|min\w*|least|most|more|less|plus|odd|ish|up|to"
+
+
 def _secondary_evidence(text: str, order_id: str | None, code: str) -> bool:
     """Absence of these conservative guards permits retrieval, not a user amendment."""
     uncertainty = r"confirm|unsure|uncertain|not\s+sure|unknown|maybe|perhaps|whether|tbc|tbd|to\s+follow|will\s+let"
@@ -216,10 +253,12 @@ def _secondary_evidence(text: str, order_id: str | None, code: str) -> bool:
         r"aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|"
         r"tbd|tbc|to\s+follow|will\s+confirm"
     )
-    if re.search(rf"\b(?:{language}|{uncertainty})\b", text, re.IGNORECASE):
+    # Exempt only references to the identified order, including spoken forms.
+    remainder = ORDER_REF.sub(
+        lambda match: " " if f"ORD-{int(match.group(1)):03d}" == order_id else match.group(0), text
+    )
+    if re.search(rf"\b(?:{language}|{uncertainty})\b", remainder, re.IGNORECASE):
         return True
-    # Only the explicit order identifier is exempt from numeric ambiguity.
-    remainder = re.sub(rf"\b{re.escape(order_id)}\b", " ", text, flags=re.IGNORECASE) if order_id else text
     return bool(re.search(r"\d", remainder))
 
 
@@ -258,6 +297,7 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
     provenance = list(previous.provenance)
     seen = set()
     changed = set()
+    unclear_quantity = False
     for update in patch["updates"]:
         _quoted(update, {"field", "value", "evidence"}, text)
         name, value = update["field"], update["value"].strip()
@@ -269,12 +309,15 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
                 raise IntakeError("The interpretation has an unsupported setting. Retry or start a new request.")
             normalized = (value == "true") if name in ("date_uncertain", "split_requested") else value
         else:
-            _literal(value, update["evidence"])
-            normalized = value
             if name == "order_id":
-                if not re.fullmatch(r"ORD-\d{3}", value, re.IGNORECASE):
-                    raise IntakeError("Please use a recorded order ID.")
-                normalized = value.upper()
+                normalized = _order_id(value, update["evidence"])
+            elif name == "suggested_workshop":
+                if _squash(value) not in _squash(update["evidence"]):
+                    _literal(value, update["evidence"])
+            else:
+                _literal(value, update["evidence"])
+                normalized = value
+            if name == "order_id":
                 if previous.request.order_id is not None and previous.request.order_id != normalized:
                     raise DifferentOrder(
                         "This is a different order. Start a new request to keep its constraints separate."
@@ -284,10 +327,12 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
             elif name == "product":
                 normalized = _product(value, desk)
             elif name == "pieces":
-                if not re.fullmatch(r"[0-9]+|[1-9][0-9]{0,2}(?:,[0-9]{3})+", value):
+                count = QUANTITY.fullmatch(value)
+                if not count or re.search(rf"\b(?:{HEDGES})\b", count.group(2), re.IGNORECASE):
                     needs.add("quantity")
+                    unclear_quantity = True
                     continue
-                normalized = int(value.replace(",", ""))
+                normalized = int(count.group(1).replace(",", ""))
             elif name == "due_date":
                 parsed = parse_date_phrase(value, desk.as_of)
                 if parsed is None:
@@ -300,6 +345,15 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         provenance.append({**update, "normalized": normalized, "speaker": speaker, "turn": len(previous.turns)})
     for name in changed:
         needs.discard(RESOLVES.get(name))
+    # With no order ID or customer there is nothing recorded to send out, so a product and a quantity
+    # make it a capacity check: Python answers who can take it and asks nothing about which order.
+    # An order ID named later turns it back into an allocation unless this message asks about capacity.
+    if values["intent"] == "allocate" and values["order_id"] is None and values["customer"] is None:
+        if values["product"] is not None and (values["pieces"] is not None or unclear_quantity):
+            values["intent"] = "capacity"
+            needs.discard("order")
+    elif values["intent"] == "capacity" and values["order_id"] is not None and "intent" not in changed:
+        values["intent"] = "allocate"
     if "due_date" in changed and "date_uncertain" not in changed:
         values["date_uncertain"] = False
     if values["date_uncertain"]:
@@ -307,7 +361,8 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
     exclusions = {item["workshop_id"]: item for item in values["exclusions"]}
     for exclusion in patch["exclusions"]:
         _quoted(exclusion, {"workshop", "imposed_by", "evidence"}, text)
-        _literal(exclusion["workshop"], exclusion["evidence"])
+        if _squash(exclusion["workshop"]) not in _squash(exclusion["evidence"]):
+            _literal(exclusion["workshop"], exclusion["evidence"])
         workshop_id = _workshop(exclusion["workshop"], desk)
         imposer = exclusion["imposed_by"].strip()
         if imposer:
@@ -320,12 +375,17 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
     for code, name in (("quantity", "pieces"), ("deadline", "due_date")):
         if code not in needs:
             continue
+        evidence_text = text
+        if code == "quantity" and "due_date" in changed:
+            # Ignore only the actual date phrase that Python successfully validated.
+            date_phrase = next(update["value"].strip() for update in patch["updates"] if update["field"] == "due_date")
+            evidence_text = evidence_text.replace(date_phrase, " ")
         explicit = (
             name in seen
             or values[name] is not None
             or values["intent"] == "capacity"
             or (code == "deadline" and values["date_uncertain"])
-            or _secondary_evidence(text, values["order_id"], code)
+            or _secondary_evidence(evidence_text, values["order_id"], code)
         )
         if explicit:
             deferred.discard(code)

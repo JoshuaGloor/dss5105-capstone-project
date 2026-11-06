@@ -6,7 +6,7 @@ from streamlit.testing.v1 import AppTest
 
 from dss5105 import assistant, llm, memory, records
 from dss5105.assistant import Services, Session, apply_event, build_view, handle_utterance
-from dss5105.dispatch import ROOT, read_inbox
+from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
 from dss5105.evaluate import PRESETS
 from dss5105.memory import MemoryStore
 from dss5105.records import AllocationStore
@@ -77,6 +77,12 @@ def last_card(session):
     [
         ("Book it", "book"),
         ("yes, book it please", "book"),
+        ("Okay, book it.", "book"),
+        ("Great, book it", "book"),
+        ("Remember that", "remember"),
+        ("yes, remember that for next time", "remember"),
+        ("Show me the other options", "options"),
+        ("why not the others?", "options"),
         ("Okay.", "book"),
         ("go ahead", "book"),
         ("cancel", "cancel"),
@@ -144,6 +150,30 @@ def test_voice_never_books_without_a_named_slide_to_confirm(services):
     assert current.model.calls == 1
 
 
+def test_saying_remember_that_saves_the_offered_rule(services):
+    current = services(order_patch())
+    session = handle_utterance(Session(), ORDER, current)
+    session = assistant.confirm_booking(assistant.request_booking(session, current), current, "Ravi")
+    session = handle_utterance(session, "Remember that.", current, channel="voice")
+    assert last_card(session)["kind"] == "memory" and len(current.memory.rules()) == 1
+    assert session.rule_offers == () and current.model.calls == 1
+    again = handle_utterance(session, "Remember that.", current, channel="voice")
+    assert last_card(again)["headline"] == "There is nothing new to remember." and len(current.memory.rules()) == 1
+
+
+def test_asking_for_the_other_options_reads_the_last_answer_without_the_model(services):
+    current = services(order_patch())
+    session = handle_utterance(Session(), "Show me the other options", current, channel="voice")
+    assert last_card(session)["headline"].startswith("There is nothing to compare")
+    session = handle_utterance(session, ORDER, current)
+    session = handle_utterance(session, "Show me the other options", current, channel="voice")
+    card = last_card(session)
+    permitted, blocked = len(session.result["candidates"]), len(session.result["excluded"])
+    assert card["headline"] == f"{permitted} workshops can take it; {blocked} cannot"
+    assert any(note.startswith("BudgetWorks cannot take it") for note in card["notes"])
+    assert current.model.calls == 1
+
+
 def test_a_stale_answer_cannot_be_booked(services):
     current = services(order_patch())
     session = handle_utterance(Session(), ORDER, current)
@@ -183,11 +213,23 @@ def test_a_capacity_question_after_an_answer_is_a_new_request_from_one_model_cal
     session = handle_utterance(session, question, current)
     card = last_card(session)
     assert card["status"] == "CAPACITY" and card["pick"] is not None
+    assert card["sub"].startswith("1,500 crewneck sweaters. Best option:")
     assert session.result["batch"]["category"] == "TOPS" and session.result["batch"]["pieces"] == 1500
     assert session.conversation.turns == ({"speaker": "Ravi", "text": question},)
     assert session.conversation.traces[-1]["restarted"] is True
     assert current.model.calls == 2
     assert session.result["commit_allowed"] is False
+
+
+def test_a_named_workshop_leads_the_capacity_card():
+    desk = DispatchDesk()
+    request = DispatchInput(
+        intent="capacity", product="tops", pieces=400, due_date="2026-04-15", suggested_workshop="W1"
+    )
+    envelope = {"request_id": "CHAT", "time": "now", "requester": "Charles", "text": "QuickStitch, 400 tops?"}
+    card = assistant.card_for_result(desk.preview(envelope, request, PRESETS["hybrid"]), desk.workshops)
+    assert card["headline"] == "QuickStitch can deliver 400 tops by Wed 15 Apr"
+    assert card["sub"].startswith("Arrives ") and card["speak"].endswith("Nothing is reserved.")
 
 
 def test_another_order_starts_a_fresh_request_without_a_second_call(services):
