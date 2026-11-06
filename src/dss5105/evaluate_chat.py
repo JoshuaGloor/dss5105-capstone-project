@@ -14,7 +14,7 @@ from pathlib import Path
 
 from dss5105 import llm
 from dss5105.allocator import ObjectiveWeights, estimate_delivery
-from dss5105.dispatch import ROOT, DispatchDesk, read_inbox
+from dss5105.dispatch import DATA, ROOT, DispatchDesk, read_inbox
 from dss5105.harness import eligible_workshops
 from dss5105.intake import (
     SCHEMA,
@@ -27,6 +27,12 @@ from dss5105.intake import (
 )
 
 RUBRIC = ROOT / "examples" / "chat_rubric.json"
+GENERATED = ROOT / "examples" / "eval_sets"
+SETS = {
+    "supplied": (DATA / "dispatch_requests.txt", RUBRIC),
+    "train": (GENERATED / "train_requests.txt", GENERATED / "train_rubric.json"),
+    "test": (GENERATED / "test_requests.txt", GENERATED / "test_rubric.json"),
+}
 
 
 def digest(value: bytes) -> str:
@@ -189,6 +195,7 @@ def evaluate_case(envelope: dict, rule: dict, desk: DispatchDesk, model: Recorde
         "request": envelope,
         "course_kind": rule.get("course_kind", "unlabelled"),
         "category": rule["category"],
+        "template": rule.get("template", "supplied"),
         "status": "not_completed",
     }
     try:
@@ -217,7 +224,7 @@ def evaluate_case(envelope: dict, rule: dict, desk: DispatchDesk, model: Recorde
     return record
 
 
-def summarize(records: list[dict], planned: int) -> dict:
+def summarize(records: list[dict], planned: int, evaluation_set: str = "supplied") -> dict:
     completed = [record for record in records if record["status"] == "completed"]
 
     def passed(record):
@@ -235,6 +242,7 @@ def summarize(records: list[dict], planned: int) -> dict:
         }
 
     return {
+        "evaluation_set": evaluation_set,
         "planned": planned,
         "attempted": len(records),
         "unattempted": planned - len(records),
@@ -248,6 +256,7 @@ def summarize(records: list[dict], planned: int) -> dict:
         "cases_with_candidates": sum(bool(record["preview"]["candidates"]) for record in completed),
         "by_course_kind": breakdown("course_kind"),
         "by_category": breakdown("category"),
+        "by_template": breakdown("template"),
         "failed_case_ids": [record["request"]["request_id"] for record in records if not passed(record)],
         "usage": dict(
             sum(
@@ -265,8 +274,12 @@ def summarize(records: list[dict], planned: int) -> dict:
             )
         ),
         "limitations": [
-            "Development set; draft checks are not independent human gold annotations.",
-            "Single initial response per request; no multi-turn or held-out evaluation.",
+            {
+                "supplied": "Development set; draft checks are not independent human gold annotations.",
+                "train": "Generated development split; labels come from construction and tools, not humans.",
+                "test": "Generated test split with unseen templates; held out only if never used for tuning.",
+            }[evaluation_set],
+            "Single initial response per request; no multi-turn evaluation.",
             "Tool field integrity is not complete UI or explanation-faithfulness evaluation.",
             "No automatic retries; no API price estimate; source queues never change.",
         ],
@@ -277,6 +290,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--live", action="store_true", help="Explicitly opt in to paid provider calls")
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--set", choices=SETS, default="supplied", dest="evaluation_set")
     args = parser.parse_args()
     if not args.live:
         parser.error("Pass --live to authorize this paid evaluation. No model was called.")
@@ -284,13 +298,15 @@ def main():
         output = output_path(args.output)
     except ValueError as error:
         parser.error(str(error))
-    desk, inbox = DispatchDesk(), read_inbox()
-    rubric = json.loads(RUBRIC.read_text())
+    inbox_path, rubric_path = SETS[args.evaluation_set]
+    desk, inbox = DispatchDesk(), read_inbox(inbox_path)
+    rubric = json.loads(rubric_path.read_text())
     if set(rubric["cases"]) != {row["request_id"] for row in inbox}:
         parser.error("Rubric IDs must match the complete inbox")
     output.mkdir(parents=True)
     paths = [
-        RUBRIC,
+        rubric_path,
+        inbox_path,
         ROOT / "uv.lock",
         ROOT / "pyproject.toml",
         *(
@@ -308,6 +324,7 @@ def main():
     ]
     manifest = {
         "started_utc": datetime.now(timezone.utc).isoformat(),
+        "evaluation_set": args.evaluation_set,
         "planned_requests": len(inbox),
         "snapshot_date": desk.as_of.isoformat(),
         "source_hashes": desk.source_hashes,
@@ -340,7 +357,7 @@ def main():
         if record["status"] in ("provider_error", "tool_error"):
             print("Stopped without retry. Saved cases remain available.", flush=True)
             break
-    summary = summarize(records, len(inbox))
+    summary = summarize(records, len(inbox), args.evaluation_set)
     write_json(output / "summary.json", summary)
     print(json.dumps(summary, indent=2))
     return int(len(records) != len(inbox))
