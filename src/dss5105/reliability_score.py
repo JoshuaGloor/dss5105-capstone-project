@@ -1073,6 +1073,7 @@ def main(argv=None):
     parser.add_argument("--source-root", type=Path, default=ROOT)
     parser.add_argument("--source-type", choices=SOURCE_TYPES, default="recorded_model_run")
     parser.add_argument("--no-tool-audit", action="store_true")
+    parser.add_argument("--html-report", action="store_true", help="Also export a local, filterable review report")
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
@@ -1120,6 +1121,14 @@ def main(argv=None):
                 Path(__file__).with_name("reliability_assertions.py").read_bytes()
             ).hexdigest()
         outputs = serialize_outputs(report, manifest)
+        if args.html_report:
+            from dss5105.reliability_report import render_html_report
+
+            manifest["report_renderer_content_hash"] = hashlib.sha256(
+                Path(__file__).with_name("reliability_report.py").read_bytes()
+            ).hexdigest()
+            outputs["manifest.json"] = json_text(manifest)
+            outputs["report.html"] = render_html_report(report, manifest)
         output.mkdir(parents=True, exist_ok=False)
         for name, content in outputs.items():
             with (output / name).open("x", encoding="utf-8", newline="\n") as file:

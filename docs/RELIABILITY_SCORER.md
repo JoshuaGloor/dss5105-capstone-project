@@ -175,7 +175,7 @@ uv run python -m dss5105.reliability_score --input results/saved-run --output re
 ```
 
 Optional arguments: --benchmark, --manifest (single-record input), --source-root,
---source-type, and --no-tool-audit. The output must be a fresh directory inside
+--source-type, --no-tool-audit, and --html-report. The output must be a fresh directory inside
 the repository, outside input directories, with no existing files overwritten.
 All inputs are read before outputs are created. Input validation failures do not
 create output files. No credentials/raw provider exceptions are copied into reports.
@@ -195,6 +195,31 @@ Each assertion contains id, group, metric, annotation_basis, outcome, expected,
 observed, reason_code and evidence_paths; observed_missing distinguishes absent
 evidence from observed null. CSV/JSON reasons are stable machine-readable codes.
 JSON is the canonical scoring output. No Markdown review prose is parsed.
+
+### Optional review report
+
+`--html-report` adds a self-contained `report.html` to the same new output
+directory. The default five files and all scoring rules remain unchanged. The
+HTML is a read-only projection of the scored cases, metric/basis aggregates,
+coverage, compatibility issues and provenance hashes. It cannot invoke providers,
+rescore records, alter labels or commit allocations. No external assets are used.
+
+Reviewers can filter assertions by case, outcome, annotation basis and text. Each
+assertion exposes expected/observed values, the explicit missing-value marker,
+reason code and existing evidence paths. Missing values and observed JSON null
+remain distinct. Context incompatibility is shown alongside scored outcomes.
+Known failures and missing evidence remain visible separately; no overall
+accuracy or case pass rate is derived from overlapping assertions. Coverage
+continues to mean `(PASS + FAIL) / (PASS + FAIL + NOT_SCORABLE)` per metric/basis.
+Unresolved policies and inapplicable assertions are outside that denominator.
+
+The report escapes artifact text as data, including values and identifiers.
+It includes only the already-scored report, not raw prompts or provider replies.
+The manifest records the renderer content hash when this option is selected.
+
+The offline demo command and recording walkthrough are in
+[EVALUATOR_DEMO.md](EVALUATOR_DEMO.md). Demo mutations are disclosed synthetic
+faults, not observed model failures or new held-out evaluation results.
 
 ## Opt-in consensus assertion approvals
 
