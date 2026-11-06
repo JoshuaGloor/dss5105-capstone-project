@@ -97,6 +97,8 @@ The [dispatch preview](DISPATCH_PREVIEW.md) now supports structured inputs and a
 independent snapshot convention specified in [DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md).
 Its draft fixtures are implementation examples, not gold labels or evidence of
 language understanding. The generated prototype bundles their tool outcomes.
+Supplementary generated train/test cases and the supplied 70/35-case run results
+are documented in [CHAT_TRAIN_TEST_RESULTS.md](CHAT_TRAIN_TEST_RESULTS.md).
 Generate a blank independent annotation sheet with
 `uv run python -m dss5105.prototype --annotations results/annotations-rater-a.csv`.
 The generator never copies predicted outcomes into expected-label columns.
