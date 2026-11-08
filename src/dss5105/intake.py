@@ -4,7 +4,7 @@ import hashlib
 import json
 import os
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -118,6 +118,13 @@ class Conversation:
     needs: tuple[str, ...] = ()
     provenance: tuple[dict, ...] = ()
     traces: tuple[dict, ...] = ()
+    # Internal retrieval classification only; unclassified needs remain blocking.
+    deferred_needs: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        if any(code not in ("quantity", "deadline") or code not in self.needs for code in self.deferred_needs):
+            raise ValueError("deferred_needs must contain only pending quantity or deadline needs")
+        object.__setattr__(self, "deferred_needs", tuple(code for code in QUESTIONS if code in self.deferred_needs))
 
 
 def parse_date_phrase(value: str, as_of: date) -> date | None:
@@ -228,37 +235,51 @@ def _product(value: str, desk: DispatchDesk) -> str:
     return aliases.get(value.casefold(), value)
 
 
-MENTIONS = {
-    "quantity": r"quantit(?:y|ies)|qty|pieces|pcs|units|amount|how\s+many|usual",
-    "deadline": r"deadline|due|dates?|deliver(?:y|ed)?|ship(?:ping)?|week|month|today|tomorrow|soon|asap|"
-    r"moved|revised|earlier|later|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec",
-}
-UNCERTAIN = r"confirm|unsure|not\s+sure|unknown|maybe|perhaps|tbc|tbd|to\s+follow|will\s+let"
-# A count, optionally followed by words such as "pieces" or "pieces of tops"; hedges keep it unclear.
+# A count may include spoken unit words; hedges still require clarification.
 QUANTITY = re.compile(r"([0-9]+|[1-9][0-9]{0,2}(?:,[0-9]{3})+)((?:\s+[a-z&'-]+)*)", re.IGNORECASE)
 HEDGES = r"or|so|about|around|roughly|approx\w*|max\w*|min\w*|least|most|more|less|plus|odd|ish|up|to"
 
 
-MONTH = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?"
-DATE_PHRASE = re.compile(
-    rf"\b{MONTH}\s+\d{{1,2}}(?:st|nd|rd|th)?\b|\b\d{{1,2}}(?:st|nd|rd|th)?\s+(?:of\s+)?{MONTH}|\b\d{{4}}-\d{{2}}-\d{{2}}\b",
-    re.IGNORECASE,
-)
-
-
-def _mentions(code: str, text: str, order_id: str | None) -> bool:
-    """Whether the message itself talks about this field; only then is the model's question kept.
-
-    Digits count as a mention, except those of an order reference and, for quantity, of a date.
-    """
-    if re.search(rf"\b(?:{MENTIONS[code]}|{UNCERTAIN})", text, re.IGNORECASE):
+def _secondary_evidence(text: str, order_id: str | None, code: str) -> bool:
+    """Absence of these conservative guards permits retrieval, not a user amendment."""
+    uncertainty = r"confirm|unsure|uncertain|not\s+sure|unknown|maybe|perhaps|whether|tbc|tbd|to\s+follow|will\s+let"
+    language = (
+        r"quantity|quantities|qty|pieces|pcs|units|amount|number|count|how\s+many|usual"
+        if code == "quantity"
+        else r"deadline|deadlines|due|date|dates|delivery|shipping|ship|revised|revision|"
+        r"today|tomorrow|yesterday|week|month|year|next|earlier|later|soon|asap|moved|delivered|"
+        r"monday|tuesday|wednesday|thursday|friday|saturday|sunday|"
+        r"jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|"
+        r"aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|"
+        r"tbd|tbc|to\s+follow|will\s+confirm"
+    )
+    # Exempt only references to the identified order, including spoken forms.
+    remainder = ORDER_REF.sub(
+        lambda match: " " if f"ORD-{int(match.group(1)):03d}" == order_id else match.group(0), text
+    )
+    if re.search(rf"\b(?:{language}|{uncertainty})\b", remainder, re.IGNORECASE):
         return True
-    remainder = ORDER_REF.sub(" ", text)
-    if order_id:
-        remainder = re.sub(re.escape(order_id), " ", remainder, flags=re.IGNORECASE)
-    if code == "quantity":
-        remainder = DATE_PHRASE.sub(" ", remainder)
     return bool(re.search(r"\d", remainder))
+
+
+def _registered_need_available(code: str, order: dict) -> bool:
+    value = order.get("pieces" if code == "quantity" else "due_date")
+    if not isinstance(value, str):
+        return False
+    if code == "quantity":
+        if not re.fullmatch(r"[0-9]+", value):
+            return False
+        try:
+            return int(value) > 0
+        except ValueError:
+            return False
+    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
 
 
 def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDesk, speaker: str) -> Conversation:
@@ -276,7 +297,7 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
     provenance = list(previous.provenance)
     seen = set()
     changed = set()
-    unclear_quantity = unclear_date = False
+    unclear_quantity = False
     for update in patch["updates"]:
         _quoted(update, {"field", "value", "evidence"}, text)
         name, value = update["field"], update["value"].strip()
@@ -315,7 +336,6 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
             elif name == "due_date":
                 parsed = parse_date_phrase(value, desk.as_of)
                 if parsed is None:
-                    unclear_date = True
                     values["date_uncertain"] = True
                     needs.add("deadline")
                     continue
@@ -334,14 +354,6 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
             needs.discard("order")
     elif values["intent"] == "capacity" and values["order_id"] is not None and "intent" not in changed:
         values["intent"] = "allocate"
-    # A recorded order carries its own quantity and due date, so a question the model raises on its
-    # own about either is dropped. A stated but unclear value, or a date said to be changing, still asks.
-    recorded = values["order_id"] is not None and values["intent"] != "capacity"
-    unclear = {"quantity": unclear_quantity, "deadline": unclear_date or values["date_uncertain"]}
-    for code, is_unclear in unclear.items():
-        mentioned = _mentions(code, text, values["order_id"])
-        if recorded and code in patch["needs"] and code not in previous.needs and not is_unclear and not mentioned:
-            needs.discard(code)
     if "due_date" in changed and "date_uncertain" not in changed:
         values["date_uncertain"] = False
     if values["date_uncertain"]:
@@ -359,7 +371,39 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         exclusions.setdefault(workshop_id, constraint)
         provenance.append({"field": "exclusion", **constraint, "speaker": speaker, "turn": len(previous.turns)})
     values["exclusions"] = list(exclusions.values())
-    values["clarification"] = " ".join(QUESTIONS[code] for code in QUESTIONS if code in needs) or None
+    deferred = set(previous.deferred_needs) & needs
+    for code, name in (("quantity", "pieces"), ("deadline", "due_date")):
+        if code not in needs:
+            continue
+        evidence_text = text
+        if code == "quantity" and "due_date" in changed:
+            # Ignore only the actual date phrase that Python successfully validated.
+            date_phrase = next(update["value"].strip() for update in patch["updates"] if update["field"] == "due_date")
+            evidence_text = evidence_text.replace(date_phrase, " ")
+        explicit = (
+            name in seen
+            or values[name] is not None
+            or values["intent"] == "capacity"
+            or (code == "deadline" and values["date_uncertain"])
+            or _secondary_evidence(evidence_text, values["order_id"], code)
+        )
+        if explicit:
+            deferred.discard(code)
+        elif code not in previous.needs:
+            # Legacy/unclassified pending needs are never retroactively weakened.
+            deferred.add(code)
+    if deferred:
+        resolution = desk.resolve_order(
+            DispatchInput(order_id=values["order_id"], customer=values["customer"], product=values["product"])
+        )
+        if resolution["status"] == "RESOLVED":
+            order = resolution["matches"][0]
+            for code in deferred:
+                if _registered_need_available(code, order):
+                    needs.discard(code)
+            # Unavailable registered fields must become visible blockers.
+            deferred.clear()
+    values["clarification"] = " ".join(QUESTIONS[code] for code in QUESTIONS if code in needs - deferred) or None
     try:
         request = DispatchInput(**values)
     except (ValueError, TypeError) as error:
@@ -370,6 +414,7 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
         needs=tuple(code for code in QUESTIONS if code in needs),
         provenance=tuple(provenance),
         traces=previous.traces,
+        deferred_needs=tuple(code for code in QUESTIONS if code in deferred),
     )
 
 
@@ -428,7 +473,7 @@ def interpret_turn(
     if restart_new_requests and switched:
         result = apply_patch(Conversation(), text, patch, desk, speaker)
         trace["restarted"] = True
-    return Conversation(result.request, result.turns, result.needs, result.provenance, result.traces + (trace,))
+    return replace(result, traces=result.traces + (trace,))
 
 
 def apply_selection(
@@ -440,7 +485,7 @@ def apply_selection(
     patch = {"updates": [{"field": field, "value": value, "evidence": value}], "exclusions": [], "needs": []}
     result = apply_patch(previous, text, patch, desk, speaker)
     trace = {"version": VERSION, "model": "dispatcher selection; no model call", "patch": patch}
-    return Conversation(result.request, result.turns, result.needs, result.provenance, result.traces + (trace,))
+    return replace(result, traces=result.traces + (trace,))
 
 
 def conversation_envelope(conversation: Conversation) -> dict:
@@ -459,6 +504,7 @@ def conversation_evidence(conversation: Conversation) -> dict:
     return {
         "turns": conversation.turns,
         "needs": conversation.needs,
+        "deferred_needs": conversation.deferred_needs,
         "provenance": conversation.provenance,
         "traces": conversation.traces,
     }

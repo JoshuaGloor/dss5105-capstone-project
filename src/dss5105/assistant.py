@@ -103,7 +103,7 @@ def parse_workshop(text: str, names: dict[str, str]) -> str | None:
 def day_label(stamp: str, *, long: bool = False) -> str:
     """'2026-04-10 17:17' -> 'Fri 10 Apr' (or 'Friday 10 April'); formatting only, no arithmetic."""
     day = date.fromisoformat(stamp[:10])
-    return day.strftime("%A %-d %B" if long else "%a %-d %b")
+    return f"{day.strftime('%A' if long else '%a')} {day.day} {day.strftime('%B' if long else '%b')}"
 
 
 def _initials(name: str) -> str:
@@ -1050,7 +1050,7 @@ def build_view(session: Session, services: Services, *, version: int, notice: di
         "profile": {"name": name, "initials": (name[:1] or "D").upper(), "speak": profile["speak_replies"]},
         "plan": {
             "as_of": summary["as_of"],
-            "as_of_label": date.fromisoformat(summary["as_of"]).strftime("%a %-d %b %Y"),
+            "as_of_label": f"{day_label(summary['as_of'])} {date.fromisoformat(summary['as_of']).year}",
             "revision": summary["revision"],
             "bookings": len(bookings),
         },
