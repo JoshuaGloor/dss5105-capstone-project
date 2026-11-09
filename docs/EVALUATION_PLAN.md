@@ -15,12 +15,12 @@ already been evaluated.
 | Report shock averaged over ten seeds | Data v3 runs and paired normal controls complete; see V3_EVALUATION.md |
 | Beat all three baselines on the primary objective and report where baselines win | Initial lateness results are favorable; primary selected; final evaluation and tradeoff reporting remain pending |
 | Compare with a short heuristic and explain the system's added value | Allocator measured in [MARGIN_STUDY.md](MARGIN_STUDY.md): it ties earliest finish on lateness and adds a configurable cost/late-days tradeoff; language-layer value still to be measured |
-| Evaluate all 30 supplied chat requests by behavior | Data v3 fixture replay refreshed; prior live run is historical; v3 live rerun, independent gold and held-out evaluation pending |
-| Judge decisions and explanation faithfulness separately | Behavior and tool-field integrity checked separately; full explanation/UX review still pending |
+| Evaluate all 30 supplied chat requests by behavior | `intake-v3` live run on frozen `main` reported by behavior in [SPRINT3_LIVE_EVALUATION.md](SPRINT3_LIVE_EVALUATION.md): 30/30 against the draft rubric, 2/3 human-confirmed behavior checks; independent gold pending |
+| Judge decisions and explanation faithfulness separately | Behavior and tool-field integrity checked separately (2,698 display fields in the Sprint 3 run); explanation wording not scored, and templated decline reasons are a recorded gap; full explanation/UX review still pending |
 | Explain metrics, evaluation-set construction, per-category results, and limitations | Initial simulator method documented; full report pending |
-| Analyze at least 10 failure cases individually | Pending; collect cases as features are built |
+| Analyze at least 10 failure cases individually | Pending; Sprint 3 live run records R10, R02 and the templated decline reasons in [SPRINT3_LIVE_EVALUATION.md](SPRINT3_LIVE_EVALUATION.md) |
 | State what would be measured with more time | Planned in final report |
-| If development used the evaluation set, disclose it and provide a held-out result | Supplied data has already been inspected and used in development; generated 70/35 train/test sets in [EVAL_SETS.md](EVAL_SETS.md), live test run pending |
+| If development used the evaluation set, disclose it and provide a held-out result | Supplied data has already been inspected and used in development; generated 70/35 train/test sets in [EVAL_SETS.md](EVAL_SETS.md); 65 designated held-out requests passed the generated rubric 65/65 in one live run ([SPRINT3_LIVE_EVALUATION.md](SPRINT3_LIVE_EVALUATION.md)), where only `test_extra` had no earlier live run |
 
 A tool specification, usable interface, and auditable output are also core Track 2
 capabilities. Completing the simulator rows does not complete the project.
