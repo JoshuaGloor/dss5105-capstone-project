@@ -377,9 +377,10 @@ def apply_patch(previous: Conversation, text: str, patch: dict, desk: DispatchDe
             continue
         evidence_text = text
         if code == "quantity" and "due_date" in changed:
-            # Ignore only the actual date phrase that Python successfully validated.
+            # Ignore only the actual date phrase that Python successfully validated. The quote check
+            # and the date parser both ignore case, so the phrase is matched the same way here.
             date_phrase = next(update["value"].strip() for update in patch["updates"] if update["field"] == "due_date")
-            evidence_text = evidence_text.replace(date_phrase, " ")
+            evidence_text = re.sub(re.escape(date_phrase), " ", evidence_text, flags=re.IGNORECASE)
         explicit = (
             name in seen
             or values[name] is not None

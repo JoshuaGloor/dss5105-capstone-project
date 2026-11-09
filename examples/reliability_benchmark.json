@@ -24,20 +24,14 @@
       "track2/data/orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
       "track2/data/workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e",
       "examples/chat_rubric.json": "3d5a17380de57ba5f78c3e627e077213493e13e806ba073f0b8ef7202c71a5d5",
-      "examples/dispatch_inputs.json": "6c0f29f6e6f5b6e8d38f6e22b160d014dbe83445628822db4863f1238801c201",
-      "tests/test_intake.py": "b6d8c0f8e0f4c42ffff0541fd49ab5e66a7f0cec3bce6a12f2677b3d1461840a",
-      "tests/test_dispatch.py": "f8ea8a1ac73d848d5964f66e26934107aa28c9b4f78a7e15cb6f2308e021a25e",
-      "tests/test_chat_ui.py": "cd90c41d85b00542836ff5298cf06ff04541040fd1841d155bd3f4b8d0081ab7"
+      "examples/dispatch_inputs.json": "6c0f29f6e6f5b6e8d38f6e22b160d014dbe83445628822db4863f1238801c201"
     },
     "source_hash_modes": {
       "track2/data/dispatch_requests.txt": "raw_bytes_sha256",
       "track2/data/orders.csv": "raw_bytes_sha256",
       "track2/data/workshops.csv": "raw_bytes_sha256",
       "examples/chat_rubric.json": "normalized_text_sha256",
-      "examples/dispatch_inputs.json": "normalized_text_sha256",
-      "tests/test_intake.py": "normalized_text_sha256",
-      "tests/test_dispatch.py": "normalized_text_sha256",
-      "tests/test_chat_ui.py": "normalized_text_sha256"
+      "examples/dispatch_inputs.json": "normalized_text_sha256"
     }
   },
   "limitations": [

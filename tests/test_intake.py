@@ -795,6 +795,21 @@ def test_spoken_reference_and_validated_date_preserve_other_quantity_evidence(su
     assert ("quantity" in state.needs) is required
 
 
+def test_validated_date_is_stripped_whatever_its_spoken_casing():
+    text = "Next order number 81, due APRIL 20TH"
+    state = turn(
+        text,
+        patch(
+            ("order_id", "81", "order number 81"),
+            ("due_date", "April 20th", "due APRIL 20TH"),
+            needs=["quantity"],
+        ),
+    )
+    assert state.request.due_date == "2026-04-20"
+    assert "quantity" not in state.needs
+    assert state.request.clarification is None
+
+
 def test_switching_to_a_new_request_reuses_the_same_patch():
     first = turn("ORD-109 please", patch(("order_id", "ORD-109", "ORD-109")))
     text = "And ORD-053?"
