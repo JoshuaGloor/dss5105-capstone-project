@@ -33,6 +33,17 @@ SETS = {
     "supplied": (DATA / "dispatch_requests.txt", RUBRIC),
     "train": (GENERATED / "train_requests.txt", GENERATED / "train_rubric.json"),
     "test": (GENERATED / "test_requests.txt", GENERATED / "test_rubric.json"),
+    "train_extra": (GENERATED / "train_extra_requests.txt", GENERATED / "train_extra_rubric.json"),
+    "test_extra": (GENERATED / "test_extra_requests.txt", GENERATED / "test_extra_rubric.json"),
+}
+DEVELOPMENT_LIMITATION = "Generated development split; labels come from construction and tools, not humans."
+HELD_OUT_LIMITATION = "Generated test split with unseen templates; held out only if never used for tuning."
+SET_LIMITATIONS = {
+    "supplied": "Development set; draft checks are not independent human gold annotations.",
+    "train": DEVELOPMENT_LIMITATION,
+    "test": HELD_OUT_LIMITATION,
+    "train_extra": DEVELOPMENT_LIMITATION,
+    "test_extra": HELD_OUT_LIMITATION,
 }
 
 
@@ -275,11 +286,7 @@ def summarize(records: list[dict], planned: int, evaluation_set: str = "supplied
             )
         ),
         "limitations": [
-            {
-                "supplied": "Development set; draft checks are not independent human gold annotations.",
-                "train": "Generated development split; labels come from construction and tools, not humans.",
-                "test": "Generated test split with unseen templates; held out only if never used for tuning.",
-            }[evaluation_set],
+            SET_LIMITATIONS[evaluation_set],
             "Single initial response per request; no multi-turn evaluation.",
             "Tool field integrity is not complete UI or explanation-faithfulness evaluation.",
             "No automatic retries; no API price estimate; source queues never change.",
