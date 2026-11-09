@@ -41,9 +41,12 @@ or simulator outcomes. Do not send fixture interpretations as model input.
   can resolve orders via the Python lookup; a model cannot invent an ID from a list.
 - Normalize known workshop IDs/names and common product plurals against the course
   register. Unknown customer/product filters may produce NOT_FOUND normally.
-- Quantities accept digits and correctly grouped thousands separators. Quantity
-  words need clarification; the model must not convert them to arithmetic results.
-- Dates accept ISO, English month/day with optional year, today, and tomorrow.
+- Quantities accept digits and correctly grouped thousands separators, optionally
+  followed by words such as "pieces" or "pieces of tops". Quantity words, and hedges
+  such as "400 or so", need clarification; the model must not convert them to
+  arithmetic results.
+- Dates accept ISO, English month/day or day/month ("April 15", "15 April", "15th
+  April 2026") with optional year, today, and tomorrow.
   Python applies the inbox year when omitted and the declared snapshot for relative
   dates. Ambiguous formats and other relative phrases prompt for an explicit date.
 - An unknown revised date marks the prior deadline uncertain. A validated new date
@@ -79,9 +82,9 @@ Retain the failed user message separately. Require Retry or New request before a
 different follow-up so a failed constraint-bearing message is not silently skipped.
 Retries are explicit; there is no background model-call loop.
 
-Group-chat request is the default mode; offline supplied examples remain one click
-away. Sending a
-message in that mode calls the configured provider and may incur its normal usage
+Typing a message is the primary input; offline supplied examples remain one click
+away. Sending a typed
+message calls the configured provider and may incur its normal usage
 charges. Read-only previews cannot create allocations. Saved-plan mode wraps the
 same validated input in a separate human-confirmed persistence workflow; the model
 never supplies commit authority or a confirming dispatcher identity.
@@ -110,3 +113,31 @@ annotation and held-out results remain pending. The authorized first live run is
 documented in [CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md); its draft
 checks do not establish complete semantic accuracy. The UI must not present draft
 fixtures or offline tests as real-provider results.
+
+## Sprint 2 additions (intake-v3)
+
+- `intent` gains `capacity`: a question about who could take a quantity of a product by a
+  date, with no order named to send out. The model copies the product (or the word tops
+  or accessories), quantity and date phrase; a message naming an order stays `allocate`.
+  `needs` gains `product` for a capacity question without a recognisable product.
+- `interpret_turn(..., restart_new_requests=True)` is used by the voice assistant. When the
+  latest message names a different order, or switches between allocating and a capacity
+  question, the same validated patch is applied to an empty request. There is no second
+  model call, and the trace records `restarted: true`. Without the flag, a different
+  order still raises, as before.
+- A quantity question the model raises on its own is dropped when the request names a
+  recorded order: `orders.csv` holds its quantity, and the dispatch tool still asks about
+  any stated amendment. A stated but unclear quantity ("usual quantities") still asks.
+  This fixes the live R14 failure, where an unneeded quantity question blocked the refusal.
+- A new order: with no order ID and no customer there is nothing recorded to send out, so
+  Python sets `intent=capacity` when a product and a quantity are stated, and drops the
+  model's question about which order. "I need an order for QuickStitch, 400 pieces of tops,
+  ready by 15 April" is answered as a check of every workshop, with QuickStitch first. An
+  order ID named in a later message turns it back into an allocation. Requests with a
+  customer still go to the order lookup, so the course inbox behaves as before.
+- Spoken input: "order 109", "order number 81" or "order #81" normalizes to ORD-109 and
+  ORD-081. The model may copy the whole reference or only its number, but the quoted words
+  must contain that order reference, so an ID the user did not say is still rejected.
+  Workshop names match without spaces or hyphens ("budget works" is BudgetWorks). When
+  judging whether a message mentions a quantity, digits inside an order reference or a date
+  phrase ("April 20th") do not count.

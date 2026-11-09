@@ -6,6 +6,9 @@ fileWatcherType = "auto"
 runOnSave = true
 folderWatchBlacklist = [".git", ".venv", ".cache", "results", "runtime"]
 
+[client]
+toolbarMode = "minimal"
+
 [browser]
 gatherUsageStats = false
 
@@ -16,3 +19,5 @@ backgroundColor = "#f4f3ec"
 secondaryBackgroundColor = "#fbfbf7"
 textColor = "#203731"
 font = "sans serif"
+baseFontSize = 18
+headingFont = "serif"

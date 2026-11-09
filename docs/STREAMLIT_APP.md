@@ -1,15 +1,30 @@
 # Streamlit dispatch desk
 
+The app has five pages in the top bar: **Assistant** (the voice-first phone experience,
+[VOICE_ASSISTANT.md](VOICE_ASSISTANT.md)), **Desk** (this guide), **Workshops** (the
+register and workload checks), **Objective lab** (sliders for the four objectives,
+replaying the course simulator), and **Memory** (standing rules, bookings, log, profile
+and plan). The desk's Custom objective offers
+sliders for lateness, defects, fairness, robustness and cost, a safety buffer, and the
+capacity-reservation and on-time-first switches; the default preset is the
+lateness-then-defects hybrid ("Recommended").
+Desk tests run it through `tests/desk_page.py`, because `streamlit_app.py` now opens on
+the assistant.
+
+To rehearse a demo without touching the real local plan, point saved state at another
+folder inside the project: `DSS5105_RUNTIME=$PWD/.cache/rehearsal sh scripts/run_app.sh`.
+Plans and memory then live there instead of `runtime/`.
+
 Data v3 is now loaded. Candidate tables show the April queue values; the Streamlit
 estimate breakdown also shows processing, transport and expected rework. Impossible
 requests show the earliest permitted estimated delivery and review options, with
 confirmation disabled. See [the update review](V3_REFINEMENT.md).
 
 
-The web app follows the [HTML prototype](prototype/index.html) and calls the existing
-Python dispatch tools directly. Request selection, objective presets, and custom
-weight sliders produce new tool previews; the app does not read the prototype's
-bundled results or reproduce the scoring formula in browser code.
+The web app follows the [chat-first HTML prototype](prototype/redesign_chat.html) and calls the
+existing Python dispatch tools directly. Each request sent to the desk produces a new tool preview
+and the page shows one request and its answer at a time; the app does not read the prototype's bundled results or reproduce the
+scoring formula in browser code.
 
 ## Start locally
 
@@ -23,8 +38,8 @@ Then open `http://localhost:8501` in Chrome. Stop the server with Ctrl+C in the 
 terminal. The script uses the locked project environment, keeps uv caches and
 temporary files under `.cache/` in this repository, and does not open a browser.
 It downloads missing dependencies on the first run if the environment needs syncing.
-Supplied examples need no API key. Natural language uses the configured model only
-when you submit or retry a message; see [NATURAL_LANGUAGE.md](NATURAL_LANGUAGE.md).
+Supplied examples need no API key. Typed messages use the configured model only
+when you send or retry one; see [NATURAL_LANGUAGE.md](NATURAL_LANGUAGE.md).
 
 To choose a different port:
 
@@ -33,7 +48,8 @@ sh scripts/run_app.sh --server.port 8502
 ```
 
 The Streamlit entrypoint is `streamlit_app.py`. Application code and local styling
-live in `src/dss5105/web_app.py` and `src/dss5105/assets/desk.css`. Project config
+live in `src/dss5105/web_app.py` (page frame), `src/dss5105/chat_ui.py` (the answer view, sending and saving),
+`src/dss5105/cards.py` (answer tiles and the working section) and `src/dss5105/assets/desk.css`. Project config
 sets a local-only listener on port 8501, headless operation, automatic file watching,
 save-triggered reruns and disabled usage telemetry. The launcher also watches CSS
 assets, course data and example inputs. Keep the page open to see saved changes;
@@ -44,26 +60,33 @@ No separate frontend build or API service is needed.
 
 ## Try the workflow
 
-The page opens on **Group-chat request**, which needs the model configured in `.env`
-(see [NATURAL_LANGUAGE.md](NATURAL_LANGUAGE.md)). For the steps below, choose
-**Supplied examples (offline, no model)** in the sidebar.
-Start in **Independent previews** for the original reproducible inbox demo.
+The page opens on **Start here** ("Which order needs a workshop today?"). Typing a message uses the
+model configured in `.env` (see [NATURAL_LANGUAGE.md](NATURAL_LANGUAGE.md)). The **Try an example
+scenario** cards, one per request kind in the course data dictionary, and the **Examples** list below
+the page send supplied examples to the desk offline, with no model call. The page shows the newest
+request and its answer; sending another replaces it. The example on screen is the one marked with a check, and sending scrolls the page back to the answer.
 
-1. Start with R25. BudgetWorks must remain excluded regardless of objective.
-2. Switch Lateness / Defects / Hybrid and inspect candidates on the same snapshot.
-3. Select Custom weights. Sliders call the same Python scorer; setting every weight
-   to zero shows an error and removes the old preview and confirmation state.
+The gold **Objective** button in the banner opens the objective choice (Recommended, Lateness, Defect, Fairness,
+Robustness, Custom) and the **Preview only / Saved local plan** workspace switch. A change applies to the next
+request you send; each answer shows the objective it was produced with. The **Saved plan** button
+lists saved allocations. **Show working** on an answer opens a column to the right of the answer
+(the answer text shrinks to make room) with the comparison, exclusions, estimate breakdown, reference policies, weights, tool trace and the
+raw evidence export. The working follows the newest answer; the column stays in view while you scroll.
+
+1. Click the R25 example. BudgetWorks must remain excluded regardless of objective.
+2. Switch the objective and send R25 again. The newer answer replaces the first and shows its own objective.
+3. Select Custom. Sliders set the weights the Python scorer uses for the next request. Setting
+   every weight to zero shows an error and sends nothing.
 4. Try R08 (refusal), R03 or R05 (clarification), R13 (missing records), and R20
-   (deadline exception). None can enter the confirmation demonstration.
-5. Try R21. Its cheapest-on-time instruction overrides global presets; the page
-   shows the effective weights and the feasibility-filtered recommendation.
-6. Return to an on-time recommendation, click Review confirmation, then Confirm demo
-   only. This records an acknowledgement in the browser session's server-side state;
-   it does not save an allocation, change queues, or contact a workshop.
-7. Change the request or weights. The previous review/receipt disappears, including
-   when switching back to the earlier configuration.
-8. Export tool evidence or inspect its source hashes, inputs, constraints, estimates,
-   score components, and configured/effective weights.
+   (deadline exception). Only a ready recommendation offers **Review confirmation**.
+5. Try R21. Its cheapest-on-time instruction overrides global presets; the answer shows the
+   request's own priority and the feasibility-filtered recommendation.
+6. On an on-time recommendation, click Review confirmation, then Confirm preview only.
+   This marks the answer in the session; it does not save an allocation, change queues, or
+   contact a workshop. A **Next** button then sends the next unsent example.
+7. Sending another request or switching workspace closes a pending review.
+8. Open **Show working** to export tool evidence or inspect its inputs, constraints,
+   estimates, score components, and configured/effective weights.
 
 The source dates, independent snapshot convention, estimates, and interpretation
 limits are specified in [DISPATCH_CONTRACT.md](DISPATCH_CONTRACT.md). Each session's
@@ -71,16 +94,16 @@ UI choices are independent; no process-wide mutable desk is cached between users
 
 ## Save a local allocation
 
-Choose **Saved local plan** in the sidebar. Select a ready request, click **Review
-confirmation**, enter the confirming dispatcher name, and click **Confirm and save
+Choose **Saved local plan** in the Objective panel. Select a ready request, click **Review
+and save**, enter the confirming dispatcher name, and click **Confirm and save
 allocation**. This persists the audited decision and updates shared local planning
-queues. Review and export records in **Saved allocation records**. Supplied examples
+queues. Review and export records under **Saved plan** in the banner. Supplied examples
 can exercise this complete flow without calling a provider.
 
 Queues start from the course inbox snapshot and remain at that planning date.
 Saved reservations add expected processing/rework occupancy and exclude transport.
 The original course files, independent previews and simulator are unaffected.
-Switching modes or changing a preview cancels a pending confirmation.
+Switching workspace or sending another request cancels a pending confirmation. An answer produced before the plan changed is rejected as stale, so send the request again.
 
 Saved state lives in Git-ignored `runtime/dispatch.sqlite3`. Keep that file to retain
 the plan across restarts. Do not delete it to recover from a stale preview; refresh
@@ -89,10 +112,28 @@ explicitly. Concurrent saves cannot silently reuse an old state. The same order
 cannot be saved again under a new chat message. This version has no cancellation
 or reset workflow. See [the record contract](ALLOCATION_RECORD_CONTRACT.md).
 
+## Workshop capacity and additional work
+
+Choose **Workshop register (offline)** in the sidebar. The initial table
+shows recorded capabilities, status, batch limits and queues. Enter a category,
+quantity and explicit delivery deadline, then select **Check delivery capacity**.
+The table explains suspended/capped workshops and shows estimates for eligible ones.
+
+Under **What if we send more work here?**, choose a workshop and extra pieces.
+**Compare before and after** places that additional same-category batch ahead of
+the reference batch at the fixed planning date. The tools show delivery changes
+and the fastest eligible alternative. Both batches must satisfy the course helper.
+The scenario adds expected processing/rework, excluding transport. It never changes
+the stored plan and does not assess other jobs' deadlines or predict closures.
+
+Both tables recompute from the selected independent or saved-plan queues. Exports
+retain source/code hashes and snapshot identity; saved mode includes state revision.
+Model calls are never needed in this workspace. Chat routing for these tools is
+still planned. See [TOOL_SPEC.md](TOOL_SPEC.md) for the finalized contracts.
+
 ## Current boundaries
 
-- Supplied examples use hand-authored fixtures. The separate Natural language mode
-  connects model extraction and follow-up clarification to the same Python tools;
+- Supplied examples use hand-authored fixtures. Typed messages connect model extraction and follow-up clarification to the same Python tools;
   its first live development evaluation and open issues are recorded in
   [CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md).
 - All costs, dates, and risk values shown in the comparison come from Python tool

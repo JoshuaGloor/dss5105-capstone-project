@@ -5,15 +5,16 @@ import json
 from collections import Counter
 
 from dss5105.dispatch import DATA, ROOT, DispatchDesk
-from dss5105.evaluate import run_experiment, run_seed_series
+from dss5105.evaluate import SPRINT1_PRESETS, run_experiment, run_seed_series
 from dss5105.evaluate_chat import check_tool_integrity
 from dss5105.harness import HARNESS_PATH
 from dss5105.prototype import build_bundle
 
 
 def main():
-    normal = run_experiment()
-    shock = run_seed_series(shock=True, seeds=10)
+    # Sprint 1 configurations, so this record stays comparable; see objective_study.py for Sprint 2.
+    normal = run_experiment(configurations=SPRINT1_PRESETS)
+    shock = run_seed_series(shock=True, seeds=10, configurations=SPRINT1_PRESETS)
     bundle = build_bundle()
     desk = DispatchDesk()
     rubric = json.loads((ROOT / "examples" / "chat_rubric.json").read_text())
@@ -80,6 +81,11 @@ def main():
 
     lines = [
         "# Data v3 offline evaluation",
+        "",
+        "> Sprint 2 note: the scorer now weights the defect term by batch pieces. The Sprint 1",
+        "> lateness and defects rows below reproduce unchanged; the 0.7/0.3 hybrid rows were",
+        "> produced before that change and reproduce exactly from commit e8c40a5. Current",
+        "> presets and results: [OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md).",
         "",
         "Generated with `uv run python scripts/refresh_v3_evidence.py`. No provider calls.",
         "Source hashes, configurations and per-seed metrics: [retained evidence](evidence/data-v3.json).",

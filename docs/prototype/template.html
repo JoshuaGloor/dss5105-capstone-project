@@ -143,7 +143,7 @@
           </section>
         </div>
         <section class="panel objective" aria-label="Objective configuration">
-          <div><div class="eyebrow">Decision settings</div><h2>Compare objectives</h2><p>Primary selection is pending. These are exploratory presets, not a final team declaration.</p>
+          <div><div class="eyebrow">Decision settings</div><h2>Compare objectives</h2><p>Primary objective: minimise lateness. Compare quality and mixed policies below.</p>
           <div role="group" aria-label="Objective preset"><button class="preset" data-preset="lateness" aria-pressed="true"><span>Lateness<small>Primary candidate</small></span><span class="mark">&rarr;</span></button><button class="preset" data-preset="defects" aria-pressed="false"><span>Defects<small>Comparison objective</small></span><span class="mark">&rarr;</span></button><button class="preset" data-preset="hybrid" aria-pressed="false"><span>Hybrid<small>Weighted compromise</small></span><span class="mark">&rarr;</span></button></div></div>
           <div><p id="override"></p><div class="weight-line"><span>Lateness weight</span><span class="weight-value" id="weight-lateness"></span></div><div class="weight-line"><span>Defects weight</span><span class="weight-value" id="weight-defects"></span></div><div class="weight-line"><span>Cost weight</span><span class="weight-value" id="weight-cost"></span></div><details><summary>Custom weights &amp; sliders</summary><p>Live sliders in the planned Streamlit web app will call the Python preview tools. This HTML prototype switches precomputed presets.</p></details><p>Hard constraints always apply. A hybrid need not fall between both other outcomes on every metric.</p></div>
         </section>

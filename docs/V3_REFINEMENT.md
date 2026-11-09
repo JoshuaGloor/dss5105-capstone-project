@@ -83,13 +83,14 @@ six with constraints, four ambiguous, three missing a number/date, four ineligib
 suggestions and three unanswerable. Preserve these course categories separately
 from overlapping rubric labels such as exclusions, preferences and split requests.
 
-Lateness is the recommended primary candidate for team discussion, with both
+At the time of the Data v3 refinement, lateness was the recommended primary candidate, with both
 late rate and mean late days in the acceptance gate. The pure-defects preset fails
 the random-lateness guardrail. It remains useful as an objective tradeoff, not a
 successful quality solution. Earliest finish remains a strong simple comparator;
 we must demonstrate the language layer's value through extraction, clarification,
-constraint handling and faithful explanations. No primary objective has been
-formally selected, and no new weights were tuned in this update.
+constraint handling and faithful explanations. No primary objective had been
+formally selected at that point, and no new weights were tuned in that update.
+The team has since agreed to declare minimise lateness at Sprint 1.
 
 ## Reproduce
 
@@ -111,12 +112,13 @@ regenerated under `results/`; the compact evidence is tracked.
   tokens and requires an explicit `--live` opt-in; this update did not run it.
 - Independently annotate/adjudicate the revised inbox, including the ship-date and
   unknown-order decisions above. Freeze additional held-out cases before using their results.
-- Complete the workshop-register query and overload probe contracts/implementation,
-  and explicit deadline amendments. Local durable confirmation with stale-state
+- Workshop lookup and extra-work scenarios now have finalized contracts and direct
+  Streamlit controls. Connecting these questions to language intake, and supporting
+  explicit deadline amendments, remain pending. Local durable confirmation with stale-state
   rejection is now implemented in a separate saved-plan mode; see
   [the record contract](ALLOCATION_RECORD_CONTRACT.md). Independent previews and
   the HTML reference retain demo confirmation.
-- Select the primary objective as a team, justify comparison/hybrid settings, and
+- With minimise lateness selected, justify comparison/hybrid settings and
   analyze failures individually. The historical weight search is not new v3 shock
   evidence; recheck frozen candidates before reporting robustness.
 - Review the regenerated HTML manually in Chrome and test dispatcher tasks with

@@ -25,18 +25,25 @@ from dss5105.intake import (
     interpret_turn,
     preview_conversation,
 )
+from dss5105.request_kinds import behavior_acceptance, group_request_kinds, load_kind_labels
 
 RUBRIC = ROOT / "examples" / "chat_rubric.json"
 GENERATED = ROOT / "examples" / "eval_sets"
 SETS = {
     "supplied": (DATA / "dispatch_requests.txt", RUBRIC),
+    "train": (GENERATED / "train_requests.txt", GENERATED / "train_rubric.json"),
+    "test": (GENERATED / "test_requests.txt", GENERATED / "test_rubric.json"),
     "train_extra": (GENERATED / "train_extra_requests.txt", GENERATED / "train_extra_rubric.json"),
     "test_extra": (GENERATED / "test_extra_requests.txt", GENERATED / "test_extra_rubric.json"),
 }
+DEVELOPMENT_LIMITATION = "Generated development split; labels come from construction and tools, not humans."
+HELD_OUT_LIMITATION = "Generated test split with unseen templates; held out only if never used for tuning."
 SET_LIMITATIONS = {
     "supplied": "Development set; draft checks are not independent human gold annotations.",
-    "train_extra": "Generated development split; labels come from construction and tools, not humans.",
-    "test_extra": "Generated test split with unseen templates; held out only if never used for tuning.",
+    "train": DEVELOPMENT_LIMITATION,
+    "test": HELD_OUT_LIMITATION,
+    "train_extra": DEVELOPMENT_LIMITATION,
+    "test_extra": HELD_OUT_LIMITATION,
 }
 
 
@@ -289,15 +296,42 @@ def summarize(records: list[dict], planned: int, evaluation_set: str = "supplied
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--live", action="store_true", help="Explicitly opt in to paid provider calls")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--live", action="store_true", help="Explicitly opt in to paid provider calls")
+    mode.add_argument("--saved-run", type=Path, help="Group an existing recorder directory or JSON bundle offline")
+    parser.add_argument("--kind-labels", type=Path, help="Use approved human request-kind labels for reporting")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--set", choices=SETS, default="supplied", dest="evaluation_set")
     args = parser.parse_args()
-    if not args.live:
+    if not args.live and not args.saved_run:
         parser.error("Pass --live to authorize this paid evaluation. No model was called.")
+    if args.kind_labels and args.evaluation_set != "supplied":
+        # The human labels only cover the course inbox, so refuse here rather than after a paid run.
+        parser.error("--kind-labels only applies to --set supplied")
     try:
         output = output_path(args.output)
-    except ValueError as error:
+        kinds = load_kind_labels(args.kind_labels, ROOT) if args.kind_labels else None
+        if args.saved_run:
+            from dss5105.reliability_score import load_artifact
+
+            if kinds is None:
+                parser.error("--saved-run requires --kind-labels")
+            if output.is_relative_to(args.saved_run.resolve()):
+                parser.error("Output must not be inside the saved run")
+            records, saved_manifest, artifact_hash, _ = load_artifact(args.saved_run)
+            grouping = group_request_kinds(kinds, records, saved_manifest.get("source_hashes", {}))
+            output.mkdir(parents=True)
+            write_json(
+                output / "summary.json",
+                {
+                    "input_sha256": artifact_hash,
+                    "human_request_kinds": grouping,
+                    "behavior_acceptance": behavior_acceptance(records),
+                },
+            )
+            print(f"Grouped {len(records)} saved records by {grouping['version']}.")
+            return 0
+    except (OSError, KeyError, TypeError, ValueError) as error:
         parser.error(str(error))
     inbox_path, rubric_path = SETS[args.evaluation_set]
     desk, inbox = DispatchDesk(), read_inbox(inbox_path)
@@ -338,6 +372,9 @@ def main():
         "model_parameters": {"timeout": 30, "max_retries": 0},
         "model": "configuration unavailable",
     }
+    if kinds is not None:
+        grouping = group_request_kinds(kinds, [], desk.source_hashes)
+        manifest["human_request_kinds"] = {key: grouping[key] for key in ("version", "sha256", "scope")}
     try:
         provider = llm.get_model(timeout=30, max_retries=0)
         manifest["model"] = os.getenv("LLM_MODEL", "configured model")
@@ -359,6 +396,9 @@ def main():
             print("Stopped without retry. Saved cases remain available.", flush=True)
             break
     summary = summarize(records, len(inbox), args.evaluation_set)
+    if kinds is not None:
+        summary["human_request_kinds"] = group_request_kinds(kinds, records, desk.source_hashes)
+        summary["behavior_acceptance"] = behavior_acceptance(records)
     write_json(output / "summary.json", summary)
     print(json.dumps(summary, indent=2))
     return int(len(records) != len(inbox))

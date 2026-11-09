@@ -2,15 +2,15 @@
 
 The Streamlit page has two input modes:
 
-- **Group-chat request (default):** submitted messages are interpreted by the
-  configured model, validated in Python, then passed to the same dispatch tools.
-- **Supplied examples (offline, no model):** the original development fixtures.
+- **Typed message (Start here box and the box under the answer):** submitted messages are
+  interpreted by the configured model, validated in Python, then passed to the same dispatch tools.
+- **Examples (scenario cards and the Examples list, offline, no model):** the original development fixtures.
 
 The first real-provider development run is documented in
 [CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md), including a blocking
 clarification failure and additional manual-review issues. It is not held-out accuracy.
 Offline tests establish orchestration and validation, not language quality.
-The primary objective remains undecided. Independent previews use demo confirmation;
+The primary objective is minimise lateness. Independent previews use demo confirmation;
 Saved local plan supports a separate human-confirmed durable allocation. The model
 cannot commit a record, and confirming does not invoke the model again.
 
@@ -69,7 +69,7 @@ Use an explicit ISO date when other date formats require clarification.
 Each reply is a card built by `replies.py` from the dispatch result. The model writes
 none of it. A card has:
 
-- a status badge and a one-line headline, such as "Send ORD-109 to Nimble Needle.";
+- a status badge and a headline identifying the recommended workshop for the order;
 - facts copied from the tool's display strings: workshop, estimated delivery,
   expected turnaround, deadline, cost and batch defect risk;
 - notes: the ranking basis, refusal reasons, the ship-date note, and every review
@@ -116,7 +116,8 @@ The [intake contract](INTAKE_CONTRACT.md) specifies the schema and state rules.
 `src/dss5105/intake.py` accepts evidence-backed patches, preserves prior fields and
 exclusions, converts supported date/quantity phrases, and validates the request.
 `src/dss5105/chat_ui.py` manages explicit submissions, answer buttons, retry, reset,
-and session history. `src/dss5105/replies.py` builds the reply cards. `web_app.py` still renders the same deterministic candidate evidence.
+and the single answer view with its session history. `src/dss5105/replies.py` builds the reply cards, and
+`src/dss5105/cards.py` renders the same deterministic candidate evidence.
 
 The model extracts intent and fields using LangChain's structured-output interface.
 It cannot output numerical estimates, score weights, workshop allocations, or a

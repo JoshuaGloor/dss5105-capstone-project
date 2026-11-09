@@ -1,0 +1,42 @@
+{
+  "version": "data-v3-human-kind-v1",
+  "scope": "request_kind_only",
+  "approved_on": "2026-11-08",
+  "inbox_sha256": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+  "sources": {
+    "rater_blank2.xlsx": "495f26f45694b406c76eb0ab72c30cad061d5703ede4e2ca36c63294c18b89ca",
+    "human_labelled_cases.numbers": "93f9f7c0082c1465be31b8b189d09141a5dafb459b15fac8f8a042fb7d80bb73"
+  },
+  "cases": {
+    "R01": {"kind": "ambiguous", "secondary_tags": ["missing_quantity"]},
+    "R02": {"kind": "unanswerable"},
+    "R03": {"kind": "ambiguous"},
+    "R04": {"kind": "complete_meetable"},
+    "R05": {"kind": "missing_number_or_date"},
+    "R06": {"kind": "complete_meetable"},
+    "R07": {"kind": "complete_meetable"},
+    "R08": {"kind": "ineligible_suggestion"},
+    "R09": {"kind": "constraint", "secondary_tags": ["fastest"]},
+    "R10": {"kind": "missing_number_or_date", "secondary_tags": ["unidentified_order"]},
+    "R11": {"kind": "ineligible_suggestion"},
+    "R12": {"kind": "constraint"},
+    "R13": {"kind": "unanswerable"},
+    "R14": {"kind": "ineligible_suggestion", "secondary_tags": ["deadline_exception"]},
+    "R15": {"kind": "ambiguous"},
+    "R16": {"kind": "complete_meetable"},
+    "R17": {"kind": "complete_meetable"},
+    "R18": {"kind": "unanswerable"},
+    "R19": {"kind": "ambiguous"},
+    "R20": {"kind": "complete_impossible"},
+    "R21": {"kind": "constraint", "secondary_tags": ["cheapest_on_time"]},
+    "R22": {"kind": "complete_meetable"},
+    "R23": {"kind": "constraint", "secondary_tags": ["split"]},
+    "R24": {"kind": "ineligible_suggestion"},
+    "R25": {"kind": "constraint"},
+    "R26": {"kind": "complete_meetable"},
+    "R27": {"kind": "constraint", "secondary_tags": ["lowest_defects"]},
+    "R28": {"kind": "complete_impossible"},
+    "R29": {"kind": "ambiguous"},
+    "R30": {"kind": "complete_impossible"}
+  }
+}

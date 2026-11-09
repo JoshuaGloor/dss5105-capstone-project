@@ -8,11 +8,23 @@ from contextlib import redirect_stdout
 from dataclasses import asdict
 from pathlib import Path
 
-from dss5105.allocator import ObjectiveWeights, ScoreScales, earliest_finish, make_allocator, rank_candidates
+from dss5105.allocator import OBJECTIVES, ObjectiveWeights, ScoreScales, earliest_finish, make_allocator
 from dss5105.harness import HARNESS_PATH, Simulator, cheapest, greedy_biggest, print_table, random_choice
 
-# Exploratory configurations, chosen before running experiments, not tuned winners.
+# One configuration per objective, frozen on development seeds by objective_study.py before the
+# course seeds were run. See docs/OBJECTIVE_STUDY.md; a test keeps these equal to the evidence.
+# "hybrid" is the team's priority: lateness first, then defects.
+_LATE = {"capacity_reservation": 1.0, "deadline_miss_days": 7.0}
 PRESETS = {
+    "hybrid": ObjectiveWeights(lateness=1.0, defects=0.2, deadline_buffer_days=2.0, **_LATE),
+    "lateness": ObjectiveWeights(lateness=1.0, **_LATE),
+    "defects": ObjectiveWeights(lateness=0.2, defects=1.0, deadline_buffer_days=5.0, **_LATE),
+    "fairness": ObjectiveWeights(lateness=1.0, fairness=1.0, **_LATE),
+    "robustness": ObjectiveWeights(lateness=1.0, robustness=0.5, **_LATE),
+}
+DEFAULT_PRESET = "hybrid"
+# The exploratory Sprint 1 configurations, kept so the earlier studies reproduce their evidence.
+SPRINT1_PRESETS = {
     "lateness": ObjectiveWeights(lateness=1.0),
     "defects": ObjectiveWeights(lateness=0.0, defects=1.0),
     "hybrid": ObjectiveWeights(lateness=0.7, defects=0.3),
@@ -49,9 +61,8 @@ def run_experiment(
                 "choice": choice,
             }
             if name in configurations:
-                decision["candidates"] = [
-                    asdict(row) for row in rank_candidates(batch, workshops, queues, configurations[name], scales)
-                ]
+                # The policy's own ranking, so fairness sees the same ledger that made the choice.
+                decision["candidates"] = [asdict(row) for row in policy.last_ranking]
             decisions.append(decision)
             return choice
 
@@ -127,7 +138,7 @@ def run_seed_series(shock=False, seed=5105, seeds=10, configurations=None):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset", choices=PRESETS, help="Choose one preset; otherwise compare all presets")
-    for objective in ("lateness", "defects", "cost"):
+    for objective in OBJECTIVES:
         parser.add_argument(
             f"--{objective}-weight",
             type=float,
@@ -138,6 +149,16 @@ def main(argv=None):
         type=float,
         help="Safety buffer for a custom configuration; needs at least one custom weight",
     )
+    parser.add_argument(
+        "--deadline-miss-days",
+        type=float,
+        help="Lateness charge for missing the date in a custom configuration; needs a custom weight",
+    )
+    parser.add_argument(
+        "--capacity-reservation",
+        type=float,
+        help="Lateness charge for scarce shared capacity in a custom configuration; needs a custom weight",
+    )
     parser.add_argument("--shock", action="store_true", help="Use the course's hidden workshop closure")
     parser.add_argument("--seed", type=int, default=5105)
     parser.add_argument("--seeds", type=int, help="Average N consecutive seeds; use 10 for reported shock results")
@@ -145,16 +166,16 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.seeds is not None and args.seeds < 1:
         parser.error("--seeds must be positive")
-    requested_weights = {
-        "lateness": args.lateness_weight,
-        "defects": args.defects_weight,
-        "cost": args.cost_weight,
-    }
+    requested_weights = {objective: getattr(args, f"{objective}_weight") for objective in OBJECTIVES}
     custom = any(value is not None for value in requested_weights.values())
     if args.preset and custom:
         parser.error("--preset cannot be combined with custom weight arguments")
     if args.deadline_buffer_days is not None and not custom:
         parser.error("--deadline-buffer-days needs at least one custom weight argument")
+    if args.capacity_reservation is not None and not custom:
+        parser.error("--capacity-reservation needs at least one custom weight argument")
+    if args.deadline_miss_days is not None and not custom:
+        parser.error("--deadline-miss-days needs at least one custom weight argument")
     configurations = None
     if args.preset:
         configurations = {args.preset: PRESETS[args.preset]}
@@ -163,6 +184,8 @@ def main(argv=None):
             weights = ObjectiveWeights(
                 **{key: 0.0 if value is None else value for key, value in requested_weights.items()},
                 deadline_buffer_days=args.deadline_buffer_days or 0.0,
+                capacity_reservation=args.capacity_reservation or 0.0,
+                deadline_miss_days=args.deadline_miss_days or 0.0,
             )
         except ValueError as exc:
             parser.error(str(exc))
