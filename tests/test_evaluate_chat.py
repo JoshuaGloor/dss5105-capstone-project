@@ -11,6 +11,7 @@ from dss5105 import evaluate_chat
 from dss5105.allocator import ObjectiveWeights
 from dss5105.dispatch import DispatchDesk, DispatchInput, read_inbox
 from dss5105.evaluate_chat import RecordedModel, check_rubric, check_tool_integrity, evaluate_case, summarize
+from dss5105.request_kinds import behavior_acceptance
 
 
 class Provider:
@@ -29,11 +30,76 @@ class Provider:
         return self.response
 
 
+@pytest.mark.parametrize(
+    ("split_time", "status", "flags", "choice", "outcome"),
+    [
+        (4.999, "NEEDS_REVIEW", ["SPLIT_REVIEW"], "W1", "PASS"),
+        (5.0, "RECOMMEND", [], "W1", "PASS"),
+        (5.001, "RECOMMEND", [], "W1", "PASS"),
+        (5.0, "NEEDS_REVIEW", ["SPLIT_REVIEW"], "W1", "FAIL"),
+        (5.001, "RECOMMEND", [], "W2", "FAIL"),
+    ],
+)
+def test_split_acceptance_checks_unrounded_times_and_fastest_fallback(split_time, status, flags, choice, outcome):
+    preview = {
+        "status": status,
+        "flags": flags,
+        "recommendation": choice,
+        "candidates": [
+            {"estimate": {"workshop_id": "W1", "expected_turnaround_days": 5.0}},
+            {"estimate": {"workshop_id": "W2", "expected_turnaround_days": 6.0}},
+        ],
+        "split_option": {"parts": [{"estimate": {"expected_turnaround_days": days}} for days in (4.0, split_time)]},
+    }
+    record = {"request": {"request_id": "R23"}, "status": "completed", "preview": preview}
+    assert behavior_acceptance([record])["R23"]["outcome"] == outcome
+
+
 def test_live_opt_in_is_required_before_model_construction(monkeypatch):
     monkeypatch.setattr("sys.argv", ["evaluate_chat", "--output", "results/test-unused"])
     monkeypatch.setattr(evaluate_chat.llm, "get_model", lambda **kwargs: pytest.fail("Unexpected provider"))
     with pytest.raises(SystemExit, match="2"):
         evaluate_chat.main()
+
+
+@pytest.mark.parametrize("changed_text", [False, True])
+def test_saved_run_groups_approved_kinds_and_checks_envelopes(tmp_path, monkeypatch, changed_text):
+    label_path = evaluate_chat.ROOT / "examples/human_request_kinds_v1.json"
+    labels = json.loads(label_path.read_text(encoding="utf-8"))
+    request = read_inbox()[0]
+    if changed_text:
+        request["text"] += " Changed."
+    bundle = tmp_path / "saved.json"
+    bundle.write_text(
+        json.dumps(
+            {
+                "manifest": {"source_hashes": {"dispatch_requests.txt": labels["inbox_sha256"]}},
+                "records": [{"request": request, "status": "completed"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "report"
+    monkeypatch.setattr(evaluate_chat, "output_path", lambda _: output)
+    monkeypatch.setattr(evaluate_chat.llm, "get_model", lambda **kwargs: pytest.fail("Unexpected provider"))
+    monkeypatch.setattr(
+        "sys.argv",
+        ["evaluate_chat", "--saved-run", str(bundle), "--kind-labels", str(label_path), "--output", str(output)],
+    )
+    if changed_text:
+        with pytest.raises(SystemExit, match="2"):
+            evaluate_chat.main()
+        assert not output.exists()
+        return
+    assert evaluate_chat.main() == 0
+    grouping = json.loads((output / "summary.json").read_text())["human_request_kinds"]
+    assert grouping["scope"] == "request_kind_only"
+    assert grouping["by_kind"]["ambiguous"] == {
+        "planned": 5,
+        "attempted": 1,
+        "completed": 1,
+        "case_ids": ["R01", "R03", "R15", "R19", "R29"],
+    }
 
 
 def test_output_stays_in_repo_and_existing_runs_are_preserved(tmp_path, monkeypatch):

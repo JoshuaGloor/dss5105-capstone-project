@@ -50,6 +50,32 @@ def test_ambiguous_reference_is_not_guessed(desk):
 
 
 @pytest.mark.parametrize(
+    "clarification",
+    [None, "Please confirm the quantity using digits. Please confirm the delivery deadline using an explicit date."],
+)
+def test_ambiguous_order_keeps_resolver_question_and_other_clarifications(desk, clarification):
+    result = desk.preview(
+        envelope(), DispatchInput(customer="TrendCart", clarification=clarification), ObjectiveWeights()
+    )
+    question = "Which order do you mean? Please confirm its order ID."
+    assert result["status"] == "CLARIFY"
+    assert result["resolution"]["status"] == "AMBIGUOUS"
+    assert result["message"] == question + (" " + clarification if clarification else "")
+    assert not result["candidates"]
+
+
+def test_unknown_order_keeps_missing_record_message_and_pending_order_question(desk):
+    clarification = "Which order do you mean? Please confirm its order ID."
+    result = desk.preview(
+        envelope(), DispatchInput(order_id="ORD-999", clarification=clarification), ObjectiveWeights()
+    )
+    assert result["status"] == "CLARIFY"
+    assert result["resolution"]["status"] == "NOT_FOUND"
+    assert result["message"] == "No matching order is recorded. Please check the order reference. " + clarification
+    assert not result["candidates"]
+
+
+@pytest.mark.parametrize(
     "fields",
     [
         {"pieces": 501},
@@ -370,6 +396,19 @@ def test_capacity_question_asks_for_what_it_needs(desk, fields, question):
     result = desk.preview(CAPACITY_ENVELOPE, DispatchInput(intent="capacity", **fields), PRESETS["hybrid"])
     assert result["status"] == "CLARIFY" and question in result["message"]
     assert result["candidates"] == []
+
+
+@pytest.mark.parametrize(
+    "workshop,opening",
+    [("W1", "QuickStitch can deliver 400 pieces of tops by 2026-04-15"), ("W4", "Little Loom cannot take")],
+)
+def test_capacity_question_answers_for_the_named_workshop_first(desk, workshop, opening):
+    request = DispatchInput(
+        intent="capacity", product="tops", pieces=400, due_date="2026-04-15", suggested_workshop=workshop
+    )
+    result = desk.preview(CAPACITY_ENVELOPE, request, PRESETS["hybrid"])
+    assert result["status"] == "CAPACITY" and result["message"].startswith(opening)
+    assert result["suggested"]["workshop_id"] == workshop and result["commit_allowed"] is False
 
 
 def test_capacity_question_reports_the_earliest_option_when_none_is_on_time(desk):
