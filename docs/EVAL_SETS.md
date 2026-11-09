@@ -2,7 +2,8 @@
 
 `dss5105.eval_sets` generates 105 chat requests from a fixed seed: a 70-request
 train split and a 35-request test split, each balanced across the seven Data v3
-request kinds (10 and 5 per kind). There is no model training in this project;
+request kinds (10 and 5 per kind), plus 100 supplementary requests (see
+[Supplements](#supplements)). There is no model training in this project;
 "train" means the split you may inspect and tune prompts or tools against.
 
 ## How cases are labelled
@@ -14,7 +15,7 @@ expected response state and review flags come from running the deterministic
 preview on those facts. Draws whose tool outcome does not match the intended kind,
 such as a "meetable" date that no workshop can make, are rejected and redrawn.
 
-A test regenerates both splits and requires them to match the committed files, and
+A test regenerates all four file pairs and requires them to match the committed files, and
 another checks every label is reachable from perfect extraction. That checks the
 rubric against the tools, not the model.
 
@@ -26,10 +27,25 @@ only 34 open orders. Several train templates paraphrase the supplied inbox; none
 the generated texts repeats it. The test split is held out only while nobody tunes
 on its results; after that, bump `VERSION`, change the seed or templates, and say so.
 
+## Supplements
+
+The same module also writes two supplementary sets, kept as separate files:
+
+| Set | IDs | Seed | Cases |
+|---|---|---:|---|
+| `train_extra` | TR071-TR140 | 5106 | 10 per kind; reuses the train templates |
+| `test_extra` | TE071-TE100 | 5107 | Course inbox mix 7/3/6/4/3/4/3; its own test wording |
+
+They come from a separate builder whose draw order fixes the committed files, and are
+drawn after the base splits, skipping any text in the supplied inbox or either base
+split. That skip list is fixed in code, so regeneration is reproducible. The TE036-TE070
+gap in test numbering is historical. Base and supplement seeds move together with
+`--seed` (seed, seed+1, seed+2).
+
 ## Run
 
 ```bash
-uv run python -m dss5105.eval_sets          # regenerate examples/eval_sets/
+uv run python -m dss5105.eval_sets          # regenerate all of examples/eval_sets/
 uv run python -m dss5105.evaluate_chat --live --set train --output results/train-1
 uv run python -m dss5105.evaluate_chat --live --set test  --output results/test-1
 ```
