@@ -11,7 +11,7 @@ evidence, including file and artifact hashes, is in
 | Item | Value |
 |---|---|
 | Date | 9 November 2026; splits started 14:51, 14:52 and 14:54 UTC |
-| Runner | `python -m dss5105.evaluate_chat --live --set <split>`, one fresh output directory per split; `supplied` also used `--kind-labels examples/human_request_kinds_v1.json`. The manifests do not record the exact command line |
+| Runner | `python -m dss5105.evaluate_chat --live --set <split> --output results/sprint3-live-01f2524/<split>`, one fresh output directory per split; `supplied` also used `--kind-labels examples/human_request_kinds_v1.json`. The manifests do not record the exact command line |
 | Model and intake | `openai:gpt-5.6`, `intake-v3` |
 | Provider settings | 30 s timeout, automatic retries disabled (`max_retries=0`) |
 | Objective weights | Default `ObjectiveWeights()`: lateness 1.0, all other terms 0 |
@@ -20,6 +20,10 @@ evidence, including file and artifact hashes, is in
 
 All three manifests record the same model, intake version, system prompt, schema,
 settings, weights and source hashes, and their file hashes match the frozen commit.
+Source files are hashed with `normalized_text_sha256` from
+[`benchmark_integrity.py`](../src/dss5105/benchmark_integrity.py), so a checkout
+verifies them whatever its line endings; the `track2/` data and the archived run
+artifacts are hashed as raw bytes.
 Each split has exactly one record per expected ID, every saved request envelope
 matches its source file, and no ID or normalized request text repeats across splits.
 Every request completed on its first attempt. The artifacts show retries were
