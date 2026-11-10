@@ -1,0 +1,278 @@
+{
+  "configuration": {
+    "intake_version": "intake-v3",
+    "model": "openai:gpt-5.6",
+    "model_parameters": {
+      "max_retries": 0,
+      "timeout": 30
+    },
+    "snapshot_date": "2026-04-01",
+    "source_hashes": {
+      "dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+      "orders.csv": "0880af9742fe7cc0923c5009e2de48a0bedb57b78cc294e35a1c9721fe0311f8",
+      "simulate.py": "b845804ad1229f593627b6ef1a6482258331178dbc4ec535274103fc3244593b",
+      "workshops.csv": "d7e1c97d3d338a2b5aef8e35f167e3582f22c4526e9c736c5b4c8125505ec59e"
+    },
+    "weights": {
+      "capacity_reservation": 0.0,
+      "cost": 0.0,
+      "deadline_buffer_days": 0.0,
+      "deadline_miss_days": 0.0,
+      "defects": 0.0,
+      "fairness": 0.0,
+      "lateness": 1.0,
+      "robustness": 0.0
+    }
+  },
+  "description": "Compact evidence for the Sprint 3 live chat evaluation. Raw per-case records (prompts and model responses) are kept outside version control; hashes below identify them.",
+  "display_fields_checked_all_splits": 2698,
+  "held_out_combined": {
+    "behavior_passed": 65,
+    "completed": 65,
+    "display_fields_checked": 1763,
+    "extraction_passed": 65,
+    "planned": 65,
+    "rubric_passed": 65,
+    "tool_integrity_passed": 65
+  },
+  "inbox_reliability_audit": {
+    "artifact_sha256": {
+      "cases.jsonl": "3df452a274683efce565463c169643a3f12dba8a026d0a15190a50601a3d6a01",
+      "checks.csv": "58f75757ba749a944934632332f1d7981e5d795db87fedf4d0a193fed9826aed",
+      "manifest.json": "1c69397855464398631ab9f12c37132febf5c2ceca634c637db09703de27b868",
+      "summary.json": "8be8ca204d97244a78b6d8dfe4adcc7ddf83ccfc01cae837c266ad99dd5dce03"
+    },
+    "basis": "provisional diagnostics from dss5105.reliability_score; not gold accuracy"
+  },
+  "recomputed_offline": "check_rubric, check_tool_integrity and summarize from evaluate_chat.py; all counts match each saved summary.json",
+  "run_directory": "results/sprint3-live-01f2524",
+  "source_commit": "01f2524f7f0198886bb5c4d99499845eacc90f5a",
+  "splits": {
+    "supplied": {
+      "artifact_sha256": {
+        "manifest.json": "fea7a7b77db90315a1486190256bcd7d55a4e0c983d7074a9795c25c6c89ccff",
+        "source_snapshot.json": "433c47d9e10c3733f48df0d87e33633455eefb8518755974da8b80d3aeb76a84",
+        "summary.json": "399720ef03c9c67fda5a3719b920a3a005dfcb711df58490bc254f1dc609d082"
+      },
+      "behavior_acceptance": {
+        "R01": "PASS",
+        "R10": "FAIL",
+        "R23": "PASS"
+      },
+      "behavior_passed": 30,
+      "by_course_kind": {
+        "ambiguous": [
+          4,
+          4
+        ],
+        "complete_impossible": [
+          3,
+          3
+        ],
+        "complete_meetable": [
+          7,
+          7
+        ],
+        "constraint": [
+          6,
+          6
+        ],
+        "ineligible_suggestion": [
+          4,
+          4
+        ],
+        "missing_number_or_date": [
+          3,
+          3
+        ],
+        "unanswerable": [
+          3,
+          3
+        ]
+      },
+      "completed": 30,
+      "display_fields_checked": 935,
+      "extraction_passed": 30,
+      "failed_case_ids": [],
+      "file_hashes": {
+        "examples/chat_rubric.json": "3d5a17380de57ba5f78c3e627e077213493e13e806ba073f0b8ef7202c71a5d5",
+        "pyproject.toml": "103360d00a1ed31d13a6da6ab5bde62acdce34f452aed9eddea07e984295ba61",
+        "src/dss5105/allocator.py": "d8ad8190ea1c41e30ba7ddee21bc20beda6fb9fc6390870ca72e2dbf0adabc6a",
+        "src/dss5105/dispatch.py": "71339f12ffd0dd16947ca63b6a51204faf60f2241848bdf876702a5af20f2fbb",
+        "src/dss5105/evaluate_chat.py": "2e8a66ef782fc31d0eb05578397a5e0afc418b36c56df20f0e0084dcbcbbacc7",
+        "src/dss5105/harness.py": "06fe5c9e584dbb10c72b808a67427928b3aa485cb90fd405edd3057e73b18049",
+        "src/dss5105/intake.py": "039bc88beb75779e71daaa6777a164a877bf032069a49f785ad87103a8527ca5",
+        "src/dss5105/llm.py": "f163bf5ee1ba063dc055bfafa433270aa2f3bf17eb71a4b32790ce52cf574bab",
+        "src/dss5105/web_app.py": "ec2419e1b04be050dbd4f7010342242f374d5da47a8af4faa7efc37e4a24b9b6",
+        "track2/data/dispatch_requests.txt": "dd00a2db398e4acaea1becf82137b6d7526c746621c28af5534806105d50117a",
+        "uv.lock": "287dec0525653d5c7ef71d822cc6a93473b03d46d8a5fc755ecc9dd93fce02fa"
+      },
+      "human_request_kinds": {
+        "scope": "request_kind_only",
+        "sha256": "51a1c810a12d82f103ced3de978ab31558a4174023d1a22f79b6172ac2bc574c",
+        "version": "data-v3-human-kind-v1"
+      },
+      "planned": 30,
+      "provider_usage": {
+        "input_tokens": 30067,
+        "output_tokens": 5295,
+        "total_tokens": 35362
+      },
+      "response_states": {
+        "CLARIFY": 7,
+        "DECLINE": 3,
+        "NEEDS_REVIEW": 4,
+        "RECOMMEND": 12,
+        "REFUSE_SUGGESTION": 4
+      },
+      "role": "development",
+      "rubric_passed": 30,
+      "started_utc": "2026-11-09T14:51:03.183767+00:00",
+      "tool_integrity_passed": 30
+    },
+    "test": {
+      "artifact_sha256": {
+        "manifest.json": "d7237ea78368eedad6ebf374d56414042ee5ecfe4989e173d57e2242c8a0d751",
+        "source_snapshot.json": "fd243275cf5da46227243089d1a794f52dbeb4d3aa9c222e46f0cd7cabec314c",
+        "summary.json": "db5e244e8e56839bb0f9d42e5654b3b7576fadb9b41bb06f643803e85f3d4d4e"
+      },
+      "behavior_passed": 35,
+      "by_course_kind": {
+        "ambiguous": [
+          5,
+          5
+        ],
+        "complete_impossible": [
+          5,
+          5
+        ],
+        "complete_meetable": [
+          5,
+          5
+        ],
+        "constraint": [
+          5,
+          5
+        ],
+        "ineligible_suggestion": [
+          5,
+          5
+        ],
+        "missing_number_or_date": [
+          5,
+          5
+        ],
+        "unanswerable": [
+          5,
+          5
+        ]
+      },
+      "completed": 35,
+      "display_fields_checked": 848,
+      "extraction_passed": 35,
+      "failed_case_ids": [],
+      "file_hashes": {
+        "examples/eval_sets/test_requests.txt": "5047dde21cbd0bff8b1f8d75a1eba1cdb861887197e07e86a08fa5f2c7115495",
+        "examples/eval_sets/test_rubric.json": "3f99fb4ca747a44118b7fd97be6c524580acde57092d55f12dc186238910d283",
+        "pyproject.toml": "103360d00a1ed31d13a6da6ab5bde62acdce34f452aed9eddea07e984295ba61",
+        "src/dss5105/allocator.py": "d8ad8190ea1c41e30ba7ddee21bc20beda6fb9fc6390870ca72e2dbf0adabc6a",
+        "src/dss5105/dispatch.py": "71339f12ffd0dd16947ca63b6a51204faf60f2241848bdf876702a5af20f2fbb",
+        "src/dss5105/evaluate_chat.py": "2e8a66ef782fc31d0eb05578397a5e0afc418b36c56df20f0e0084dcbcbbacc7",
+        "src/dss5105/harness.py": "06fe5c9e584dbb10c72b808a67427928b3aa485cb90fd405edd3057e73b18049",
+        "src/dss5105/intake.py": "039bc88beb75779e71daaa6777a164a877bf032069a49f785ad87103a8527ca5",
+        "src/dss5105/llm.py": "f163bf5ee1ba063dc055bfafa433270aa2f3bf17eb71a4b32790ce52cf574bab",
+        "src/dss5105/web_app.py": "ec2419e1b04be050dbd4f7010342242f374d5da47a8af4faa7efc37e4a24b9b6",
+        "uv.lock": "287dec0525653d5c7ef71d822cc6a93473b03d46d8a5fc755ecc9dd93fce02fa"
+      },
+      "planned": 35,
+      "provider_usage": {
+        "input_tokens": 34974,
+        "output_tokens": 6048,
+        "total_tokens": 41022
+      },
+      "response_states": {
+        "CLARIFY": 10,
+        "DECLINE": 5,
+        "NEEDS_REVIEW": 6,
+        "RECOMMEND": 9,
+        "REFUSE_SUGGESTION": 5
+      },
+      "role": "designated held-out",
+      "rubric_passed": 35,
+      "started_utc": "2026-11-09T14:52:39.763561+00:00",
+      "tool_integrity_passed": 35
+    },
+    "test_extra": {
+      "artifact_sha256": {
+        "manifest.json": "4c5eac34a4063928fd55fbf773908f75b542b5a84726a394d068015d3eb9f2cb",
+        "source_snapshot.json": "35da49814c22cae2dd8bc7ccf7b04062a66e7e980ea11e756ed97c40b3c68e6c",
+        "summary.json": "d600de8253ba7c4681bc75fc225665511a6e21d0006963014be8849379b01f52"
+      },
+      "behavior_passed": 30,
+      "by_course_kind": {
+        "ambiguous": [
+          4,
+          4
+        ],
+        "complete_impossible": [
+          3,
+          3
+        ],
+        "complete_meetable": [
+          7,
+          7
+        ],
+        "constraint": [
+          6,
+          6
+        ],
+        "ineligible_suggestion": [
+          4,
+          4
+        ],
+        "missing_number_or_date": [
+          3,
+          3
+        ],
+        "unanswerable": [
+          3,
+          3
+        ]
+      },
+      "completed": 30,
+      "display_fields_checked": 915,
+      "extraction_passed": 30,
+      "failed_case_ids": [],
+      "file_hashes": {
+        "examples/eval_sets/test_extra_requests.txt": "8e102be4985320d0798330b4849178cfa22c35311b68a6421b7e6d8385037932",
+        "examples/eval_sets/test_extra_rubric.json": "db607dfd024dc43d18bbbd715ccb54965c3713def974a37f1ce54144f988d080",
+        "pyproject.toml": "103360d00a1ed31d13a6da6ab5bde62acdce34f452aed9eddea07e984295ba61",
+        "src/dss5105/allocator.py": "d8ad8190ea1c41e30ba7ddee21bc20beda6fb9fc6390870ca72e2dbf0adabc6a",
+        "src/dss5105/dispatch.py": "71339f12ffd0dd16947ca63b6a51204faf60f2241848bdf876702a5af20f2fbb",
+        "src/dss5105/evaluate_chat.py": "2e8a66ef782fc31d0eb05578397a5e0afc418b36c56df20f0e0084dcbcbbacc7",
+        "src/dss5105/harness.py": "06fe5c9e584dbb10c72b808a67427928b3aa485cb90fd405edd3057e73b18049",
+        "src/dss5105/intake.py": "039bc88beb75779e71daaa6777a164a877bf032069a49f785ad87103a8527ca5",
+        "src/dss5105/llm.py": "f163bf5ee1ba063dc055bfafa433270aa2f3bf17eb71a4b32790ce52cf574bab",
+        "src/dss5105/web_app.py": "ec2419e1b04be050dbd4f7010342242f374d5da47a8af4faa7efc37e4a24b9b6",
+        "uv.lock": "287dec0525653d5c7ef71d822cc6a93473b03d46d8a5fc755ecc9dd93fce02fa"
+      },
+      "planned": 30,
+      "provider_usage": {
+        "input_tokens": 30041,
+        "output_tokens": 4904,
+        "total_tokens": 34945
+      },
+      "response_states": {
+        "CLARIFY": 7,
+        "DECLINE": 3,
+        "NEEDS_REVIEW": 3,
+        "RECOMMEND": 13,
+        "REFUSE_SUGGESTION": 4
+      },
+      "role": "designated held-out",
+      "rubric_passed": 30,
+      "started_utc": "2026-11-09T14:54:18.606174+00:00",
+      "tool_integrity_passed": 30
+    }
+  }
+}
