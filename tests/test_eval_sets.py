@@ -40,17 +40,17 @@ def test_labels_are_reachable_from_perfect_extraction(name):
 
 
 def test_splits_are_balanced_and_test_wording_is_unseen():
-    train_inbox, train = load("train")
-    test_inbox, test = load("test")
-    supplied_inbox, supplied = load("supplied")
-    for rubric in (train, test):
+    generated = ("train", "test", "train_extra", "test_extra")
+    loaded = {name: load(name) for name in ("supplied", *generated)}
+    supplied = loaded["supplied"][1]
+    for name in generated:
+        rubric = loaded[name][1]
         assert Counter(case["course_kind"] for case in rubric["cases"].values()) == rubric["course_kind_counts"]
         assert set(rubric["course_kind_counts"]) == set(supplied["course_kind_counts"])
-    assert len(train["cases"]) + len(test["cases"]) == 105
-    templates = {
-        name: {case["template"] for case in rubric["cases"].values()}
-        for name, rubric in (("train", train), ("test", test))
-    }
-    assert not templates["train"] & templates["test"]
-    texts = [item["text"] for item in train_inbox + test_inbox + supplied_inbox]
+    assert len(loaded["train"][1]["cases"]) + len(loaded["test"][1]["cases"]) == 105
+    templates = {name: {case["template"] for case in loaded[name][1]["cases"].values()} for name in generated}
+    assert not (templates["train"] | templates["train_extra"]) & (templates["test"] | templates["test_extra"])
+    texts = [item["text"] for name in ("supplied", *generated) for item in loaded[name][0]]
     assert len(texts) == len(set(texts))
+    ids = [item["request_id"] for name in generated for item in loaded[name][0]]
+    assert len(ids) == len(set(ids))
