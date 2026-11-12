@@ -16,6 +16,7 @@ from dss5105.chat_ui import (
     DeskContext,
     clear_review,
     history,
+    objective_mode,
     open_entry,
     process_pending,
     queue,
@@ -224,7 +225,7 @@ def main():
         '<div class="qr-brand"><span>S</span><div>StitchFlow'
         "<small>QUICK-RESPONSE SUBCONTRACTING DESK</small></div></div>"
     )
-    mode = st.session_state.get("objective", "lateness")
+    mode = objective_mode()
     with objective_box:
         objectives = st.popover(
             "⚙ Objective: " + LABELS[mode], key="objective_pop", help="Choose the objective", width="stretch"

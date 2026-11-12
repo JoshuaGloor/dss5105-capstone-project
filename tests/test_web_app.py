@@ -5,6 +5,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 from dss5105.allocator import ObjectiveWeights
+from dss5105.chat_ui import LABELS
 from dss5105.dispatch import ROOT, DispatchDesk, DispatchInput, read_inbox
 from dss5105.evaluate import DEFAULT_PRESET, PRESETS
 from dss5105.web_app import SCENARIOS
@@ -33,6 +34,26 @@ def latest(app):
 
 def markup(app):
     return "".join(element.body for element in app.main if element.type == "html")
+
+
+def popover_labels(app):
+    """Labels of the banner popovers, read from the element tree."""
+    found = []
+
+    def walk(node):
+        label = getattr(getattr(getattr(node, "proto", None), "popover", None), "label", "")
+        if label:
+            found.append(label)
+        for child in getattr(node, "children", {}).values():
+            walk(child)
+
+    walk(app.main)
+    return found
+
+
+def test_objective_button_names_the_default_preset_on_first_load(app):
+    # The radio inside the popover has not run yet on the first pass, so the label must not rely on its state.
+    assert any(label.endswith("Objective: " + LABELS[DEFAULT_PRESET]) for label in popover_labels(app))
 
 
 def test_page_opens_on_start_screen_without_calling_a_model(app):

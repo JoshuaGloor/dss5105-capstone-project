@@ -2,8 +2,9 @@
    Palette (dark green identity from the slides): ink #203731, green #1c5948, deep green #123d31,
    gold #cf923e, oat #f4f3ec, card #fbfbf7, line #dce3db. Keep in step with .streamlit/config.toml. */
 .stApp { color: #203731; }
-.block-container { max-width: 1400px; padding-top: 1.2rem; padding-bottom: 3rem; }
-[data-testid="stHeader"] { background: transparent; }
+/* The top navigation is fixed: keep the page clear of it, and opaque so scrolled content does not show through. */
+.block-container { max-width: 1400px; padding-top: 4.2rem; padding-bottom: 3rem; }
+[data-testid="stHeader"] { background: #f4f3ec; }
 h1, h2, h3 { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; letter-spacing: -0.4px; }
 [data-testid="stCaptionContainer"] { color: #60726c; font-size: 0.95rem; }
 html { scroll-behavior: smooth; }
@@ -115,7 +116,7 @@ html { scroll-behavior: smooth; }
 .st-key-examples_area button:hover { box-shadow: 0 4px 14px #20373114; border-color: #1c5948; }
 
 /* ---- working column: stays in view beside the thread ---- */
-[data-testid="stColumn"]:has(.st-key-working_panel) { position: sticky; top: 12px; align-self: flex-start; max-height: calc(100vh - 24px); overflow-y: auto; }
+[data-testid="stColumn"]:has(.st-key-working_panel) { position: sticky; top: 4.4rem; align-self: flex-start; max-height: calc(100vh - 5rem); overflow-y: auto; }
 .st-key-working_panel { background: #fbfbf7; border-radius: 16px; }
 
 /* with the working open, the answer column is set smaller so the working has room without horizontal scrolling */
@@ -151,7 +152,7 @@ html { scroll-behavior: smooth; }
 @media (max-width: 760px) {
   [data-testid="stHorizontalBlock"]:has([class*="st-key-card_"]) { grid-template-columns: 1fr; }
   [data-testid="stColumn"]:has(.st-key-working_panel) { position: static; max-height: none; }
-  .block-container { padding: 1rem 0.8rem; }
+  .block-container { padding: 4.2rem 0.8rem 1rem; }
   .st-key-topbar { padding: 1rem 1rem 1.5rem; }
   .qr-brand { font-size: 1.7rem; }
   .qr-start h1 { font-size: 2rem; }
