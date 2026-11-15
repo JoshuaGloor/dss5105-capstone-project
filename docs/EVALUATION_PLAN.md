@@ -2,25 +2,27 @@
 
 Source of mandatory requirements: Spec v5 p. 5 and Tracks v4 pp. 5-7. Evaluation
 quality carries 15% of the project rubric; the simulator does not produce a final
-course grade. This document is a plan, not a claim that the complete system has
-already been evaluated.
+course grade. This document is the plan and its current status. Results and failure
+analysis are in the final evaluation report (submitted as Evaluation.pdf); where this
+plan and that report differ, the report and the cited evidence files are the record.
+Measured results do not cover every part of the system: see the caveats below.
 
 ## Course requirements and current evidence
 
 | Requirement | Current status |
 |---|---|
-| Use the shared simulator against all three provided baselines | Initial offline runs complete; reproducible runner and traces available |
+| Use the shared simulator against all three provided baselines | Done: every frozen preset against all three baselines on the course seeds, normal and shock ([OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md), `evidence/objective-study.json`) |
 | Declare a primary objective at Sprint 1 | Team selected minimise lateness; the Sprint 1 deck declares it |
 | Report primary, another objective, and a justified weighted hybrid | Primary lateness, secondary defects; one frozen preset per objective and a lateness-then-defects hybrid, selected by stated rules on development seeds ([OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md)) |
-| Report shock averaged over ten seeds | Data v3 runs and paired normal controls complete; see V3_EVALUATION.md |
-| Beat all three baselines on the primary objective and report where baselines win | Initial lateness results are favorable; primary selected; final evaluation and tradeoff reporting remain pending |
-| Compare with a short heuristic and explain the system's added value | Allocator measured in [MARGIN_STUDY.md](MARGIN_STUDY.md): it ties earliest finish on lateness and adds a configurable cost/late-days tradeoff; language-layer value still to be measured |
-| Evaluate all 30 supplied chat requests by behavior | Data v3 fixture replay refreshed; prior live run is historical; v3 live rerun, independent gold and held-out evaluation pending |
-| Judge decisions and explanation faithfulness separately | Behavior and tool-field integrity checked separately; full explanation/UX review still pending |
-| Explain metrics, evaluation-set construction, per-category results, and limitations | Initial simulator method documented; full report pending |
-| Analyze at least 10 failure cases individually | Pending; collect cases as features are built |
-| State what would be measured with more time | Planned in final report |
-| If development used the evaluation set, disclose it and provide a held-out result | Supplied data has already been inspected and used in development; generated 70/35 train/test sets in [EVAL_SETS.md](EVAL_SETS.md), live test run pending |
+| Report shock averaged over ten seeds | Data v3 runs and paired normal controls complete; see [V3_EVALUATION.md](V3_EVALUATION.md) |
+| Beat all three baselines on the primary objective and report where baselines win | Met on the course seeds by every frozen preset, normal and shock ([OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md)); baseline and earliest-finish wins reported in the final report |
+| Compare with a short heuristic and explain the system's added value | Allocator measured in [MARGIN_STUDY.md](MARGIN_STUDY.md) and the objective study: the hybrid beats earliest finish on late days, defects and cost but not on the shock late rate; language-layer value still to be measured |
+| Evaluate all 30 supplied chat requests by behavior | Sprint 3 live run done ([SPRINT3_LIVE_EVALUATION.md](SPRINT3_LIVE_EVALUATION.md)): 30/30 rubric agreement by behavior. This scores the evaluated setup (bare lateness weights), not the shipped hybrid default; an offline replay keeps every state and flag but changes 38 of 95 recommended workshops, which are unscored (`evidence/preset-replay-01f2524.json`). Expected answers remain provisional: the inbox rubric is a team draft, and human labels cover request kinds only |
+| Judge decisions and explanation faithfulness separately | Behavior and tool-field integrity checked separately (2,698 displayed fields, 0 errors). Explanation wording is not systematically scored; the final report lists known explanation failures. Full explanation/UX review still pending |
+| Explain metrics, evaluation-set construction, per-category results, and limitations | Final evaluation report written (submitted as Evaluation.pdf). The inbox field-level audit still leaves 9 cases unscored pending policy decisions |
+| Analyze at least 10 failure cases individually | 18 analysed in the final report (F1-F18), 10 open, none fabricated; sources are saved runs, human checks, the field-level audit and the default-preset replay |
+| State what would be measured with more time | In the final report, section 5 |
+| If development used the evaluation set, disclose it and provide a held-out result | Disclosed: the supplied inbox is development data. Held-out generated sets ([EVAL_SETS.md](EVAL_SETS.md)): `test` 35/35 (run once before under intake-v2) and `test_extra` 30/30 (never run before), both rubric agreement under the evaluated setup, with labels generated by our own tool |
 
 A tool specification, usable interface, and auditable output are also core Track 2
 capabilities. Completing the simulator rows does not complete the project.
@@ -79,8 +81,12 @@ The scoring penalty is not the evaluator: it uses a continuous point estimate of
 lateness, while the simulator uses sampled outcomes and rounded completion dates.
 A good internal score does not establish a good realized result or global optimum.
 
-Next experiments should inspect changed allocations, baseline wins, and sensitivity
-to scales and additional scenarios. Initial weight and seed sensitivity results are
+Baseline wins are reported in the final report. Changed allocations were inspected
+for the chat inputs only: replaying the Sprint 3 extracted inputs under the shipped
+hybrid preset changes 38 of 95 recommended workshops with no change of state or flags
+(`scripts/preset_replay.py` on the archived run, result in `evidence/preset-replay-01f2524.json`);
+those hybrid recommendations have not been scored against a rubric. Sensitivity to
+scales and additional scenarios remains open. Initial weight and seed sensitivity results are
 documented in [WEIGHT_TUNING.md](WEIGHT_TUNING.md). Avoid presenting tuning on this supplied replay as
 held-out performance. Use documented additional data/scenarios and freeze any held-out
 set before tuning against it. Preserve the shared run for cross-team comparison.
@@ -123,7 +129,9 @@ retry, and absence of provider calls on ordinary reruns. These do not measure re
 extraction accuracy. The [intake contract](INTAKE_CONTRACT.md) distinguishes those
 checks from semantic correctness/completeness. The first live run is documented in
 [CHAT_EVALUATION_RESULTS.md](CHAT_EVALUATION_RESULTS.md), with a frozen draft rubric,
-raw outputs and manual review of errors that the automated checks missed.
+raw outputs and manual review of errors that the automated checks missed. The Sprint 3
+live run ([SPRINT3_LIVE_EVALUATION.md](SPRINT3_LIVE_EVALUATION.md)) is the one the final
+report scores; it used bare lateness weights, not the shipped hybrid default.
 
 The simulator never reads `dispatch_requests.txt`. Run these requests through the
 chat application and retain the conversation, tool inputs/outputs, structured
@@ -175,11 +183,24 @@ adjudicated rubric and document the reasoning.
 Report agreement before adjudication. Cohen's kappa applies to two raters; use
 pairwise Cohen's kappa or an appropriate multi-rater measure such as Fleiss' kappa
 if more raters participate. Define how multi-label behaviors are encoded before
-calculating agreement. These statistics are planned, not already measured.
+calculating agreement.
 
-Prepare additional labeled requests that are held out from prompt and tool tuning.
-Set their size and category coverage explicitly in the evaluation design; the
-course does not prescribe an additional set of exactly 30 chat requests.
+Measured for request kinds only: two team members labelled R01-R30 independently,
+without having seen the draft rubric, and agreed on 23 of 30 before adjudication
+(Cohen's kappa 0.71). Disagreements were discussed only after both sheets were saved. This describes agreement
+between these two raters on request kinds; it is not a gold answer set and not a general
+measure of labelling reliability. Both raters' labels are in
+`examples/human_rater_labels_v1.json`; `uv run python scripts/rater_agreement.py`
+recomputes every figure offline. The original sheets are committed unchanged in
+`examples/rater_sheets/`; their SHA-256 hashes are recorded in that file and in
+`examples/human_request_kinds_v1.json`.
+Expected fields, replies and explanations still have no independent human labels. Details: [HUMAN_LABELS.md](HUMAN_LABELS.md).
+
+Additional held-out requests exist as generated splits ([EVAL_SETS.md](EVAL_SETS.md)):
+`test` (35) and `test_extra` (30, never run before the Sprint 3 run). Their labels come
+from our own tool, not independent humans, and they stay held out only while nobody
+tunes prompts or tools against them. The course does not prescribe an additional set
+of exactly 30 chat requests.
 
 ## Explanation faithfulness
 
@@ -225,6 +246,8 @@ and UX. Include baseline wins and policy tradeoffs separately from software bugs
 If too few genuine failures are observed, design meaningful stress cases and disclose
 that construction; do not fabricate failures to fill a quota.
 
-The final report should distinguish implemented behavior, observed results, proposed
-improvements, and untested assumptions. Do not mark required evaluation complete
+The final report (Evaluation.pdf) analyses 18 failures, F1-F18, 10 of them open, drawn
+from saved runs, human checks, the field-level audit and the default-preset replay; none
+were constructed to fill the quota. It distinguishes implemented behavior, observed
+results, proposed improvements, and untested assumptions. Do not mark required evaluation complete
 merely because the corresponding code or plan exists.
