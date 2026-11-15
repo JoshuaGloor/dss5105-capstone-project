@@ -1,0 +1,31 @@
+﻿request_id,time,requester,text,kind
+R01,7:53,Chen,"Need scarves for Harbor Knits sent out today, usual quantities.",ambiguous
+R02,7:59,Ravi,Which workshop did we use for the Harbor Knits batch last October?,unanswerable
+R03,8:03,Priya,Can we get the TrendCart order moving? They are chasing.,ambiguous
+R04,8:08,Boss,"ORD-041 needs a home today. 600 beanies, back by Apr 21.",complete_meetable
+R05,8:14,Mei,"ORD-066 due date just moved up ‚  will confirm the new date after the call, but line something up.",missing_number_or_date
+R06,8:18,Chen,"Farm out ORD-096 please ‚  1000 beanies for TrendCart, ship date Apr 17.",complete_meetable
+R07,8:23,Ravi,"ORD-063 ‚  100 cardigans. No special requirements, just make Apr 29.",complete_meetable
+R08,8:29,Priya,"Send ORD-073 (400 hoodies) to FreshStart, their quote was good.",ineligible_suggestion
+R09,8:33,Boss,"ORD-045 ‚  150 vests for Cotton Club, due Apr 09. It's urgent. Cost doesn't matter, just the fastest turnaround.",complete_meetable
+R10,8:38,Mei,"New rush coming in from Loom & Leaf ‚  details to follow, but book capacity somewhere good.",missing_number_or_date
+R11,8:44,Chen,OldMill is free right now ‚  give them ORD-008.,ineligible_suggestion
+R12,8:49,Ravi,"ORD-053 ‚  800 polo shirts for UrbanThread, due Apr 10. Boss says nothing new to QuickStitch this week, they're swamped.",constraint
+R13,8:55,Priya,Finance asks: what price did we quote TrendCart on ORD-120?,unanswerable
+R14,9:02,Boss,QuickStitch for the scarves on ORD-103?,ineligible_suggestion
+R15,9:07,Mei,Boss wants the Loom & Leaf stuff outside asap.,ambiguous
+R16,9:12,Chen,"Loom & Leaf confirmed the reorder: ORD-024, 300 vests. Needs to ship Apr 15, so it has to go out today.",complete_meetable
+R17,9:18,Ravi,"ORD-017 ‚  800 cardigans for TrendCart. Factory is full, this one goes outside. Back by Apr 10 please.",complete_meetable
+R18,9:23,Priya,Any movement on ORD-999? Customer is chasing.,unanswerable
+R19,9:29,Boss,That big reorder from last week ‚  send it to whoever is quickest.,ambiguous
+R20,9:34,Mei,"New one for the network: ORD-103, 2000 scarves for Bright Basics, due Apr 04.",complete_meetable
+R21,9:39,Chen,"ORD-081 ‚ 1500 crewneck sweaters for Harbor Knits, due Apr 13. Margin is thin on this one ‚ cheapest shop that can still make Apr 13.",complete_meetable
+R22,9:45,Ravi,"ORD-040 ready to dispatch. 1200 hoodies for Loom & Leaf, back by Apr 21.",complete_meetable
+R23,9:51,Priya,"ORD-005 ‚  500 scarves for TrendCart, due Apr 20. Split it across two shops if that gets it back faster.",complete_meetable
+R24,9:56,Boss,Little Loom does lovely work ‚  ORD-015 to them?,ineligible_suggestion
+R25,10:02,Mei,"ORD-109 ‚  500 vests for Harbor Knits, due Apr 13. and keep it away from BudgetWorks, the last batch came back rough.",constraint
+R26,10:08,Chen,"Can someone place ORD-010? 1000 cardigans, Cotton Club, due Apr 25.",complete_meetable
+R27,10:14,Ravi,"ORD-095 ‚  800 hoodies for Bright Basics, due Apr 26. Bright Basics rejected a batch last month, so lowest defect rate you can get.",complete_meetable
+R28,10:20,Priya,Sending ORD-002 outside ‚  1000 crewneck sweaters. Who has room this week? Due Mar 29.,complete_impossible
+R29,10:25,Boss,The vests need to go out this week ‚  who takes them?,ambiguous
+R30,10:31,Mei,"Please allocate ORD-099: 1500 polo shirts, Northwind Apparel. Deadline Apr 05.",complete_meetable
