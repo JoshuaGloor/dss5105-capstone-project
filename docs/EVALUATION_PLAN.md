@@ -200,9 +200,11 @@ Measured for inbox replies: the same two team members independently judged the 3
 first replies of the Sprint 3 run, Yes / No / Unsure, on two questions. Decision correct:
 28/30 agree (Cohen's kappa 0.48; disagreements R01 and R29, rater A unsure, rater B yes).
 Explanation faithful: 29/30 agree (kappa 0.00, because almost every label is Yes;
-disagreement R10). Both raters judged R10's decision wrong. These are before adjudication,
-and R01 and R29 await a team decision. Expected fields and item-level reply wording still
-have no independent human labels. Details: [HUMAN_REPLY_LABELS.md](HUMAN_REPLY_LABELS.md).
+disagreement R10). Both raters judged R10's decision wrong. These figures are before
+adjudication. The team then recorded R01 and R29 (decision) and R10 (explanation) as Yes,
+so the final labels are 29/30 decisions correct (R10 wrong) and 30/30 explanations faithful
+(`examples/human_reply_labels_adjudicated_v1.json`). Expected fields and item-level reply
+wording still have no independent human labels. Details: [HUMAN_REPLY_LABELS.md](HUMAN_REPLY_LABELS.md).
 
 Additional held-out requests exist as generated splits ([EVAL_SETS.md](EVAL_SETS.md)):
 `test` (35) and `test_extra` (30, never run before the Sprint 3 run). Their labels come
