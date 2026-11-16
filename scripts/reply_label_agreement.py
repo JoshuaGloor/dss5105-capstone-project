@@ -1,4 +1,5 @@
-"""Agreement between the two independent reply raters (examples/human_reply_labels_v1.json).
+"""Agreement between the two independent reply raters (examples/human_reply_labels_v1.json),
+and the final labels after adjudication (examples/human_reply_labels_adjudicated_v1.json).
 
 The default run needs no extra packages:
 
@@ -18,6 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LABELS = ROOT / "examples" / "human_reply_labels_v1.json"
+ADJUDICATED = ROOT / "examples" / "human_reply_labels_adjudicated_v1.json"
 COLUMNS = {"decision": 11, "explanation": 13}
 
 
@@ -77,6 +79,31 @@ def main():
         print(f"  disagreements: {', '.join(disagree) or 'none'}")
         flagged = [i for i in ids if a[i][question] != "Yes" or b[i][question] != "Yes"]
         print(f"  not 'Yes' by at least one rater: {', '.join(flagged) or 'none'}")
+    report_adjudicated(a, b, ids)
+
+
+def report_adjudicated(a, b, ids):
+    final = json.loads(ADJUDICATED.read_text(encoding="utf-8"))
+    expected_hash = hashlib.sha256(LABELS.read_bytes()).hexdigest()
+    if final["independent_labels"]["sha256"] != expected_hash:
+        raise SystemExit("Adjudicated file does not point at the current independent labels")
+    labels = final["labels"]
+    if sorted(labels) != ids:
+        raise SystemExit("Adjudicated file must label exactly the same cases")
+    decided = {(d["case"], d["question"]) for d in final["decisions"]}
+    print(f"\nAfter adjudication ({final['adjudicated_on']}):")
+    for question in COLUMNS:
+        for i in ids:
+            shared = a[i][question] == b[i][question]
+            if shared and labels[i][question] != a[i][question]:
+                raise SystemExit(f"{i} {question}: final label differs from both raters")
+            if not shared and (i, question) not in decided:
+                raise SystemExit(f"{i} {question}: disagreement without a recorded decision")
+        final_labels = [labels[i][question] for i in ids]
+        not_yes = [i for i in ids if labels[i][question] != "Yes"]
+        print(f"  {question}: {dict(Counter(final_labels))}; not 'Yes': {', '.join(not_yes) or 'none'}")
+    for d in final["decisions"]:
+        print(f"  decided {d['case']} {d['question']}: A {d['rater_A']}, B {d['rater_B']} -> {d['final']}")
 
 
 if __name__ == "__main__":

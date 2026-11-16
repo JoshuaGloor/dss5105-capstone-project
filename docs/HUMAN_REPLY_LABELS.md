@@ -29,8 +29,9 @@ Each rater answered two questions per reply, Yes / No / Unsure:
 | File | What it holds |
 |---|---|
 | `examples/human_reply_labels_v1.json` | Both raters' labels and notes before adjudication, the run's artifact hashes and the SHA-256 of each returned sheet |
+| `examples/human_reply_labels_adjudicated_v1.json` | Final labels after adjudication, each decision with both raters' labels and the reason, and the SHA-256 of the independent labels file |
 | `examples/rater_sheets/reply/` | The two returned sheets, byte for byte |
-| `scripts/reply_label_agreement.py` | Recomputes every figure below from the JSON with no extra packages; `--sheets` also checks the sheets against their hashes (needs openpyxl) |
+| `scripts/reply_label_agreement.py` | Recomputes every figure below from the two JSON files with no extra packages, and checks that every disagreement has a recorded decision; `--sheets` also checks the sheets against their hashes (needs openpyxl) |
 
 ## Agreement (before adjudication)
 
@@ -50,6 +51,20 @@ Kappa is low although raw agreement is high because almost every label is "Yes":
 rater A marking all 30 explanations faithful, chance agreement equals observed agreement
 and kappa is 0. Read the raw agreement and the disagreement list, not kappa alone.
 
+## After adjudication
+
+The team decided the three disagreements on 16 November 2026, after both sheets had been
+returned and compared. Every other label is the label both raters gave.
+
+| Case | Question | Rater A | Rater B | Final | Reason |
+|---|---|---|---|---|---|
+| R01 | Decision | Unsure | Yes | Yes | Asking for the order ID and the quantity is acceptable under the current clarification policy, which is still open |
+| R29 | Decision | Unsure | Yes | Yes | Same as R01; the "delivery deadline" wording is a separate known wording failure, not a decision error |
+| R10 | Explanation | Yes | No | Yes | The reply text matches the tool output; the wrong question is already counted as a decision error, so it is not counted twice |
+
+Final labels: **decision correct 29/30** (R10 wrong) and **explanation faithful 30/30**.
+The agreement figures above are from before adjudication and do not change.
+
 ## What the labels show
 
 - **R10 is the only reply either rater judged wrong.** Both marked the decision wrong
@@ -58,7 +73,8 @@ and kappa is 0. Read the raw agreement and the disagreement list, not kappa alon
   check in `docs/SPRINT3_LIVE_EVALUATION.md`.
 - **R01 and R29: rater A unsure.** Rater A noted that the order ID should be enough to
   identify the order, i.e. once the order is known, the record could supply what else is
-  asked. Rater B judged both correct. This is a policy question, not a clear error.
+  asked. Rater B judged both correct. This is a policy question, not a clear error; the
+  team recorded both as Yes (see "After adjudication").
 - **The raters did not flag the wording issues found by reading the replies**, for
   example the shared "Agree a deadline or split plan" headline on R23 when the deadline is
   safe, or the "delivery deadline" question on R29 when the message gives a ship date. A
@@ -69,7 +85,8 @@ and kappa is 0. Read the raw agreement and the disagreement list, not kappa alon
 - Two raters from the team, one run, first replies only, inbox (development) set only.
 - Decisions were judged against the data shown, not against a written policy, so the
   raters could differ on policy cases (R01, R29).
-- Adjudicated labels are not yet recorded; this file holds the independent labels only.
+- R01 and R29 were decided by the team, not by an outside adjudicator, and the clarification
+  policy behind them is still open.
 
 ## Reproduce
 
