@@ -1,0 +1,455 @@
+{
+  "version": "sprint3-reply-labels-v1",
+  "scope": "decision_and_explanation_of_first_reply",
+  "status": "independent_before_adjudication",
+  "run": {
+    "directory": "results/sprint3-live-01f2524/supplied",
+    "source_commit": "01f2524f7f0198886bb5c4d99499845eacc90f5a",
+    "manifest_sha256": "fea7a7b77db90315a1486190256bcd7d55a4e0c983d7074a9795c25c6c89ccff",
+    "summary_sha256": "399720ef03c9c67fda5a3719b920a3a005dfcb711df58490bc254f1dc609d082",
+    "source_snapshot_sha256": "433c47d9e10c3733f48df0d87e33633455eefb8518755974da8b80d3aeb76a84"
+  },
+  "questions": {
+    "decision": "Given the request and the data, is the desk's state and the workshop or action it offers what a careful dispatcher should do? (Yes / No / Unsure)",
+    "explanation": "Does everything the desk shows (reply message, reasons, options, exclusions) agree with the tool output and the request? (Yes / No / Unsure)"
+  },
+  "protocol": "Blind sheet built from the saved replies with rubric results, request kinds and categories removed. Each rater labelled alone; sheets were returned before any comparison. Both raters are team members who had seen the system.",
+  "raters": {
+    "A": {
+      "name": "Sridhar Niyanthri Rajeswari",
+      "sheet": "examples/rater_sheets/reply/rater_niyanthri_replies.xlsx",
+      "sheet_sha256": "e7d4273006bd2d84b4751a82663274a00add81346aba872b9802d6151dc0320d",
+      "finished": "2026-11-15",
+      "labels": {
+        "R01": {
+          "decision": "Unsure",
+          "decision_note": "Order ID is more than enough to identify the order.",
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R02": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R03": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R04": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R05": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R06": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R07": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R08": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R09": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R10": {
+          "decision": "No",
+          "decision_note": "Ask for more details rather than Order ID. Since it mentions 'new rush', it is known that there is no exixting order.",
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R11": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R12": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R13": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R14": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R15": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R16": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R17": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R18": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R19": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R20": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R21": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R22": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R23": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R24": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R25": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R26": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R27": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R28": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R29": {
+          "decision": "Unsure",
+          "decision_note": "Oredr ID should be enough to identify the order.",
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R30": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        }
+      }
+    },
+    "B": {
+      "name": "Sundara Rajan Saadhvika",
+      "sheet": "examples/rater_sheets/reply/rater_saadhvika_replies.xlsx",
+      "sheet_sha256": "99d5e5bf60004f3863ab21ac977f79f5aece1b0d928aa34a68531787aaf543a8",
+      "finished": "2026-11-15",
+      "labels": {
+        "R01": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R02": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R03": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R04": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R05": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R06": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R07": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R08": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R09": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R10": {
+          "decision": "No",
+          "decision_note": "The request is a new order, So only ask for product, quantity and date. Don't ask for an existing Order-ID",
+          "explanation": "No",
+          "explanation_note": "Asks for which existing order when it's a new order",
+          "notes": null
+        },
+        "R11": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R12": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R13": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R14": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R15": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R16": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R17": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R18": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R19": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R20": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R21": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R22": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R23": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R24": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R25": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R26": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R27": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R28": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R29": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        },
+        "R30": {
+          "decision": "Yes",
+          "decision_note": null,
+          "explanation": "Yes",
+          "explanation_note": null,
+          "notes": null
+        }
+      }
+    }
+  }
+}
