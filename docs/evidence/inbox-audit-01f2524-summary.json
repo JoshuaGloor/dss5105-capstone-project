@@ -1,0 +1,1377 @@
+{
+  "attempted": 30,
+  "behavior_acceptance": {
+    "R01": {
+      "expected": "Ask for order ID and quantity together",
+      "outcome": "PASS"
+    },
+    "R10": {
+      "expected": "Ask for product, quantity and delivery date without requesting an order ID. Verify the no-reservation disclosure manually.",
+      "outcome": "FAIL"
+    },
+    "R23": {
+      "expected": "Use unrounded estimates and suggest a split only if strictly faster",
+      "outcome": "PASS"
+    }
+  },
+  "execution_outcomes": {
+    "completed": 30
+  },
+  "human_request_kinds": {
+    "by_kind": {
+      "ambiguous": {
+        "attempted": 5,
+        "case_ids": [
+          "R01",
+          "R03",
+          "R15",
+          "R19",
+          "R29"
+        ],
+        "completed": 5,
+        "planned": 5
+      },
+      "complete_impossible": {
+        "attempted": 3,
+        "case_ids": [
+          "R20",
+          "R28",
+          "R30"
+        ],
+        "completed": 3,
+        "planned": 3
+      },
+      "complete_meetable": {
+        "attempted": 7,
+        "case_ids": [
+          "R04",
+          "R06",
+          "R07",
+          "R16",
+          "R17",
+          "R22",
+          "R26"
+        ],
+        "completed": 7,
+        "planned": 7
+      },
+      "constraint": {
+        "attempted": 6,
+        "case_ids": [
+          "R09",
+          "R12",
+          "R21",
+          "R23",
+          "R25",
+          "R27"
+        ],
+        "completed": 6,
+        "planned": 6
+      },
+      "ineligible_suggestion": {
+        "attempted": 4,
+        "case_ids": [
+          "R08",
+          "R11",
+          "R14",
+          "R24"
+        ],
+        "completed": 4,
+        "planned": 4
+      },
+      "missing_number_or_date": {
+        "attempted": 2,
+        "case_ids": [
+          "R05",
+          "R10"
+        ],
+        "completed": 2,
+        "planned": 2
+      },
+      "unanswerable": {
+        "attempted": 3,
+        "case_ids": [
+          "R02",
+          "R13",
+          "R18"
+        ],
+        "completed": 3,
+        "planned": 3
+      }
+    },
+    "scope": "request_kind_only",
+    "sha256": "51a1c810a12d82f103ced3de978ab31558a4174023d1a22f79b6172ac2bc574c",
+    "version": "data-v3-human-kind-v1"
+  },
+  "limitations": [
+    "Provisional diagnostics are not independent gold accuracy.",
+    "Integrity audits are partial and do not establish rendered explanation faithfulness.",
+    "Unresolved cases have no inferred approved subfields."
+  ],
+  "metrics": [
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "constraint_application",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 2,
+        "evaluable_assertions": 2,
+        "value": 1.0
+      },
+      "denominator": 2,
+      "metric": "constraint_application",
+      "numerator": 2,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 19,
+        "NOT_SCORABLE": 0,
+        "PASS": 2,
+        "UNRESOLVED_POLICY": 9
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "constraint_application",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "constraint_application_evidence",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "constraint_application_evidence",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "constraint_application_evidence",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "deferred_needs_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 21,
+        "evaluable_assertions": 21,
+        "value": 1.0
+      },
+      "denominator": 21,
+      "metric": "deferred_needs_correctness",
+      "numerator": 21,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 21,
+        "UNRESOLVED_POLICY": 9
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "deferred_needs_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "deferred_needs_invariant",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "deferred_needs_invariant",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 30,
+        "evaluable_assertions": 30,
+        "value": 1.0
+      },
+      "denominator": 30,
+      "metric": "deferred_needs_invariant",
+      "numerator": 30,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 30,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "duplicate_standard_clarification_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "duplicate_standard_clarification_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 7,
+        "evaluable_assertions": 7,
+        "value": 1.0
+      },
+      "denominator": 7,
+      "metric": "duplicate_standard_clarification_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 23,
+        "NOT_SCORABLE": 0,
+        "PASS": 7,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": 0.0
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "exclusion_exactness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 21,
+        "evaluable_assertions": 21,
+        "value": 1.0
+      },
+      "denominator": 21,
+      "metric": "exclusion_exactness",
+      "numerator": 21,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 21,
+        "UNRESOLVED_POLICY": 9
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "exclusion_exactness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "exclusion_recall",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 2,
+        "evaluable_assertions": 2,
+        "value": 1.0
+      },
+      "denominator": 2,
+      "metric": "exclusion_recall",
+      "numerator": 2,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 19,
+        "NOT_SCORABLE": 0,
+        "PASS": 2,
+        "UNRESOLVED_POLICY": 9
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "exclusion_recall",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "forbidden_field_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 124,
+        "eligible_assertions": 85,
+        "evaluable_assertions": 85,
+        "value": 1.0
+      },
+      "denominator": 85,
+      "metric": "forbidden_field_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 85,
+        "UNRESOLVED_POLICY": 39
+      },
+      "value": 0.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "forbidden_field_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "forbidden_flags_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 78,
+        "eligible_assertions": 50,
+        "evaluable_assertions": 50,
+        "value": 1.0
+      },
+      "denominator": 50,
+      "metric": "forbidden_flags_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 11,
+        "NOT_SCORABLE": 0,
+        "PASS": 50,
+        "UNRESOLVED_POLICY": 17
+      },
+      "value": 0.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "forbidden_flags_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "forbidden_needs_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 122,
+        "eligible_assertions": 100,
+        "evaluable_assertions": 100,
+        "value": 1.0
+      },
+      "denominator": 100,
+      "metric": "forbidden_needs_violation_rate",
+      "numerator": 2,
+      "outcome_counts": {
+        "FAIL": 2,
+        "NOT_APPLICABLE": 1,
+        "NOT_SCORABLE": 0,
+        "PASS": 98,
+        "UNRESOLVED_POLICY": 21
+      },
+      "value": 0.02
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "forbidden_needs_violation_rate",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "operational_completion",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "operational_completion",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 30,
+        "evaluable_assertions": 30,
+        "value": 1.0
+      },
+      "denominator": 30,
+      "metric": "operational_completion",
+      "numerator": 30,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 30,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "request_exact_match",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 21,
+        "evaluable_assertions": 21,
+        "value": 1.0
+      },
+      "denominator": 21,
+      "metric": "request_exact_match",
+      "numerator": 20,
+      "outcome_counts": {
+        "FAIL": 1,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 20,
+        "UNRESOLVED_POLICY": 9
+      },
+      "value": 0.9523809523809523
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "request_exact_match",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "request_field_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 139,
+        "eligible_assertions": 98,
+        "evaluable_assertions": 98,
+        "value": 1.0
+      },
+      "denominator": 98,
+      "metric": "request_field_correctness",
+      "numerator": 97,
+      "outcome_counts": {
+        "FAIL": 1,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 97,
+        "UNRESOLVED_POLICY": 41
+      },
+      "value": 0.9897959183673469
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "request_field_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "required_flags_recall",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 35,
+        "eligible_assertions": 12,
+        "evaluable_assertions": 12,
+        "value": 1.0
+      },
+      "denominator": 12,
+      "metric": "required_flags_recall",
+      "numerator": 12,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 14,
+        "NOT_SCORABLE": 0,
+        "PASS": 12,
+        "UNRESOLVED_POLICY": 9
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "required_flags_recall",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "required_needs_recall",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 31,
+        "eligible_assertions": 1,
+        "evaluable_assertions": 1,
+        "value": 1.0
+      },
+      "denominator": 1,
+      "metric": "required_needs_recall",
+      "numerator": 1,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 20,
+        "NOT_SCORABLE": 0,
+        "PASS": 1,
+        "UNRESOLVED_POLICY": 10
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "required_needs_recall",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "resolved_field_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 130,
+        "eligible_assertions": 103,
+        "evaluable_assertions": 103,
+        "value": 1.0
+      },
+      "denominator": 103,
+      "metric": "resolved_field_correctness",
+      "numerator": 103,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 3,
+        "NOT_SCORABLE": 0,
+        "PASS": 103,
+        "UNRESOLVED_POLICY": 24
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "resolved_field_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "status_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 21,
+        "evaluable_assertions": 21,
+        "value": 1.0
+      },
+      "denominator": 21,
+      "metric": "status_correctness",
+      "numerator": 21,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 21,
+        "UNRESOLVED_POLICY": 9
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "status_correctness",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_candidate_integrity",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_candidate_integrity",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 1012,
+        "eligible_assertions": 1012,
+        "evaluable_assertions": 1012,
+        "value": 1.0
+      },
+      "denominator": 1012,
+      "metric": "tool_candidate_integrity",
+      "numerator": 1012,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 1012,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_integrity",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_integrity",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 30,
+        "eligible_assertions": 30,
+        "evaluable_assertions": 30,
+        "value": 1.0
+      },
+      "denominator": 30,
+      "metric": "tool_integrity",
+      "numerator": 30,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 30,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": 1.0
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_integrity_evidence",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_integrity_evidence",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_integrity_evidence",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "adjudicated",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_split_integrity",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "provisional",
+      "coverage": {
+        "declared_checks": 0,
+        "eligible_assertions": 0,
+        "evaluable_assertions": 0,
+        "value": null
+      },
+      "denominator": 0,
+      "metric": "tool_split_integrity",
+      "numerator": 0,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 0,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": null
+    },
+    {
+      "annotation_basis": "integrity_audit",
+      "coverage": {
+        "declared_checks": 75,
+        "eligible_assertions": 75,
+        "evaluable_assertions": 75,
+        "value": 1.0
+      },
+      "denominator": 75,
+      "metric": "tool_split_integrity",
+      "numerator": 75,
+      "outcome_counts": {
+        "FAIL": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_SCORABLE": 0,
+        "PASS": 75,
+        "UNRESOLVED_POLICY": 0
+      },
+      "value": 1.0
+    }
+  ],
+  "planned": 30,
+  "schema_version": "reliability-score-v1",
+  "source_type": "recorded_model_run",
+  "unattempted_ids": []
+}
