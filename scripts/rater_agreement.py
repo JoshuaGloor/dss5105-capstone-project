@@ -14,7 +14,7 @@ readers are not project dependencies):
         python scripts/rater_agreement.py --sheets examples/rater_sheets/rater_blank2.xlsx \
         examples/rater_sheets/human_labelled_cases.numbers
 
-`shasum -a 256 examples/rater_sheets/*` must also match the recorded hashes.
+`shasum -a 256` of those two sheets must also match the recorded hashes.
 
 Labels are lower-cased, spaces become underscores, and the one typo ("complete_meltable")
 is mapped to complete_meetable before comparison; the export keeps the raw labels too.

@@ -3,7 +3,8 @@
 Human labelling of the supplied inbox (`track2/data/dispatch_requests.txt`, R01-R30).
 Scope is **request kind only**: each request is tagged with one of the data dictionary's
 seven kinds. These are not gold answers. Expected fields, replies, recommended workshops
-and explanations have no independent human labels.
+and explanations have no independent human labels here; the two raters' judgements of the
+30 inbox replies (decision and explanation) are in [HUMAN_REPLY_LABELS.md](HUMAN_REPLY_LABELS.md).
 
 ## Files
 
@@ -11,7 +12,7 @@ and explanations have no independent human labels.
 |---|---|
 | `examples/human_rater_labels_v1.json` | Both raters' independent labels before adjudication, raw and normalised, with the SHA-256 of each source sheet |
 | `examples/human_request_kinds_v1.json` | Adjudicated kinds (approved 2026-11-08), the inbox hash and the same sheet hashes. Used by `tests/test_evaluate_chat.py` and `dss5105.reliability_score --kind-labels` |
-| `examples/rater_sheets/` | The two original rater sheets, committed byte for byte so their hashes match, plus a CSV copy of each for easier viewing |
+| `examples/rater_sheets/` | The two original request-kind sheets, committed byte for byte so their hashes match, plus a CSV copy of each for easier viewing. The `reply/` subfolder holds the reply-label sheets ([HUMAN_REPLY_LABELS.md](HUMAN_REPLY_LABELS.md)) |
 | `scripts/rater_agreement.py` | Recomputes every agreement figure below from the two JSON files and `examples/chat_rubric.json` |
 
 ## How the labels were made
@@ -64,7 +65,7 @@ confusion matrix as JSON.
 
 ## The original sheets
 
-The rater sheets are committed unchanged in `examples/rater_sheets/`. They hold the inbox
+The request-kind sheets are committed unchanged in `examples/rater_sheets/`. They hold the inbox
 columns (request_id, time, requester, text) plus each rater's `kind` column:
 
 | Rater | File | SHA-256 |

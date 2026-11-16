@@ -17,7 +17,7 @@ Measured results do not cover every part of the system: see the caveats below.
 | Report shock averaged over ten seeds | Data v3 runs and paired normal controls complete; see [V3_EVALUATION.md](V3_EVALUATION.md) |
 | Beat all three baselines on the primary objective and report where baselines win | Met on the course seeds by every frozen preset, normal and shock ([OBJECTIVE_STUDY.md](OBJECTIVE_STUDY.md)); baseline and earliest-finish wins reported in the final report |
 | Compare with a short heuristic and explain the system's added value | Allocator measured in [MARGIN_STUDY.md](MARGIN_STUDY.md) and the objective study: the hybrid beats earliest finish on late days, defects and cost but not on the shock late rate; language-layer value still to be measured |
-| Evaluate all 30 supplied chat requests by behavior | Sprint 3 live run done ([SPRINT3_LIVE_EVALUATION.md](SPRINT3_LIVE_EVALUATION.md)): 30/30 rubric agreement by behavior. This scores the evaluated setup (bare lateness weights), not the shipped hybrid default; an offline replay keeps every state and flag but changes 38 of 95 recommended workshops, which are unscored (`evidence/preset-replay-01f2524.json`). Expected answers remain provisional: the inbox rubric is a team draft, and human labels cover request kinds only |
+| Evaluate all 30 supplied chat requests by behavior | Sprint 3 live run done ([SPRINT3_LIVE_EVALUATION.md](SPRINT3_LIVE_EVALUATION.md)): 30/30 rubric agreement by behavior. This scores the evaluated setup (bare lateness weights), not the shipped hybrid default; an offline replay keeps every state and flag but changes 38 of 95 recommended workshops, which are unscored (`evidence/preset-replay-01f2524.json`). Expected answers remain provisional: the inbox rubric is a team draft, and human labels cover request kinds and one decision and one explanation judgement per reply ([HUMAN_REPLY_LABELS.md](HUMAN_REPLY_LABELS.md)) |
 | Judge decisions and explanation faithfulness separately | Behavior and tool-field integrity checked separately (2,698 displayed fields, 0 errors). Explanation wording is not systematically scored; the final report lists known explanation failures. Full explanation/UX review still pending |
 | Explain metrics, evaluation-set construction, per-category results, and limitations | Final evaluation report written (submitted as Evaluation.pdf). The inbox field-level audit still leaves 9 cases unscored pending policy decisions |
 | Analyze at least 10 failure cases individually | 18 analysed in the final report (F1-F18), 10 open, none fabricated; sources are saved runs, human checks, the field-level audit and the default-preset replay |
@@ -185,7 +185,7 @@ pairwise Cohen's kappa or an appropriate multi-rater measure such as Fleiss' kap
 if more raters participate. Define how multi-label behaviors are encoded before
 calculating agreement.
 
-Measured for request kinds only: two team members labelled R01-R30 independently,
+Measured for request kinds: two team members labelled R01-R30 independently,
 without having seen the draft rubric, and agreed on 23 of 30 before adjudication
 (Cohen's kappa 0.71). Disagreements were discussed only after both sheets were saved. This describes agreement
 between these two raters on request kinds; it is not a gold answer set and not a general
@@ -194,7 +194,15 @@ measure of labelling reliability. Both raters' labels are in
 recomputes every figure offline. The original sheets are committed unchanged in
 `examples/rater_sheets/`; their SHA-256 hashes are recorded in that file and in
 `examples/human_request_kinds_v1.json`.
-Expected fields, replies and explanations still have no independent human labels. Details: [HUMAN_LABELS.md](HUMAN_LABELS.md).
+Details: [HUMAN_LABELS.md](HUMAN_LABELS.md).
+
+Measured for inbox replies: the same two team members independently judged the 30 saved
+first replies of the Sprint 3 run, Yes / No / Unsure, on two questions. Decision correct:
+28/30 agree (Cohen's kappa 0.48; disagreements R01 and R29, rater A unsure, rater B yes).
+Explanation faithful: 29/30 agree (kappa 0.00, because almost every label is Yes;
+disagreement R10). Both raters judged R10's decision wrong. These are before adjudication,
+and R01 and R29 await a team decision. Expected fields and item-level reply wording still
+have no independent human labels. Details: [HUMAN_REPLY_LABELS.md](HUMAN_REPLY_LABELS.md).
 
 Additional held-out requests exist as generated splits ([EVAL_SETS.md](EVAL_SETS.md)):
 `test` (35) and `test_extra` (30, never run before the Sprint 3 run). Their labels come

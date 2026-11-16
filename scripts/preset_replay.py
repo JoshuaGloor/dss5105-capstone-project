@@ -7,7 +7,7 @@ model-extracted input back into DispatchDesk.preview under both, checks the bare
 reproduces the saved live preview, and lists every case where the hybrid picks a different
 workshop. The model's extraction is held fixed: this is a tool replay, not a new live run.
 
-The raw run directory is kept outside version control (team archive results.zip). Before
+The raw run directory (results/sprint3-live-01f2524) is kept outside version control. Before
 replaying, the script checks each split's manifest.json, summary.json and
 source_snapshot.json against the hashes in the committed evidence file, and it records the
 SHA-256 of every case file it reads. The committed result is
