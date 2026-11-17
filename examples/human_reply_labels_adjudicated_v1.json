@@ -1,0 +1,166 @@
+{
+  "version": "sprint3-reply-labels-adjudicated-v1",
+  "scope": "decision_and_explanation_of_first_reply",
+  "status": "adjudicated",
+  "adjudicated_on": "2026-11-16",
+  "adjudication": "Decided by the team in the group chat after both independent sheets were returned and compared. Only the three disagreements needed a decision; every other label is the raters' shared label.",
+  "independent_labels": {
+    "file": "examples/human_reply_labels_v1.json",
+    "sha256": "0ff88e3f1a9664b1de83d01f7f3b4315435847ede06ed7cdf1ac9d446735b96b"
+  },
+  "run": {
+    "directory": "results/sprint3-live-01f2524/supplied",
+    "source_commit": "01f2524f7f0198886bb5c4d99499845eacc90f5a",
+    "manifest_sha256": "fea7a7b77db90315a1486190256bcd7d55a4e0c983d7074a9795c25c6c89ccff",
+    "summary_sha256": "399720ef03c9c67fda5a3719b920a3a005dfcb711df58490bc254f1dc609d082",
+    "source_snapshot_sha256": "433c47d9e10c3733f48df0d87e33633455eefb8518755974da8b80d3aeb76a84"
+  },
+  "decisions": [
+    {
+      "case": "R01",
+      "question": "decision",
+      "rater_A": "Unsure",
+      "rater_B": "Yes",
+      "final": "Yes",
+      "reason": "Rater A Unsure (order ID alone should identify the order), rater B Yes. Recorded Yes: asking for the order ID and the quantity is acceptable under the current clarification policy, which is still open (unresolved policy case in the field-level audit)."
+    },
+    {
+      "case": "R10",
+      "question": "explanation",
+      "rater_A": "Yes",
+      "rater_B": "No",
+      "final": "Yes",
+      "reason": "Rater A Yes, rater B No (asks about an existing order when the request is a new order). Recorded Yes: the reply text matches the tool output; the wrong question is already counted as a decision error (both raters No), so it is not counted twice."
+    },
+    {
+      "case": "R29",
+      "question": "decision",
+      "rater_A": "Unsure",
+      "rater_B": "Yes",
+      "final": "Yes",
+      "reason": "Rater A Unsure (order ID alone should identify the order), rater B Yes. Recorded Yes on the same grounds as R01; the clarification policy is still open. The 'delivery deadline' wording is a separate known failure (F16), not a decision error."
+    }
+  ],
+  "labels": {
+    "R01": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R02": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R03": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R04": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R05": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R06": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R07": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R08": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R09": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R10": {
+      "decision": "No",
+      "explanation": "Yes"
+    },
+    "R11": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R12": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R13": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R14": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R15": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R16": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R17": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R18": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R19": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R20": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R21": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R22": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R23": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R24": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R25": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R26": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R27": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R28": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R29": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    },
+    "R30": {
+      "decision": "Yes",
+      "explanation": "Yes"
+    }
+  }
+}
