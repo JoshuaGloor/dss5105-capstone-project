@@ -1,353 +1,96 @@
 # DSS5105 Capstone Project: Group 11
 
-Track 2: the Quick-Response Subcontracting Desk. The first working increment is
-an offline, configurable allocator evaluated with the course's shared simulator.
-The Streamlit prototype adds natural-language intake and structured dispatch previews.
-Course sources: Spec v5, Tracks v4 and Data v3. See [the update review](docs/V3_REFINEMENT.md)
-and [refreshed evaluation evidence](docs/V3_EVALUATION.md).
+Track 2: the Quick-Response Subcontracting Desk. A dispatcher describes a job in plain language, and the app turns it into a structured request, picks a workshop and shows its reasoning. The model never does the arithmetic. Every number on screen comes from a Python tool.
 
-## Quickstart
+What the system optimises for is a set of numbers rather than a code path. One scorer takes five weights (lateness, defects, fairness, robustness, cost), a safety buffer and two lateness settings. A preset is one filled-in set of those.
+
+## Requirements
+
+- **[uv](https://docs.astral.sh/uv/getting-started/installation/)**, the Python package and project manager.
+- **Python 3.12**, pinned in `.python-version`. `uv sync` installs it for you.
+- **git**
+- **Chrome, Edge or Safari** if you want to talk to the assistant instead of typing. It uses the browser's own speech recognition, and the microphone needs either `localhost` or HTTPS. Running it as below gives you `localhost`.
+- **An OpenAI API key**, or an Anthropic one. The Assistant and the Desk call the provider whenever you hand them a request of your own. The supplied examples, the allocation experiments and the tests all run without one.
+- **Docker or Podman**, only if you want the container route below.
+
+## Setup
 
 ```bash
-git clone git@github.com:JoshuaGloor/dss5105-capstone-project.git
+git clone https://github.com/JoshuaGloor/dss5105-capstone-project.git
 cd dss5105-capstone-project
-uv sync --all-groups         # installs everything into .venv
-uv run pre-commit install    # sets up the commit-time checks
-uv run pytest                # see current tests pass
+uv sync --locked --all-groups  # installs the right Python and every dependency into .venv
+uv run pytest                  # confirms the install works
 ```
 
-As suggested by the course, we run and manage everything using `uv`.
-No API key is needed for tests, allocation experiments, or the prototype. Set up
-`.env` only when deliberately running a provider-backed feature or live test.
+Now add your key. Without one you only get the supplied examples:
 
-## The app: voice assistant, desk, objective lab and memory
+```bash
+cp .env.example .env
+```
+
+Set `LLM_MODEL=openai:gpt-5.6` and your own `OPENAI_API_KEY`. We ran the demos and every recorded evaluation on that model, so stay on it if you want your numbers to line up with ours. For Anthropic, `anthropic:claude-opus-4-8` works, with `ANTHROPIC_API_KEY` instead. A model that has extended thinking on by default does not. You only need the key for whichever provider you name.
+
+That is all you need to run things.
+
+## Run it locally
+
+### The app
 
 ```bash
 sh scripts/run_app.sh
 ```
 
-Open `http://localhost:8501` in Chrome. The top bar has four pages:
+Open <http://localhost:8501>. Five pages across the top:
 
-- **Assistant** (opens first): the dispatcher's phone. Hold the microphone and say what
-  needs to go out ("ORD-109, 500 vests for Harbor Knits, due April 13, keep it away from
-  BudgetWorks"), or type. The answer arrives as a card and is read aloud; both are
-  written by Python from tool output. "Book it" opens a confirmation sheet, and a slide
-  with your name saves the booking. Constraints from a confirmed booking can be
-  remembered as standing rules for that customer. See [VOICE_ASSISTANT.md](docs/VOICE_ASSISTANT.md).
-- **Desk**: the desktop dispatch desk described below.
-- **Workshops**: the workshop register, delivery checks for a batch and date, and what
-  extra work would do to a workshop's estimate. Read-only.
-- **Objective lab**: sliders for all four course objectives (lateness, defects,
-  fairness, robustness) plus cost, buffer and capacity reservation. Each change replays
-  the course simulator on the ten course seeds, normal and with the closure.
-- **Memory**: standing rules (pause or resume), the booking ledger, the conversation log,
-  the profile, and a non-destructive "start a fresh demo plan".
+| Page | What it does |
+|---|---|
+| **Assistant** (opens first) | The dispatcher's phone. Hold the microphone and say what needs to go out, or type it. The answer is a card, read aloud, both written by Python from tool output. "Book it" confirms and saves the booking |
+| **Desk** | The same job on a desktop: type or paste a group-chat message, or run an example offline. Objective presets and weight sliders, candidate comparison, exclusion reasons, evidence export |
+| **Workshops** | Read-only. The workshop register, delivery checks against a given date, and what extra work would do to an estimate. Never reserves capacity |
+| **Objective lab** | Sliders for the four course objectives, cost and a safety buffer, plus two lateness toggles. Every change replays the course simulator over the ten course seeds, normal and with the closure |
+| **Memory** | Standing rules, the booking ledger, the conversation log, the profile, and a non-destructive "start a fresh demo plan" |
 
-Voice uses the browser's speech recognition (Chrome, Edge or Safari on localhost). The
-assistant and the desk's saved plan share `runtime/dispatch.sqlite3`; memory lives in
-`runtime/memory.sqlite3`. Both are Git-ignored. Without a configured model the assistant
-still answers the course inbox examples from their reviewed interpretations.
+The pages are documented in more detail under [docs/](https://github.com/JoshuaGloor/dss5105-capstone-project/tree/main/docs).
 
-### The desk
+The Desk works in two modes. **Preview only**, the default, scores every request against the untouched course snapshot, so one request never affects the next. **Saved local plan** keeps a running plan instead: confirming a recommendation, which takes a dispatcher's name, writes it to a local file, and later requests see the capacity it used up.
+Switch between the two in the **Objective** panel at the top of the Desk, under "Where do saved allocations go?", which is also where the presets live. [The record contract](https://github.com/JoshuaGloor/dss5105-capstone-project/blob/main/docs/ALLOCATION_RECORD_CONTRACT.md) says what a saved plan can and cannot do.
 
-The desk is the chat-first desktop view: one request and its answer at a time, objective
-presets and custom weight sliders for the four objectives in the **Objective** panel,
-candidate comparison, exclusion reasons, evidence export, and confirmation. Supplied
-examples need no API key. **Preview only** keeps the course snapshot unchanged.
-Choose **Saved local plan**, review an on-time recommendation, enter the confirming
-dispatcher's name, and confirm to persist a record and update local planning queues. Saved records survive restarts and can be exported.
-They live in Git-ignored `runtime/dispatch.sqlite3`; no workshop is contacted.
-See [the record contract](docs/ALLOCATION_RECORD_CONTRACT.md) for queue semantics,
-duplicate/stale-preview protection, and local-prototype limitations.
-The desk opens on **Start here**: type or paste a group-chat message and answer
-clarification questions using the configured model, or click an example scenario or any
-message in the **Examples** list to run it offline. The page shows one request and its
-answer at a time, a card built by Python from tool output. Answer buttons for ambiguous
-orders and refused workshops apply the choice without another model call.
-Provider calls happen only on send/retry. Examples need no model and no API key. See [the language guide](docs/NATURAL_LANGUAGE.md).
-The launcher keeps caches/temp files in this project and does not open a browser.
-The default port is fixed at 8501. Saved Python, CSS, data and example-input changes
-automatically rerun the open page; no model call or allocation is triggered by a rerun.
-See [the web app guide](docs/STREAMLIT_APP.md) for examples, tests, and limitations.
+### In a container
 
-Open **Workshops** to inspect the workshop register,
-check a batch against an explicit delivery date, and compare delivery before and
-after additional work. Checks use the selected workspace's queues and never reserve
-capacity. Free-text capacity questions ("who can take 1,500 crewnecks by April 15?")
-are answered in the assistant and the desk chat with the same estimates.
-
-The [first real-model evaluation](docs/CHAT_EVALUATION_RESULTS.md) covers the old inbox
-and is historical evidence only. Data v3 fixture replay is refreshed; a new live
-language run on the corrected inbox is still required.
-See [the evaluation command](docs/CHAT_EVALUATION.md) to reproduce a paid run;
-default tests remain offline. Its draft-check results are not held-out accuracy.
-
-## Portable HTML prototype and CLI
+Slower, since it builds the image, but this is what the server runs:
 
 ```bash
-uv run python -m dss5105.dispatch --request R12 --preset lateness
-uv run python -m dss5105.prototype
+cd infra
+docker compose up --build  # podman compose works the same
 ```
 
-Open [the HTML prototype](docs/prototype/index.html) directly in a browser. It
-compares Python-generated previews, explains exclusions, and exports evidence.
-The web interface uses **Streamlit**; this HTML remains a standalone design reference.
-No Streamlit installation is needed to open the HTML.
-Its request interpretations are hand-authored development fixtures, not a working
-language agent. Confirmation demonstrates the UI only; it saves no allocation.
+Open <http://localhost:8080> rather than 8501: Caddy sits in front, and `infra/compose.override.yaml` publishes `8080:80`. You will get a password prompt, because the same Caddyfile serves the public demo. The user is `demo_user`, and the password is `KopiCKosong`. Saving a file does nothing here, and the SQLite state goes to the `app_runtime` volume rather than your `runtime/` directory. The rest is in [DEPLOYMENT.md](https://github.com/JoshuaGloor/dss5105-capstone-project/blob/main/docs/DEPLOYMENT.md).
 
-See [PLAN.md](PLAN.md) for the staged build plan,
-[the dispatch run guide](docs/DISPATCH_PREVIEW.md) for input/state conventions, and
-[the Sprint 1 architecture](docs/sprint1-architecture.svg) for implemented vs planned
-components. The team's primary objective is **minimise lateness**, measured by
-late fraction and mean late days.
+### The allocator on its own
 
-Keep new artifacts, helper scripts, caches, and temporary files within the project.
-Prototype review does not require browser automation or an external browser profile;
-open the HTML directly in Chrome.
-
-## Allocation experiments (no API key needed)
-
-The Sprint 2 scorer adds capacity reservation, fairness and robustness terms. One
-command chooses a configuration per objective on development seeds and then reports it
-once on the course seeds:
+No API key needed for the below runs.
 
 ```bash
-uv run python -m dss5105.objective_study
-```
-
-The default `hybrid` preset (lateness first, then defects) beats all three baselines and
-the earliest-finish rule on late batches and late days, with fewer defective pieces and
-lower cost. The defects preset now beats all three baselines on `% def pcs`, and the
-fairness preset matches random's spread while staying on time. See
-[OBJECTIVE_STUDY.md](docs/OBJECTIVE_STUDY.md) for the protocol, every number, and where a
-baseline still wins.
-
-```bash
+# The three course baselines, a short earliest-finish heuristic, and the five
+# objective presets
 uv run python -m dss5105.evaluate --output results/allocation-normal.json
 uv run python -m dss5105.evaluate --shock --seeds 10 --output results/allocation-shock.json
-```
 
-These compare the course baselines, a short earliest-finish heuristic, and
-the five objective presets. Delivery arithmetic stays in Python;
-objectives are configuration. Eligibility uses the course helper, and the course
-simulator is left unchanged. See [the allocation guide](docs/ALLOCATION_ENGINE.md)
-for the score definition, assumptions, saved traces, and current limitations.
-
-The same entry point can run one preset or a custom mix without editing code:
-
-```bash
-uv run python -m dss5105.evaluate --preset defects
+# One preset, or a custom mix
+uv run python -m dss5105.evaluate --preset lateness
 uv run python -m dss5105.evaluate --lateness-weight 1 --defects-weight 0.05 --cost-weight 0.1
-uv run python -m dss5105.evaluate --lateness-weight 1 --fairness-weight 0.05 --capacity-reservation 1
 ```
 
-For an exploratory weight grid and additional random-seed checks, run
-`uv run python -m dss5105.tune`. This saves `results/weight-search.json` without
-changing the existing presets. See [WEIGHT_TUNING.md](docs/WEIGHT_TUNING.md) for
-the selection rules, observed tradeoffs, and limits of these development results.
+Each run prints its table. The first two also save JSON wherever `--output` points. Delivery arithmetic stays in Python, eligibility uses the course helper, and the course simulator is left unchanged.
 
-## Project documents
-
-Read [PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md) for course sources, scope, milestones,
-and implementation status. [DATA_FINDINGS.md](docs/DATA_FINDINGS.md) records source
-facts and reproducible experiment results;
-[TOOL_SPEC.md](docs/TOOL_SPEC.md) separates implemented interfaces from planned tools;
-[EVALUATION_PLAN.md](docs/EVALUATION_PLAN.md) distinguishes course requirements from
-our proposed methodology. Team proposals are not verified results or extra course
-requirements. [SPRINT1_REVIEW.md](docs/SPRINT1_REVIEW.md) ranks the open gaps before Sprint 2,
-and [DEFECTS_FRONTIER.md](docs/DEFECTS_FRONTIER.md) shows where a baseline still wins. The team has selected **minimise lateness** as its primary objective.
-
-When data or policies change, reproduce affected results with the documented runner
-and update their evidence. Do not treat the earlier, unretained probes as established
-findings. Finalize proposed tool contracts before implementing them. The scorer
-supports lateness, defects, fairness, robustness and cost weights, a deadline buffer
-and capacity reservation.
-
-## Deployment
-
-The app runs on AWS as two containers, the Streamlit app behind Caddy, on one
-EC2 instance that is stopped between demos. Merging to `main` builds an image;
-deploying is a manual **Deploy app** run in the Actions tab, and **Power**
-starts and stops the instance.
-
-See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for the day-to-day steps, the one-time
-setup, and teardown. Everything it describes lives in `infra/`.
-
-## Understanding the repo
-
-Below is a brief overview of the repo.
-
-In practice we spend our time in `notebooks/`, `src/`
-and `tests/`, and the rest quietly keeps everyone's setup in sync.
-
-| File | What it's for | When it comes up |
-|---|---|---|
-| `src/dss5105/` | Our actual code | This is where we build |
-| `tests/` | Tests for that code | Alongside the code we write |
-| `notebooks/` | Exploration and analysis | For exploration using notebooks |
-| `.env` (yours; don't commit) | Your own API key | Once, during setup |
-| `pyproject.toml` | Dependency list + tool settings | When we add a package |
-| `uv.lock` | The exact version of every package | Updates itself, we just commit it |
-| `.python-version` | The one Python we all run; `pyproject.toml` only sets a minimum | Static, never changes for this course |
-| `.env.example` | Template listing which keys exist | When a new env variable should be added |
-| `.gitignore` | What git deliberately ignores | Sometimes |
-| `CONTRIBUTING.md` | Step-by-step setup and how to contribute | Whenever helpful |
-| `AGENTS.md` | Same rules, written for AI coding agents | When an agent (or you) decides to modify this |
-| `CLAUDE.md` | One-line pointer to `AGENTS.md` | Never |
-| `.pre-commit-config.yaml` | Checks that run as we commit | Runs on its own, at commit time |
-| `.github/workflows/ci.yaml` | Checks that run on a pull request | Runs on its own, on every PR |
-
-### 1. The environment: `pyproject.toml`, `uv.lock`, `.python-version`
-
-These make sure we all have the same environment.
-`uv sync` makes `.venv` match `uv.lock`.
-
-**Adding a package:**
+### The tests
 
 ```bash
-uv add <package-name>
+uv run pytest
 ```
 
-This edits `pyproject.toml` *and* `uv.lock`. Commit both. If you forget the
-lock file, CI fails: it runs `uv sync --locked`, which refuses to run when the
-two have drifted apart.
+That is what CI runs too: free and offline. The `live` marker is there so tests that really call a provider can be opted into with `uv run pytest -m live`, but we only ever wrote one, a check that your key and `LLM_MODEL` work.
 
-### 2. The code: `src/`, `tests/`
+## Contributing
 
-`src/dss5105/` holds the package, `tests/` holds its tests.
-
-LangChain allows us to code in a vendor agnostic way.
-Both classes, `ChatOpenAI` and `ChatAnthropic` are `BaseChatModel`s.
-We can use [`init_chat_model`](https://reference.langchain.com/python/langchain/chat_models/base/init_chat_model) with the model string to take advantage of this.
-`get_model()` in `llm.py` provides a simple wrapper for that: in our scripts we
-call `get_model()` and it returns the model named by `LLM_MODEL` in `.env`. If
-`LLM_MODEL` isn't set, it fails right away with a message telling you what to
-fix, instead of breaking confusingly later.
-
-We deliberately don't set `temperature`. Recent Anthropic models (Sonnet 5,
-Opus 5 and newer) reject it with a 400, so passing it would break the default
-provider. That means we can't dial in determinism that way, and identical
-prompts can give slightly different answers.
-
-We can use `llm.py` to add anything that is model related later as well.
-
-**Recommendation:** we build models with `get_model()`, not `ChatAnthropic()`,
-`ChatOpenAI()`, or `init_chat_model()` directly.
-
-**Running tests:**
-
-```bash
-uv run pytest          # fast, free, no API calls
-uv run pytest -m live  # really calls the provider, costs money
-```
-
-Anything that reaches a real provider needs `@pytest.mark.live`. Plain
-`uv run pytest` skips those, and so does CI, so no PR ever spends tokens. When
-a test does need a model, pass a fake one in (`FakeListChatModel`) rather than
-importing the real thing, so it stays free and deterministic.
-
-### 3. Keys: `.env.example`, `.gitignore`
-
-`.env.example` is the committed template: variable names, no values. `.env` is
-your own copy with the real keys, and `.gitignore` keeps it out of git.
-
-```bash
-cp .env.example .env  # then paste in your own key
-```
-
-You only need the key for the provider you actually use.
-
-**If a key does get committed**, revoke it in the provider console and generate
-a new one. No need to panic, this repo is private.
-
-### 4. Commit-time checks: `.pre-commit-config.yaml`
-
-These run automatically on `git commit`, against the files you staged.
-As described in the [Quickstart](#quickstart), you set them up as follows:
-
-```bash
-uv run pre-commit install  # once per person, per clone
-```
-
-What runs:
-
-- **ruff** lints and formats our Python.
-- A few cheap safety nets: catch leftover merge conflict markers, check that
-  YAML and TOML still parse, and tidy up whitespace and end-of-file newlines.
-
-**If a commit gets blocked, the hook has usually already fixed the file.** Look
-at what changed, `git add` it, and commit again.
-
-Run everything manually any time, without committing:
-
-```bash
-uv run pre-commit run --all-files
-```
-
-### 5. PR-time checks: `ci.yaml`
-
-Runs on every pull request to `main`, and on `main` itself:
-
-1. **`uv sync --locked`** fails if `uv.lock` is stale
-   (see [environment section](#1-the-environment-pyprojecttoml-uvlock-python-version)).
-2. **`pre-commit run --all-files`** runs the exact same hooks as your machine,
-   which also catches anyone who hasn't run `pre-commit install`.
-3. **Notebook sync** re-runs `jupytext --sync` and fails if that produces a
-   diff, so a committed `.ipynb` and its `.py` can't drift apart.
-4. **`uv run pytest`** skips `live` tests by default (`addopts = "-m 'not live'"`),
-   so a PR never spends tokens. CI also has no API keys, as a second line of defence.
-
-### 6. Notebooks: `notebooks/` and jupytext
-
-We use [jupytext](https://jupytext.org) because `.ipynb` files are JSON
-and their diffs are unreadable.
-That means every notebook in `notebooks/` is paired with a `.py` "percent" twin. The
-`.ipynb` is what you run, the `.py` is what git diffs and what is reviewable.
-
-If you edit notebooks in JupyterLab, jupytext syncs the `.py` on save
-automatically. In VS Code the same holds once you install the extension linked
-in [6.1](#61-how-to-use-jupytext); without it, nothing syncs on its own.
-You can always trigger a sync manually:
-
-```bash
-uv run jupytext --sync notebooks/*.ipynb
-```
-
-**Recommendation: commit the `.py`, not the `.ipynb`.** The `.py` holds the full
-source, so anyone can rebuild a runnable notebook from it:
-
-```bash
-uv run jupytext --sync notebooks/my_notebook.py  # recreates the my_notebook.ipynb
-```
-
-That keeps outputs and unreadable JSON diffs out of Git, and avoids bloating the repo.
-
-**If we do decide to commit an `.ipynb` (e.g., fear of plots not being reproducible etc.),
-it has to be in sync with its `.py`.**
-CI checks exactly that and fails if the two disagree ([PR-time checks](#5-pr-time-checks-ciyaml)).
-
-**Committing rewrites the notebook.** The commit hooks sync your edits into the
-`.py`, let ruff format it, then write the result back into the `.ipynb`. So if
-the notebook is open in Jupyter while you commit, reload it before carrying on.
-Otherwise the stale buffer saves the old, unformatted source back over what the
-hooks just did.
-
-For the same reason, **edit one side at a time**. If both an `.ipynb` and its
-`.py` change before a sync, jupytext keeps whichever was written last and
-silently discards the other. Work in the notebook, or work in the script, and
-sync in between.
-
-#### 6.1 How to use Jupytext
-
-For a quick run, start JupyterLab with:
-
-```bash
-uv run jupyter lab
-```
-
-Right-click a `.py` file and select **Open With > Jupytext Notebook** to run it as a notebook.
-
-For VS Code, install the
-[jupytext extension](https://marketplace.visualstudio.com/items?itemName=congyiwu.vscode-jupytext)
-and right-click the `.py` file and select **Open as a Jupyter Notebook**.
+`main` is protected: branch, open a pull request, let CI run. [CONTRIBUTING.md](https://github.com/JoshuaGloor/dss5105-capstone-project/blob/main/CONTRIBUTING.md) has the rest, with screenshots, and [AGENTS.md](https://github.com/JoshuaGloor/dss5105-capstone-project/blob/main/AGENTS.md) is the same for AI coding agents.
