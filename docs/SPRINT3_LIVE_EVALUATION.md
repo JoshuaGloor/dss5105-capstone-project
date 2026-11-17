@@ -119,6 +119,10 @@ and from reading the saved replies. Paths are relative to the run directory.
 The offline reliability audit in `inbox-review/` scores only provisional expectations.
 It left 9 of the 30 inbox cases as `UNRESOLVED_POLICY` (R01, R03, R06, R10, R15, R16,
 R19, R23, R29), so its rates cover 21 cases and are diagnostics, not gold accuracy.
+Its `summary.json` is committed unchanged as
+[`evidence/inbox-audit-01f2524-summary.json`](evidence/inbox-audit-01f2524-summary.json);
+its SHA-256 is the `summary.json` entry under `inbox_reliability_audit` in the evidence file.
+The per-check `cases.jsonl` and `checks.csv` stay in the team archive.
 
 ## Limitations
 
@@ -140,6 +144,11 @@ into a checkout of `01f2524`, the inbox audit can be regenerated offline:
 ```bash
 uv run --locked --offline python -m dss5105.reliability_score --input results/sprint3-live-01f2524/supplied --kind-labels examples/human_request_kinds_v1.json --output results/independent-inbox-review --html-report
 ```
+
+Re-run on the current tree, this reproduces `cases.jsonl` and `checks.csv` byte for byte
+and every metric in `summary.json`. The summary's recorded SHA-256 of
+`examples/human_request_kinds_v1.json` differs only because the run hashed a CRLF
+checkout of the same file.
 
 On Windows with a non-UTF-8 locale, set `PYTHONUTF8=1` before reading the saved
 source snapshot with Python.
